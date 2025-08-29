@@ -1,0 +1,195 @@
+/**
+ * Typography
+ * =================================
+ * - Base
+ * - Paragraphs
+ * - Headings
+ * - Type sizes
+ * - Misc
+ * - Utilities
+ *
+ * Body font size, leadings etc have been set in _variables.scss
+ *
+ * See http://modularscale.com for
+ *
+ */
+
+@import url('https://fonts.googleapis.com/css2?family=Lato:ital,wght@0,300;0,400;0,700;1,400;1,700&display=swap');
+
+body {
+    // background: #F2F5FA !important;
+    font-family: "Lato", serif !important;
+    
+}
+p {
+    font-size: 12px !important;
+}
+
+.lato-light {
+    font-family: "Lato", serif !important;
+    font-weight: 300 !important;
+    font-style: normal !important;
+}
+
+.lato-regular {
+    font-family: "Lato", serif !important;
+    font-weight: 400 !important;
+    font-style: normal !important;
+}
+
+.lato-medium {
+    font-family: "Lato", serif !important;
+    font-weight: 500 !important;
+    font-style: normal !important;
+}
+
+.lato-semibold, .semibold {
+    font-family: "Lato", serif !important;
+    font-weight: 600 !important;
+    font-style: normal !important;
+}
+
+.lato-bold {
+    font-family: "Lato", serif !important;
+    font-weight: 700 !important;
+    font-style: normal !important;
+}
+
+.poppins-extrabold {
+    font-family: "Lato", serif !important;
+    font-weight: 800 !important;
+    font-style: normal !important;
+}
+
+/**
+ * Quotes
+ */
+sub,
+sup {
+    font-size: 75%;
+    line-height: 0;
+    position: relative;
+    vertical-align: baseline;
+}
+
+sup {
+    top: -0.5em;
+}
+
+sub {
+    bottom: -0.25em;
+}
+.underline {
+    text-decoration: underline;
+}
+
+
+/**
+ * Utilities
+ */
+.text-center {
+    text-align: center;
+}
+
+.text-left {
+    text-align: left;
+}
+
+.text-right {
+    text-align: right;
+}
+
+.text-black {
+    color: $black;
+}
+
+.text-white {
+    color: $white;
+}
+
+.text-blue {
+    color: $primary;
+}
+
+.text-gray {
+    color: #777777;
+}
+
+.text-red {
+    color: $vermilion;
+}
+
+.font-16 {
+    font-size: 16px !important;
+}
+
+.font-14 {
+    font-size: 14px !important;
+}
+
+.font-12 {
+    font-size: 12px !important;
+}
+
+.font-13 {
+    font-size: 13px !important;
+}
+
+.font-10 {
+    font-size: 10px !important;
+}
+
+.font-18 {
+    font-size: 18px !important;
+}
+
+.font-20 {
+    font-size: 20px !important;
+}
+.font-22 {
+    font-size: 22px !important;
+}
+
+.font-26 {
+    font-size: 26px !important;
+}
+
+.font-32 {
+    font-size: 32px !important;
+}
+
+h1,
+h2,
+h3,
+h4,
+h5,
+h6,
+p,
+input,
+button,
+body,
+a {
+    font-family: "Lato", serif !important;
+}
+
+.MuiInputLabel-formControl {
+    font-size: 12px !important;
+    font-family: "Lato", serif !important;
+}
+
+.title {
+    font-size: 18px;
+    margin-bottom: 10px;
+    @extend .lato-medium;
+}
+
+.inner-navi-list {
+    text-decoration: none !important;
+
+    &:hover {
+        text-decoration: none !important;
+    }
+}
+.nowrap {
+    white-space: nowrap;
+}

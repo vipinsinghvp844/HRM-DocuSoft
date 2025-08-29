@@ -66,15 +66,13 @@ function App() {
     setUserId(id);
     localStorage.setItem("user", JSON.stringify({ roles: [role], id }));
   };
-  // const userId = localStorage.getItem("user_id")
   const handleLogout = () => {
-    setUserRole(null); // Reset user role
-    setUserId(null); // Reset user id
-    localStorage.removeItem("user"); // Clear user from local storage
+    setUserRole(null); 
+    setUserId(null); 
+    localStorage.removeItem("user");
   };
 
   useEffect(() => {
-    // Check if user data exists in localStorage
     const storedUser = localStorage.getItem("user");
     if (storedUser) {
       try {

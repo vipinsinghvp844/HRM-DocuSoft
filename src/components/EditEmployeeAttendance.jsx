@@ -2,7 +2,7 @@ import React, { useState, useEffect } from "react";
 import { Form, Button, Container } from "react-bootstrap";
 import axios from "axios";
 import { useDispatch, useSelector } from "react-redux";
-import { GetTotalUserAction } from "../../redux/actions/EmployeeDetailsAction";
+import { GetAttendanceDataActionByDate, GetTotalUserAction } from "../../redux/actions/EmployeeDetailsAction";
 import { toast } from "react-toastify";
 
 const EditEmployeeAttendance = () => {
@@ -155,6 +155,7 @@ const EditEmployeeAttendance = () => {
           })
         )
       );
+      const response = await dispatch(GetAttendanceDataActionByDate());
       toast.success(`${updatedTypes.join(", ")} Attendance updated successfully!`);
     } catch (error) {
       console.error("Error updating attendance", error);

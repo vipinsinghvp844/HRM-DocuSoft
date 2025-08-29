@@ -1,0 +1,116 @@
+select:focus,
+.form-control:focus {
+    box-shadow: none;
+}
+
+.form-control,
+.form-select,
+.textarea {
+    border: 1px solid rgba(0, 0, 0, 0.23);
+    border-radius: 3px;
+    font-size: 14px;
+    height: 34px;
+}
+
+.form-control:focus,
+.form-select:focus,
+.textarea:focus {
+    box-shadow: none;
+}
+
+.textarea {
+    padding: 15px;
+    height: 70px;
+    resize: none;
+    border-radius: 5px;
+    width: 100%;
+}
+
+.textarea:focus {
+    outline: none;
+}
+
+.textarea-2 {
+    min-height: 130px !important;
+}
+
+.textarea-text {
+    padding: 0;
+    border: 0;
+}
+
+input,
+.form-select {
+    font-size: 14px !important;
+}
+
+.input-text,
+.input-text:focus {
+    display: inline-block;
+    border: 0px;
+    width: 100%;
+    box-shadow: none;
+    outline: none;
+    /* padding: 0 5px; */
+    font-size: 14px !important;
+}
+
+.resize-none {
+    resize: none;
+}
+
+.search-input {
+    position: relative;
+    background: $white;
+    border-radius: 4px;
+
+    svg {
+        position: absolute;
+        top: 9px;
+        right: 10px;
+        font-size: 20px;
+        color: #9b9b9b;
+    }
+}
+
+.css-1d3z3hw-MuiOutlinedInput-notchedOutline {
+    border-color: rgb(0 0 0 / 10%) !important;
+}
+
+.file-upload {
+    position: relative;
+
+    label {
+        border: 2px dashed #f1f1f1;
+        padding: 20px;
+        display: block;
+        width: 100%;
+        cursor: pointer;
+        font-size: 14px;
+        border-radius: 2px;
+        background-color: $white;
+    }
+
+    input {
+        position: absolute;
+        opacity: 0;
+        visibility: hidden;
+    }
+}
+
+.custom-date-2 {
+    input {
+        padding-top: 0px !important;
+        padding-bottom: 0px !important;
+    }
+}
+.custom-checkbox .MuiTypography-root {
+    font-size: 13px;
+    font-weight: 500;
+}
+
+@media only screen and (max-width: 767px) {
+    .search-input.css-n8sbe2 {
+        width: 213px;
+    }
+}

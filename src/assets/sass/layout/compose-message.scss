@@ -1,0 +1,113 @@
+.compose-message {
+    position: fixed;
+    right: 15px;
+    top: 50px;
+    background: #fff;
+    height: auto;
+    max-height: 82vh;
+    overflow: auto;
+    border: 1px solid #4780FF;
+    width: 30%;
+    border-bottom: 1;
+    border-radius: 4px 4px 0 0;
+    z-index: 999;
+
+    .modal-head {
+        border-bottom: 2px solid #f1f1f1;
+        margin-bottom: 20px;
+        background: #4780FF;
+        color: #fff;
+
+        button {
+            color: $black;
+
+            &:hover {
+                background: transparent;
+            }
+        }
+
+    }
+
+    .compose-editor .tox.tox-tinymce {
+        height: 200px !important;
+    }
+
+    .compose-attachments {
+        width: 100%;
+        max-height: 100px;
+        overflow: auto;
+        display: flex;
+        flex-wrap: wrap;
+        margin-bottom: 10px;
+    }
+}
+
+.main-email-attachment {
+    .email-attachment {
+        text-align: center;
+        border: 1px solid #f1f1f1;
+        // padding: 18px 14px;
+        margin-right: 10px;
+        border-radius: 4px;
+        position: relative;
+        cursor: pointer;
+        width: 40%;
+        display: flex;
+
+        p {
+            word-break: break-all;
+        }
+
+        img {
+            margin-bottom: 10px;
+            margin-top: 10px;
+            margin-left: 5px;
+        }
+    }
+
+    .download {
+        position: absolute;
+        right: 2px;
+        top: 0;
+        bottom: 0;
+        margin: auto;
+        display: flex;
+        align-items: center;
+    }
+}
+
+.compose-editor .dx-toolbar.dx-toolbar-multiline .dx-toolbar-items-container{
+    display: flex;
+    flex-wrap: nowrap;
+    overflow: auto;
+}
+
+@media only screen and (max-width:1024px) {
+    .compose-message {
+        overflow: hidden;
+        width: 45%;
+        max-height: 90vh;
+    }
+
+    .main-email-attachment .email-attachment {
+        width: 48%;
+    }
+
+
+}
+
+@media only screen and (max-width:576px) {
+    .compose-message {
+        overflow: auto;
+        width: 65%;
+        max-height: 90vh;
+        overflow: auto;
+    }
+
+    .main-email-attachment .email-attachment {
+        width: 100% !important;
+    }
+
+
+
+}

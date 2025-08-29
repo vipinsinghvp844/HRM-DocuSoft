@@ -1,9 +1,12 @@
 .sidebar-container {
-  background-color: #f8f9fa;
-  padding: 10px 0px 0px 0px;
+  background: #ffffff;
+  padding: 15px 0 0 0;
   height: 100vh;
-  width: 250px;
-  overflow: auto;
+  width: 260px;
+  overflow-y: auto;
+  border-right: 1px solid #e9ecef;
+  box-shadow: 2px 0 8px rgba(0, 0, 0, 0.05);
+  transition: width 0.3s ease;
 }
 .sidebar-container:hover {
   overflow-x: hidden;
@@ -12,7 +15,7 @@
   width: 5px;
 }
 ::-webkit-scrollbar-thumb {
-  background: rgba(255, 0, 0, 0.493);
+  background: rgba(220, 53, 69, 0.6);
   border-radius: 10px;
 }
 .sidebar-container img {
@@ -55,33 +58,45 @@ h2 {
 
 .sidebar {
   padding: 5px;
-  background-color: #ffffff;
-  border-radius: 10px;
-  /* overflow-y: hidden; */
+  background: #fafafa;
+  border-radius: 12px;
+  width: 250px;
 }
 
 .nav-link {
-  color: #495057;
+color: #495057;
   font-size: 15px;
   font-family: "Poppins", sans-serif;
-  font-weight: 600;
+  font-weight: 500;
+  padding: 5px 15px;
+  margin: 2px 0px;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  border-radius: 8px;
+  transition: all 0.25s ease;
+  width: 100%;
 }
 
 .nav-link:hover {
-  background-color: #9e2950;
-  border-radius: 5px;
-  color: white;
+   background-color: #9e2950;
+  color: #fff;
+  transform: translateX(4px);
+  box-shadow: 0 2px 6px rgba(158, 41, 80, 0.3);
 }
 
 .sidebar i.bi {
-  margin-right: 7px;
-  background-color: white;
-  padding: 5px;
-  border-radius: 10px;
+   font-size: 16px;
+  background: #f1f1f1;
+  padding: 6px;
+  border-radius: 8px;
+  color: #9e2950;
+  transition: all 0.3s ease;
 }
 
 .nav-link:hover i.bi {
-  color: red;
+  background: #fff;
+  color: rgb(226, 98, 12);
 }
 .sidebar-logo img {
   max-width: 100%;
@@ -113,16 +128,28 @@ span .badge .bg-danger{
 .sidebar.nav .nav-link{
   width: 100%;
 }
-/* @media (min-width: 768px) {
-    .mobilechatsidebar {
-        flex: 0 0 auto;
-        width: 40%;
-    }
-} */
-/* @media (min-width: 768px){
-  .mobilschatwindow{
-    flex: 0 0 auto;
-    width: 60%;
-  }
-} */
+/*active side bar navlink*/
+
+/* * Active Link */
+.sidebar .nav-link.active {
+  background: linear-gradient(90deg, #dc3545, #9e2950);
+  color: #fff;
+  font-weight: 600;
+  box-shadow: 0 3px 10px rgba(220, 53, 69, 0.3);
+}
+
+.sidebar .nav-link.active i.bi {
+  background: #fff;
+  color: #dc3545;
+}
+
+/* Badge */
+.badge.bg-danger {
+  background: #9e2950 !important;
+  font-weight: bold;
+  font-size: 12px;
+  padding: 4px 8px;
+  border-radius: 12px;
+}
+
  

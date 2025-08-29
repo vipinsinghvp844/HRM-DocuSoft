@@ -126,6 +126,7 @@ export const ProfilePicUpdateAction = (file) => async (dispatch) => {
       }
     );
     // console.log(response, "=====ProfilePicUpdateAction");
+console.log(response.data,"check");
 
     if (response?.data) {
       dispatch(UserProfilePicReduser(response.data.url));

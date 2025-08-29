@@ -1,14 +1,24 @@
 import React, { useEffect, useState } from "react";
 import { Nav, Container, Offcanvas, Button } from "react-bootstrap";
-import { Link } from "react-router-dom";
+import { NavLink } from "react-router-dom";
 import axios from "axios";
 import "./Sidebar.css"; // Import custom CSS for styling
+import { GetAttendanceDataActionByDate } from "../../redux/actions/EmployeeDetailsAction";
+import { useDispatch } from "react-redux";
+
 
 const Sidebar = ({ userRole, pendingCount }) => {
   const [userStatus, setUserStatus] = useState("active");
   const [show, setShow] = useState(false);
   const userId = localStorage.getItem("user_id");
+  const dispatch = useDispatch();
 
+  useEffect(() => {
+    const fetchTodayAtt = async () => {
+    const response = await dispatch(GetAttendanceDataActionByDate());
+    }
+    fetchTodayAtt();
+  })
   useEffect(() => {
     const fetchUserStatus = async () => {
       try {
@@ -188,9 +198,12 @@ const Sidebar = ({ userRole, pendingCount }) => {
     (sidebarItems[userRole] || []).map(({ to, icon, label, badge }, index) => (
       <Nav.Link
         key={`${to}-${index}`}
-        as={Link}
+        as={NavLink}
         to={to}
         onClick={handleNavClick}
+        className={({ isActive }) =>
+          isActive ? "active nav-link" : "nav-link"
+        }
       >
         <i className={`bi ${icon}`}></i> {label}
         {badge && <span className="badge bg-danger">{badge}</span>}

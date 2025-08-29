@@ -8,15 +8,15 @@ import "./ManageYourAccount.css";
 import { useDispatch, useSelector } from "react-redux";
 import { ProfilePicUpdateAction } from "../../redux/actions/dev-aditya-action";
 import getCroppedImg from "./cropImageHelper.jsx";
+import imageCompression from "browser-image-compression";
+import { compressImage } from "./compressImage.jsx";
 
 const ManageYourAccount = () => {
-  const [profileImage, setProfileImage] = useState("");
   const { loginUserProfile, loginUserData } = useSelector(
     ({ AllReducers }) => AllReducers
   );
   const dispatch = useDispatch();
  const placeholderImage = import.meta.env.VITE_PLACEHOLDER_IMAGE;
-  const [selectedFile, setSelectedFile] = useState(null);
   const [activeTab, setActiveTab] = useState("Personal Info");
   const user_name = localStorage.getItem("user_name");
 
@@ -42,27 +42,45 @@ const ManageYourAccount = () => {
         setShowCropModal(true);
       }
      
-      // const response = await dispatch(ProfilePicUpdateAction(file));
-      // // console.log(response, "====response 1212121");
-
-      // if (response?.data) {
-      //   setLoading(false);
-      // }
     }
   };
-  const handleCropConfirm = async (event) => { 
-    setLoading(true);
-    const croppedImage = await getCroppedImg(selectedImage, croppedAreaPixels);
-    setShowCropModal(false);
+const handleCropConfirm = async () => {
+  setLoading(true);
+  try {
+    const croppedDataUrl = await getCroppedImg(
+      selectedImage,
+      croppedAreaPixels
+    );
 
-    const blob = await fetch(croppedImage).then((res) => res.blob());
-    const file = new File([blob], "cropped_image.jpg", { type: "image.jpeg" });
+    const blob = await fetch(croppedDataUrl).then((res) => res.blob());
+    let file = new File([blob], "profile.jpg", { type: "image/jpeg" });
 
-    const response = await dispatch(ProfilePicUpdateAction(file));
-    if (response?.data) {
-      setLoading(false);
+    try {
+      file = await compressImage(file, { maxWidth: 1024, quality: 0.72 });
+      
+    } catch (e) {
+      console.warn(
+        "Canva compression failed, using image-compression fallback:",
+        e
+      );
+      file = await imageCompression(file, {
+        maxSizeMB: 1, 
+        maxWidthOrHeight: 1024,
+        useWebWorker: false, 
+        initialQuality: 0.72,
+      });
     }
+
+
+    const res = await dispatch(ProfilePicUpdateAction(file));
+  
+  } catch (err) {
+    console.error("Crop/Compress/Upload error:", err);
+  } finally {
+    setLoading(false);
+    setShowCropModal(false);
   }
+};
 
   const renderTabContent = () => {
     switch (activeTab) {
