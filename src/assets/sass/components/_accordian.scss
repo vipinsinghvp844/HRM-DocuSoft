@@ -1,0 +1,188 @@
+// .main-accordian.main-accordian-single-row {
+//     -moz-column-count: 1;
+//     -webkit-column-count: 1;
+//     column-count: 1;
+// }
+
+// .main-accordian {
+//     -moz-column-count: 3;
+//     -webkit-column-count: 3;
+//     column-count: 3;
+// }
+
+.main-accordian {
+    .accordian-box {
+        // page-break-inside: avoid;
+        // break-inside: avoid-column;
+        margin-bottom: 10px;
+        box-shadow: 0 2px 0px #e2e0e0;
+        border-radius: 6px;
+        outline: none !important;
+        border: 1px solid #f1f1f1;
+        width: 100%;
+    }
+
+    .accordian-box:before {
+        display: none;
+    }
+
+    .table {
+        tbody {
+            tr {
+                th {
+                    padding: 5px 5px 5px 0;
+                }
+
+                td {    
+                    text-align: right;
+                    color: #878787;
+                    padding: 5px 5px 5px 0;
+                }
+
+                .table {
+                    font-size: 12px;
+                    width: 100%;
+                    margin: 0;
+                }
+            }
+        }
+    }
+
+    .accordian-box {
+        &.Mui-expanded {
+            border-color: rgb(1 98 232 / 10%);
+
+            .MuiButtonBase-root .MuiAccordionSummary-content {
+                margin: 0px !important;
+                align-items: center;
+            }
+
+            .MuiButtonBase-root.Mui-expanded {
+                background: rgb(1 98 232 / 10%);
+                color: $primary;
+                min-height: 50px;
+            }
+
+            .MuiButtonBase-root p {
+                color: $primary;
+            }
+
+            .MuiButtonBase-root svg {
+                // color: $white;
+            }
+        }
+
+        // &.expired.Mui-expanded {
+
+        //         .MuiButtonBase-root.Mui-expanded {
+        //             background: blue;
+
+        //     }
+        // }
+
+        .table-responsive {
+            max-height: 284px;
+            overflow: auto;
+        }
+    }
+
+    &.main-accordian-2 {
+        -moz-column-count: 3;
+        -webkit-column-count: 3;
+        column-count: 3;
+
+        .accordian-box {
+            page-break-inside: avoid;
+            break-inside: avoid-column;
+        }
+    }
+}
+
+.chips {
+    color: $white !important;
+    // margin-left: 20px;
+    border: 1px solid #fff;
+}
+
+.request-details-accordian .main-accordian .accordian-box.Mui-expanded .MuiButtonBase-root p,
+.request-details-accordian .main-accordian .accordian-box.Mui-expanded .MuiButtonBase-root.Mui-expanded svg {
+    color: #000;
+}
+
+.request-details-accordian .main-accordian .accordian-box {
+    border: 1px solid;
+    border-radius: 2px;
+}
+
+// expired
+.main-accordian.expired .accordian-box.Mui-expanded .MuiButtonBase-root.Mui-expanded,
+.main-accordian.expired .accordian-box .MuiAccordionSummary-root {
+    background: #ffe1e3;
+}
+
+.main-accordian.expired .accordian-box {
+    border-color: #a6272d;
+}
+
+// pending
+.main-accordian.pending .accordian-box.Mui-expanded .MuiButtonBase-root.Mui-expanded,
+.main-accordian.pending .accordian-box .MuiAccordionSummary-root {
+    background: #fff5e2;
+    color: #d58b00;
+}
+
+.main-accordian.pending .accordian-box {
+    border-color: #eea706;
+}
+
+// approved
+.main-accordian.approved .accordian-box.Mui-expanded .MuiButtonBase-root.Mui-expanded,
+.main-accordian.approved .accordian-box .MuiAccordionSummary-root {
+    background: #ecffec;
+    color: #005a00;
+}
+
+.main-accordian.approved .accordian-box {
+    border-color: #008000;
+}
+
+// expiring
+.main-accordian.expiring .accordian-box.Mui-expanded .MuiButtonBase-root.Mui-expanded,
+.main-accordian.expiring .accordian-box .MuiAccordionSummary-root {
+    background: #fff1f1;
+    color: #ab0000;
+}
+
+.main-accordian.expiring .accordian-box {
+    border-color: #FF0000;
+}
+
+// rejected
+.main-accordian.rejected .accordian-box.Mui-expanded .MuiButtonBase-root.Mui-expanded,
+.main-accordian.rejected .accordian-box .MuiAccordionSummary-root {
+    background: #e6f6ff;
+    color: #005585;
+}
+
+.main-accordian.rejected .accordian-box {
+    border-color: #195e83;
+}
+
+.request-details-accordian .MuiAccordionDetails-root {
+
+    padding: 0;
+}
+
+.main-accordian .accordian-box.Mui-expanded .MuiButtonBase-root.Mui-expanded #basic-button svg {
+    color: #fff !important;
+}
+.main-accordian .accordian-box .css-eqpfi5-MuiAccordionSummary-content{
+    align-items: center;
+}
+
+.main-accordian .accordian-box .Mui-expanded .MuiButtonBase-root{
+    background: transparent;
+}
+.main-accordian .accordian-box .Mui-expanded svg{
+    color: #000 !important;
+}

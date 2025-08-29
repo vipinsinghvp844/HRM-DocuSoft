@@ -1,0 +1,1150 @@
+.font-10 {
+    font-size: 10px !important;
+}
+
+.font-12 {
+    font-size: 12px !important;
+}
+
+.font-14 {
+    font-size: 14px !important;
+}
+
+.font-16 {
+    font-size: 16px !important;
+}
+
+.font-18 {
+    font-size: 18px !important;
+}
+
+.font-20 {
+    font-size: 20px !important;
+}
+
+.font-22 {
+    font-size: 22px !important;
+}
+
+.font-24 {
+    font-size: 24px !important;
+}
+
+
+.custom-toaster {
+    position: fixed;
+    right: 5px;
+    top: 5px;
+    max-width: 400px;
+}
+
+.card {
+    border-color: #f1f1f1;
+}
+
+.white-box {
+    // background: $white;
+    // box-shadow: 0 0 10px #f3f1f1;
+    // border-radius: 5px;
+    // padding: 20px;
+    // margin-bottom: 20px;
+}
+
+.no-data-found {
+    background: $white;
+    padding: 50px;
+    min-height: calc(100vh - 290px);
+    margin-top: 10px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    border-radius: 6px;
+    width: calc(100%);
+    margin: 10px auto 0;
+}
+
+.no-data-found img {
+    max-width: 400px;
+}
+
+.Toastify {
+    /* position: absolute; */
+    z-index: 999999;
+}
+
+.swal2-container.swal2-center.swal2-backdrop-show {
+    z-index: 9999 !important;
+}
+
+.green {
+    color: green;
+}
+
+.relative {
+    position: relative;
+}
+
+.Toastify__toast-container--top-right {
+    margin-top: 46px;
+}
+
+.pointer {
+    cursor: pointer;
+}
+
+.pointer-table {
+    tbody {
+        tr {
+            td {
+                cursor: pointer;
+            }
+        }
+    }
+}
+
+.addition-icon {
+    p {
+        svg {
+            width: 20px;
+            margin-right: 8px;
+        }
+    }
+}
+
+.min-width-auto {
+    min-width: initial !important;
+}
+
+.min-h-auto {
+    min-height: auto !important;
+}
+
+.bg-returned {
+    background-color: #de6a22 !important;
+}
+
+.box.overview-status {
+    // background: url(/images/app/invites/eye-solid.png) 100% 100% no-repeat;
+}
+
+.bg-rejected {
+    background-color: #f96868 !important;
+}
+
+.bg-accepted {
+    background-color: #87af58 !important;
+}
+
+.bg-red {
+    background-color: #d42027 !important;
+}
+
+.chips-warning {
+    background-color: #fff0f0 !important;
+    color: #e74448 !important;
+    font-weight: 500;
+    border: 1px solid #ffc3c5 !important;
+}
+
+.chips-accepted {
+    background-color: #e3ffdb !important;
+    color: #24a700 !important;
+    font-weight: 500;
+    border: 1px solid #adff95 !important;
+}
+
+.custom-progress {
+    // width: 300px;
+    // width: 100%;
+    // max-width: 600px;
+    // text-align: center;
+    // color: $white;
+    // font-size: 12px;
+}
+
+.inner-custom-progress {
+    padding: 8px 5px;
+    width: 100%;
+}
+
+.custom-progress {
+    min-width: 200px;
+    text-align: center;
+    color: #fff;
+    font-size: 12px;
+
+    .inner-custom-progress.pending {
+        background: #e8c723;
+        // width: 30%;
+    }
+
+    .inner-custom-progress.accept {
+        background: #87af58;
+        // width: 50%;
+    }
+
+    .inner-custom-progress.returned {
+        background: #de6a2f;
+        // width: 30%;
+    }
+
+}
+
+#vertical-tabpanel-1 {
+    overflow: auto;
+}
+
+#vertical-tabpanel-0 {
+    overflow: auto;
+}
+
+// jayprakash Gurjar 
+
+.hending-text {
+    font-size: 14px;
+    color: #555;
+    font-weight: 700;
+    text-transform: capitalize;
+}
+
+.loader {
+    width: 20px;
+    height: 20px;
+    border: 5px dotted $white;
+    border-radius: 50%;
+    display: inline-block;
+    position: relative;
+    box-sizing: border-box;
+    animation: rotation 2s linear infinite;
+    background: #f7f7f7;
+
+}
+
+@keyframes rotation {
+    0% {
+        transform: rotate(0deg);
+    }
+
+    100% {
+        transform: rotate(360deg);
+    }
+}
+
+.Request_Detailas {
+
+    margin-top: 5px;
+    color: #616161;
+    font-size: 12px;
+    font-weight: 550;
+}
+
+.tox.tox-silver-sink.tox-tinymce-aux,
+.tox .tox-statusbar {
+    display: none !important;
+}
+
+.paragraph_heding {
+    //  padding-bottom: 15px;
+    padding-top: 15px;
+}
+
+.custom-cursor {
+    cursor: url('https://www.svgrepo.com/show/42233/pencil-edit-button.svg'), auto;
+}
+
+// stepper
+
+.step-form {
+
+    .MuiStep-root.MuiStep-horizontal.css-1bw0nnu-MuiStep-root {
+        border: 1px solid $LightGray;
+        padding: 3px 20px;
+        width: 22%;
+        text-align: left;
+        font-weight: 800;
+        border-radius: 3px;
+        position: relative;
+
+        &:after,
+        &:before {
+            width: 0px;
+            height: 0px;
+            position: absolute;
+            content: '';
+        }
+
+        &:after {
+            border-left: 14px solid $white;
+            border-top: 16px solid transparent;
+            border-bottom: 14px solid transparent;
+            right: -13px;
+            top: 0px;
+            z-index: 1;
+        }
+
+        &:before {
+            border-left: 17px solid $LightGray;
+            border-top: 17px solid transparent;
+            border-bottom: 16px solid transparent;
+            position: absolute;
+            right: -16px;
+            top: -1px;
+        }
+
+        svg {
+            font-size: 16px;
+        }
+    }
+        @media only screen and (max-width: 1024px) {
+    
+    
+            .MuiStep-root.MuiStep-horizontal.css-1bw0nnu-MuiStep-root:after {
+                border-left: 0px !important;
+                border-top: 0px !important;
+                border-bottom: 0px !important;
+    
+            }
+    
+            .MuiStep-root.MuiStep-horizontal.css-1bw0nnu-MuiStep-root:before {
+                border-left: 0px !important;
+                border-top: 0px !important;
+                border-bottom: 0px !important;
+    
+            }
+    
+            .MuiStep-root.MuiStep-horizontal.css-1bw0nnu-MuiStep-root {
+                width: 30% !important;
+            }   }
+}
+
+.step-form .MuiStep-root.MuiStep-horizontal.Mui-completed.css-1bw0nnu-MuiStep-root {
+    border: 1px solid #4780FF;
+    /* background: #6177fa; */
+    color: $white;
+    position: relative;
+
+    &:before {
+        border-left: 17px solid #4780FF;
+    }
+}
+
+.css-1u4zpwo-MuiSvgIcon-root-MuiStepIcon-root.Mui-completed {
+    color: #4780FF !important;
+}
+
+hr {
+    border-color: #ababab;
+}
+
+// .MuiPaper-root.MuiPaper-elevation.MuiPaper-rounded.MuiPaper-elevation24.MuiDialog-paper.MuiDialog-paperScrollPaper.MuiDialog-paperWidthSm.css-1t1j96h-MuiPaper-root-MuiDialog-paper {
+//     width: 1100px;
+//     max-width: 100%;
+// }
+
+.client-img {
+    width: 90px;
+    min-width: 90px;
+    height: 90px;
+    overflow: hidden;
+    border-radius: 90px;
+    margin: 0 auto 22px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    position: relative;
+}
+
+.client-img img {
+    height: 90px;
+}
+
+.client-img {
+    width: 90px;
+    min-width: 90px;
+    height: 90px;
+    overflow: hidden;
+    border-radius: 90px;
+    margin: 0 auto 22px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    position: relative;
+}
+
+.country-flage img {
+    width: 20px;
+    height: 20px;
+}
+
+.country-flage {
+    width: 20px;
+    height: 20px;
+    border-radius: 90px;
+    /* position: absolute; */
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    position: absolute;
+    left: 2px;
+    top: 6px;
+    border: 2px solid #fff;
+    overflow: hidden;
+}
+
+.client-img img {
+    height: 90px;
+}
+
+.user-register {
+    position: absolute;
+    right: 0;
+    bottom: 32px;
+    color: #557ff7;
+    background: #fff;
+    border-radius: 90px;
+}
+
+.contact-availability .contact-availability-box {
+    font-size: 14px;
+    /* background: #239500; */
+    /* padding: 10px 20px 10px 15px; */
+    border-radius: 3px;
+    margin: 5px;
+    color: #fff;
+    display: flex;
+    align-items: center;
+    /* width: 140px; */
+    margin-bottom: 8px;
+    text-align: center;
+    justify-content: center;
+    border: 1px solid #239500;
+    color: #239500;
+    width: calc(50% - 10px);
+    padding: 9px;
+}
+
+.contact-availability .contact-availability-box svg {
+    margin-right: 6px;
+    font-size: 14px;
+}
+
+.contact-availability .contact-availability-box h5 {
+    font-size: 12px;
+    font-weight: 500;
+}
+
+.contact-availability .contact-availability-box.inactive {
+    border-color: #d2d2d2;
+    color: #d2d2d2;
+}
+
+
+.contact-detail-row {
+    display: flex;
+    text-align: center;
+    justify-content: space-between;
+}
+
+.contact-detail-row .contact-detail-box {
+    width: 100%;
+    background: #ecf2ff;
+    margin-right: 10px;
+    border-radius: 3px;
+    padding: 20px 10px;
+    color: #5d87ff;
+}
+
+.contact-detail-row .contact-detail-box:last-child {
+    margin-right: 0px;
+}
+
+.contact-detail-row .contact-detail-box:nth-child(2) {
+    background: #fef5e5;
+    color: #ffae1f;
+}
+
+.contact-detail-row .contact-detail-box:nth-child(3) {
+    background: #e8f7ff;
+    color: #49beff;
+}
+
+.contact-detail-row .contact-detail-box:nth-child(4) {
+    background: #fdede8;
+    color: #fa896b;
+}
+
+.contact-detail-row .contact-detail-box:nth-child(5) {
+    background: #fef4e5;
+    color: #d07f06;
+}
+
+
+.contact-detail-row .contact-detail-box svg {
+    font-size: 46px;
+    margin-bottom: 20px;
+}
+
+.contact-detail-row .contact-detail-box h4 {
+    font-size: 16px;
+    font-weight: 500;
+}
+
+.contact-detail-row .contact-detail-box span {
+    font-size: 20px;
+    margin-bottom: 0;
+    font-weight: 600;
+}
+
+.subscribe-box {
+    position: absolute;
+    right: 0;
+    left: 0;
+    background: rgb(0 0 0 / 70%);
+    height: 100%;
+    z-index: 1;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    padding: 15px;
+    color: #fff;
+    border-radius: 4px;
+}
+
+.well-box {
+    background: #F2F5FA;
+    padding: 20px;
+    margin: 0;
+}
+
+.editor-height-200 {
+    .tox.tox-tinymce {
+        height: 200px !important;
+    }
+}
+
+// Pagination added by 3 jun added by ritesh
+.pagination {
+    display: flex;
+    list-style: none;
+    padding: 0;
+}
+
+.pagination li {
+    margin: 0 5px;
+}
+
+.pagination button {
+    padding: 5px 10px;
+}
+
+.pagination .active button {
+    background-color: #007bff;
+    color: white;
+    border: none;
+}
+
+// End Pagination added by 3 jun
+
+.single-user-comments {
+    max-height: 400px;
+    overflow: auto;
+}
+
+.custom-tabs-list {
+    background: #fff;
+}
+
+.custom-tabs-list {
+    ul li {
+        border-bottom: 1px solid #f1f1f1;
+        transition: .5s all ease;
+
+        &:hover {
+            background-color: #d42027;
+            color: #fff;
+
+            svg {
+                color: #fff;
+            }
+        }
+    }
+}
+
+.custom-tabs-box {
+
+    ul {
+        display: flex;
+        flex-wrap: wrap;
+        border-left: 1px solid #f1f1f1;
+        border-top: 1px solid #f1f1f1;
+
+        li {
+            // width: 240px;
+            display: flex;
+            flex-direction: column;
+            text-align: center;
+            padding: 15px 10px !important;
+            border-right: 1px solid #f1f1f1;
+            border-bottom: 1px solid #f1f1f1;
+            align-items: center;
+            justify-content: center;
+
+            .file-details-dropdown {
+                position: absolute;
+                right: 5px;
+                top: 5px;
+            }
+        }
+    }
+}
+
+.expiring-box {
+    background: rgba(1, 98, 232, 0.1);
+    padding: 11px;
+    border-radius: 3px;
+    color: #4780FF;
+
+    svg {
+        margin-right: 7px;
+    }
+}
+
+.custom-pagination {
+    .MuiPagination-ul {
+        li {
+            .MuiButtonBase-root {
+                background: #fff;
+                border-color: #f3f3f3;
+                color: #333333;
+
+                &.Mui-selected,
+                &:hover {
+                    background: $vermilion;
+                    border-color: $vermilion;
+                    color: $white;
+                }
+            }
+        }
+    }
+}
+
+.main-details-box {
+    &.pending {
+        border: 1px solid #eea706;
+        // background: #fffdf7;
+    }
+
+    &.approved {
+        border: 1px solid #009100;
+        // background: #f6fff6;
+    }
+
+    &.rejected {
+        border: 1px solid $vermilion;
+        // background: #f6fff6;
+    }
+
+    &.rejected,
+    &.expiring {
+        border: 1px solid $vermilion;
+        // background: #f6fff6;
+    }
+
+    .details-box-row {
+        .details-box {
+            // border-right: 1px solid #f1f1f1;
+            padding-right: 8px;
+            // padding-left: 10px;
+            margin-bottom: 10px;
+
+            &:first-child {
+                padding-left: 0px;
+            }
+
+            &:last-child {
+                border-right: 0px;
+            }
+
+            text-align: center;
+
+            p {
+                font-size: 13px;
+            }
+        }
+    }
+}
+
+.profile-box {
+    border-radius: 20px 20px 0 0;
+    overflow: hidden;
+
+    .user-profile-img {
+        position: relative;
+        top: -45px;
+
+        @media only screen and (max-width: 767px) {
+            top: -20px;
+        }
+    }
+
+    .inner-user-profile-img {
+        /* background: red; */
+        width: 68px;
+        height: 68px;
+        cursor: pointer;
+        margin: 0 auto;
+        border-radius: 90px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        background: #ff4e63;
+        background: -webkit-linear-gradient(to top, #0ABFBC, #FC354C);
+        background: linear-gradient(to top, #4094ff, #ff4e63);
+        position: relative;
+
+        .profile-flat {
+            width: 22px;
+            height: 22px;
+            position: absolute;
+            top: 10px;
+            left: 0;
+            border: 1px solid #d42027;
+            border-radius: 90px;
+        }
+
+        .MuiAvatar-circular {
+            background: #fff;
+            color: #4780FF;
+            font-size: 28px;
+            font-family: "Lato", serif !important;
+            font-weight: 600 !important;
+        }
+    }
+}
+
+.contact-list li {
+    display: flex;
+
+    span {
+        padding: 4px 0;
+        font-size: 13px;
+
+        svg {
+            margin-right: 5px;
+            color: $primary;
+            font-size: 16px;
+        }
+    }
+}
+
+.table-toggle-btn {
+    // position: absolute;
+    // top: -54px;
+    // right: 0;
+    // background: #fff;
+}
+
+.table-toggle-btn .MuiButtonBase-root {
+    padding: 3px;
+}
+
+.search-area {
+    position: absolute;
+    right: 0;
+    top: -50px;
+    width: 100%;
+    justify-content: end;
+    max-width: 800px;
+
+    @media only screen and (max-width:1024px) {
+        position: static;
+        right: 0;
+        top: -5px;
+        width: 100%;
+        justify-content: flex-start;
+        max-width: 600px;
+        margin-top: 0px !important;
+
+    }
+
+    @media only screen and (max-width:767px) {
+        position: relative;
+        right: 0;
+        top: -5px;
+        width: 100%;
+        justify-content: flex-start;
+        max-width: 600px;
+    }
+}
+.filter-btn{
+    display: flex;
+    align-items: center;
+    @media only screen and (max-width: 480px) {
+        position: absolute;
+        left: 120;
+        bottom: 0;
+    }
+}
+
+
+.underlined-typography {
+    position: relative;
+    font-size: 14px;
+    // color: gray;
+    cursor: pointer;
+    // color: red;
+
+}
+
+.underlined-typography::after {
+    content: '';
+    position: absolute;
+    top: 23px;
+    bottom: 0;
+    left: 0;
+    width: 0;
+    height: 2px;
+    background-color: #d42027;
+    animation: underline-animation 4s linear infinite;
+}
+
+.document-box {
+    border: 1px solid #f1f1f1;
+    padding: 5px 0 5px 6px;
+}
+
+.draft-btn {
+    position: fixed;
+    right: 15px;
+    bottom: 15px;
+}
+
+@keyframes underline-animation {
+    0% {
+        width: 0;
+    }
+
+    100% {
+        width: 100%;
+    }
+}
+
+.validation-container {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    margin-top: 16px;
+}
+
+.validation-input {
+    width: 40px;
+    height: 40px;
+    margin: 0 5px;
+    font-size: 18px;
+    text-align: center;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+    transition: border-color 0.3s ease-in-out;
+}
+
+.validation-input:focus {
+    border-color: #3f51b5;
+    outline: none;
+    box-shadow: 0 0 5px rgba(63, 81, 181, 0.5);
+}
+
+.step-text {
+    font-size: 16px;
+    color: #000;
+    margin-bottom: 10px;
+    padding-left: 8px;
+}
+
+.setup-image {
+    display: block;
+    // width: 50%;
+    width: auto;
+    margin: 0 auto;
+    border: 1px solid #ddd;
+    border-radius: 8px;
+}
+
+.height-130 {
+    height: 90px;
+}
+
+.btn-signature {
+    position: absolute !important;
+    right: 16px;
+    top: 20px;
+}
+
+.custom-date-2.css-z3c6am-MuiFormControl-root-MuiTextField-root {
+    min-width: 50px !important;
+}
+
+.custom-card {
+    border: 1px dashed #e1e1e1;
+    border-radius: 20px;
+    box-shadow: 0 10px 15px -3px #8585851a, 0 4px 6px -2px #6868680d;
+    cursor: pointer;
+    margin-bottom: 10px;
+    transition: all .5s ease;
+}
+
+.attachment-list {
+    display: flex;
+    flex-wrap: wrap;
+
+    .MuiMenuItem-root {
+        // width: 33.33%;
+        width: 45%;
+        border-right: 1px solid #f1f1f1;
+
+        p {
+            white-space: break-spaces;
+        }
+
+        @media only screen and (max-width: 1199px) {
+            width: 50%;
+        }
+
+        @media only screen and (max-width: 767px) {
+            width: 100%;
+        }
+    }
+}
+
+.advance-filter {
+    background: #fff;
+    border: 1px solid #e1e1e1;
+    border-radius: 3px;
+    box-shadow: 0px 10px 10px #f1f1f1;
+    left: 0;
+    padding: 25px 15px 15px;
+    position: absolute;
+    top: 50px;
+    width: 99%;
+    z-index: 3;
+}
+
+.dropdown-arrow:after {
+    content: '';
+    width: 0px;
+    height: 0px;
+    border-top: 12px solid transparent;
+    border-bottom: 12px solid #d42027;
+    border-right: 12px solid transparent;
+    border-left: 12px solid transparent;
+    position: absolute;
+    top: -25px;
+    left: 10px;
+}
+
+.custom-select-dropdown.css-1ps6pg7-MuiPaper-root {
+    box-shadow: 0 0px 0px rgba(0, 0, 0, 0.14) !important;
+}
+
+.custom-select-dropdown .MuiPaper-root.MuiPaper-elevation {
+    box-shadow: 0 0px 0px rgba(0, 0, 0, 0.14) !important;
+}
+
+.client-profile-bg {
+    height: 70px;
+    overflow: hidden;
+    display: flex;
+    align-items: center;
+}
+
+.aml-document-box {
+    position: sticky;
+    top: 60px;
+    height: 90vh;
+}
+
+.message-template-list {
+    height: calc(100vh - 320px);
+    overflow-y: auto;
+}
+
+// .message-template-list ul li:hover {
+//     background-color: #d42027;
+//     color: #ffffff;
+//     border-radius: 5px;
+// }
+
+.badge {
+    border-radius: 2px !important;
+}
+
+.hover-status-box {
+    position: absolute;
+    right: 0;
+    background: #fff;
+    z-index: 9999;
+    width: 280px;
+    top: 34px;
+    opacity: 0;
+    visibility: hidden;
+    padding: 10px;
+}
+
+.hover-status-heading {
+    position: relative;
+}
+
+.hover-status-heading:hover {
+    .hover-status-box {
+        opacity: 1;
+        visibility: visible;
+    }
+}
+
+.btn-toggle {
+    position: fixed;
+    left: 11px;
+    z-index: 9999;
+    /* background: red; */
+    background: #fff;
+    top: 7px;
+}
+
+.contact-main-box {
+    max-height: calc(100vh - 140px);
+    overflow: auto;
+
+    .contact-box {
+        padding: 10px;
+        margin-bottom: 10px;
+        border: 1px solid #f3f3f3;
+        background: rgb(63 122 255 / 2%);
+        width: 100%;
+    }
+}
+
+.message-template-list ul li .MuiTreeItem-label {
+    font-size: 12px;
+}
+
+.verification-input {
+    .MuiFormControl-root {
+        width: 40px !important;
+        height: 40px;
+        margin-right: 4px;
+        margin-left: 4px;
+
+        input {
+            font-weight: 700;
+            font-size: 18px !important;
+        }
+    }
+}
+
+
+.file-uploads #file-upload,
+.file-upload-2 #file-upload,
+.file-input {
+    position: absolute;
+    left: 0;
+    top: 0;
+    opacity: 0;
+    visibility: hidden;
+}
+
+.file-uploads .file-uploads-label {
+    background: #fff;
+    border: 2px dashed #f1f1f1;
+    padding: 8px 10px;
+    border-radius: 5px;
+    display: flex;
+    align-items: center;
+    cursor: pointer;
+    justify-content: space-between;
+}
+
+.file-uploads .file-uploads-label .img-format>img {
+    width: 36px;
+}
+
+.file-uploads .file-uploads-label .img-format {
+    margin-right: 10px;
+}
+
+.file-uploads .file-uploads-label .icon {
+    font-size: 26px;
+    font-weight: 200 !important;
+    margin-right: 12px;
+    color: #bababa;
+}
+
+.file-uploads .file-uploads-label h4 {
+    font-size: 12px;
+    font-weight: 600;
+    color: #474747;
+    margin-bottom: 5px;
+}
+
+.file-uploads .file-uploads-label p {
+    font-size: 12px;
+    font-weight: 400;
+    color: #aeaeae;
+}
+
+.file-upload-2-label {
+    border: 2px dashed #ccc;
+    padding: 20px;
+    border-radius: 10px;
+    display: block;
+    cursor: pointer;
+}
+
+.file-upload-2-label span {
+    font-size: 40px;
+    color: #000;
+}
+
+.text-ellipsis {
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.custom-date-2 .css-v0pjtz-MuiStack-root {
+    overflow: hidden;
+}
+
+.date-pick .css-v0pjtz-MuiStack-root {
+    padding-top: 0px;
+    overflow: hidden;
+
+    .css-nxo287-MuiInputBase-input-MuiOutlinedInput-input {
+        padding: 8px;
+
+    }
+
+
+}
+
+
+
+
+
+
+
+
+.select_attachment {
+    background-color: rgba(0, 0, 0, 0.04) !important;
+}
+
+.note_Box {
+    border-left-width: 5px !important;
+    border-left-style: solid !important;
+    // border-left-color: red !important;
+    cursor: pointer;
+}
+
+.table-grid tr.dx-row.dx-column-lines.dx-datagrid-filter-row td {
+    background: #f5f5f5;
+}

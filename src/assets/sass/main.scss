@@ -1,0 +1,59 @@
+@import 'abstracts/variables';
+@import url('https://fonts.googleapis.com/css2?family=Dancing+Script:wght@400..700&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Architects+Daughter&family=Dancing+Script:wght@400..700&family=Pacifico&family=Satisfy&display=swap');
+// // 
+@import 'base/reset';
+@import 'base/typography';
+
+// // 
+// @import 'layout/navigation';
+@import 'layout/common';
+@import 'layout/header';
+@import 'layout/sidebar';
+@import 'layout/login';
+@import 'layout/forms';
+@import 'layout/media-queries';
+@import 'layout/compose-message.scss';
+
+// // 
+@import 'components/buttons';
+@import 'components/dropdown';
+@import 'components/table';
+@import 'components/tabs';
+@import 'components/accordian';
+@import 'components/modal';
+@import 'components/timeline';
+@import 'components/loader';
+
+
+// .custom-modal .modal-head
+// // 
+
+// @import 'pages/home';
+
+.shake-element {
+    transition: transform 0.1s ease;
+  }
+  
+  @keyframes shake {
+    0% {
+      transform: translateX(0);
+    }
+    25% {
+      transform: translateX(-10px);
+    }
+    50% {
+      transform: translateX(10px);
+    }
+    75% {
+      transform: translateX(-10px);
+    }
+    100% {
+      transform: translateX(0);
+    }
+  }
+  
+  .shake {
+    animation: shake 0.3s ease-in-out; /* Duration of the shake */
+  }
+  

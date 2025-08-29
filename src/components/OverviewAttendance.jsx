@@ -22,6 +22,9 @@ function OverviewAttendance() {
   const handleClose = () => setShow(false);
   const handleShow = () => setShow(true);
   const dispatch = useDispatch();
+ const { getAttendanceByDate } = useSelector(
+   ({ EmployeeDetailReducers }) => EmployeeDetailReducers
+ );
 
   useEffect(() => {
     fetchAttendanceRecords();
@@ -30,7 +33,7 @@ function OverviewAttendance() {
   const fetchAttendanceRecords = async () => {
     setIsLoading(true);
     try {
-      const data = await dispatch(GetAttendanceDataActionByDate());
+      const data = getAttendanceByDate;
 
       const todayRecord = data.filter((record) => record.date === currentDate);
 

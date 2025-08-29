@@ -3,12 +3,22 @@ import { Nav, Container, Offcanvas, Button } from "react-bootstrap";
 import { Link } from "react-router-dom";
 import axios from "axios";
 import "./Sidebar.css"; // Import custom CSS for styling
+import { GetAttendanceDataActionByDate } from "../../redux/actions/EmployeeDetailsAction";
+import { useDispatch } from "react-redux";
+
 
 const Sidebar = ({ userRole, pendingCount }) => {
   const [userStatus, setUserStatus] = useState("active");
   const [show, setShow] = useState(false);
   const userId = localStorage.getItem("user_id");
+  const dispatch = useDispatch();
 
+  useEffect(() => {
+    const fetchTodayAtt = async () => {
+    const response = await dispatch(GetAttendanceDataActionByDate());
+    }
+    fetchTodayAtt();
+  })
   useEffect(() => {
     const fetchUserStatus = async () => {
       try {

@@ -1,0 +1,49 @@
+
+.login-head {
+    padding: 50px 15px;
+    width: 100%;
+    max-width: 70%;
+  }
+  .login-head img {
+    width: 200px;
+    max-height: 130px;
+  }
+  
+  .right-side-login {
+    background-color: $white;
+    display: flex !important;
+    min-height: 100vh;
+    height: 100vh;
+    /* gap: 0 !important; */
+    justify-content: center;
+    align-items: center;
+  }
+  
+  .date-unerline {
+    font-weight: 600;
+    // border-bottom: 2px solid;
+    padding: 4px 0px 4px 0;
+  }
+  
+  .left-side-login h2 {
+    font-size: 28px;
+    font-weight: 600;
+    margin-bottom: 30px;
+    color: $black;
+  }
+  
+  .left-side-login {
+    max-width: 420px;
+    width: 100%;
+    margin: 0 auto;
+    min-height: calc(100vh - 300px);
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+  }
+  
+  .login-head {
+    padding: 50px 15px;
+    width: 100%;
+    max-width: 70%;
+  }

@@ -1,0 +1,171 @@
+/* header css start */
+
+.header {
+  box-shadow: 0 0 0 rgb(0 0 0 / 0%), 0 1px 18px rgb(109 109 109 / 10%) !important;
+
+  @media only screen and (max-width: 767px) {
+    .btn-blue {
+      // padding: 0px !important;
+      // min-width: auto;
+      // width: 30px;
+      height: 30px;
+      .MuiButton-icon {
+        margin: 0px;
+      }
+    }
+  } 
+}
+
+.user-dropdown .user-img,
+.user-img-list {
+  min-width: 30px;
+  width: 30px;
+  height: 30px;
+  display: flex;
+  align-items: center;
+  /* justify-content: center; */
+  justify-content: center;
+  overflow: hidden;
+  border-radius: 90px;
+  background: #557ff7;
+  color: $white;
+  cursor: pointer;
+  border: 2px solid transparent;
+  font-weight: 400;
+}
+
+.user-img-list.admin {
+  width: 40px;
+  height: 40px;
+}
+
+.user-img-list.user-total-list {
+  background: $white;
+  color: #557ff7;
+  border-color: #3569ff;
+  font-weight: 600;
+}
+
+/* .box-user-list-dropdown button:nth-child(-n + 2) .user-img-list {
+    background: #088aee;
+  } 
+  .box-user-list-dropdown button:nth-child(-n + 3) .user-img-list {
+    background: #ee5908;
+  } 
+  .box-user-list-dropdown button:nth-child(-n + 4) .user-img-list {
+    background: #9a08ee;
+  } 
+  .box-user-list-dropdown button:nth-child(-n + 5) .user-img-list {
+    background: #03a64f;
+  }  */
+/* .user-img-list:nth-child(-n + 2),
+  .box-user-list-dropdown button:nth-child(-n + 2) .user-img-list {
+    background: #088aee;
+  }
+  
+  .user-img-list:nth-child(-n + 3), .box-user-list-dropdown button:nth-child(-n + 3) .user-img-list {
+    background: red;
+  }
+  
+  .user-img-list:nth-child(-n + 4),.box-user-list-dropdown button:nth-child(-n + 4) .user-img-list {
+    background: red;
+  }
+  
+  .user-img-list:nth-child(-n + 5),.box-user-list-dropdown button:nth-child(-n + 5) .user-img-list {
+    background: red;
+  } */
+
+.user-dropdown .user-img p,
+.user-img-list p {
+  margin: 0px;
+}
+
+.user-dropdown .user-img img,
+.user-img-list img {
+  max-height: 30px;
+  min-height: 30px;
+}
+
+.user-dropdown .user-content h2 {
+  font-size: 14px;
+  text-transform: capitalize;
+  color: #151D48;
+  font-weight: 600;
+}
+
+.user-dropdown .user-content p {
+  font-size: 14px;
+  /* text-transform: capitalize; */
+  color: #565656;
+}
+
+.custom-dropdown .MuiPaper-root.MuiPaper-elevation {
+  box-shadow: 0 9px 20px rgb(0 0 0 / 14%);
+}
+
+.notification-list {
+  padding: 0 15px;
+  cursor: pointer;
+}
+
+.notification-box {
+  display: flex;
+  align-items: center;
+  padding: 10px 0;
+  border-bottom: 1px solid #f1f1f1;
+}
+
+.notification-box-img {
+  width: 46px;
+  min-width: 46px;
+  overflow: hidden;
+  height: 46px;
+  border-radius: 90px;
+  margin-right: 12px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.notification-box-img img {
+  /* width: 46px; */
+  min-height: 46px;
+  height: 46px;
+}
+
+.notification-box h4 {
+  font-size: 14px;
+  margin: 0;
+}
+
+.notification-box p {
+  margin: 0;
+  font-size: 12px;
+}
+
+.notification-content {
+  padding-right: 70px;
+}
+
+.notification-content .notification-date {
+  font-size: 12px;
+  color: #ccc;
+  position: absolute;
+  right: 15px;
+}
+
+.notificaiton-icon {
+  position: absolute;
+  width: 8px;
+  height: 8px;
+  background: #00cd00;
+  display: block;
+  border-radius: 90px;
+  left: 10px;
+  top: 15px;
+}
+.header-top{
+  min-height: 47px !important;
+}
+
+/* header css end */

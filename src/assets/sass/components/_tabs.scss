@@ -1,0 +1,189 @@
+.custom-tabs .table-grid .custom-tabs {
+  overflow: auto;
+  border: 0px solid !important;
+  margin-bottom: 10px;
+}
+
+
+
+.custom-tabs {
+  .MuiTabs-flexContainer button {
+    // background: $white;
+    // margin-right: 8px;
+    // text-transform: capitalize;
+    // padding: 5px 30px;
+    // border-radius: 4px;
+    // box-shadow: 0px 0px 10px #ebebeb;
+    // margin-bottom: 8px;
+    // background: $vermilion;
+    // white-space: nowrap;
+  }
+
+  // button.MuiTab-root.Mui-selected {
+  //   background-color: $vermilion;
+  //   color: $white;
+  // }
+
+  .MuiTabs-indicator {
+    display: none;
+  }
+
+  button.MuiTab-root {
+    background: $white;
+    text-transform: capitalize;
+    padding: 6px 10px;
+    /* box-shadow: 0px 0px 10px #ebebeb; */
+    /* text-transform: uppercase; */
+    /* text-align: left; */
+    /* justify-content: start; */
+    min-height: auto;
+    /* text-transform: capitalize; */
+    border-radius: 2px;
+    border: 1px solid #e5e5e5;
+    margin-right: 6px;
+    font-size: 11px;
+  }
+
+  button.MuiTab-root.Mui-selected {
+    background-color: $vermilion;
+    color: $white !important;
+  }
+
+  .MuiTabs-indicator {
+    display: none;
+  }
+
+  .tabs-list .css-1me3vxy {
+    padding: 20px;
+  }
+
+
+  .tabs-vertical {
+    height: calc(100vh - 130px);
+    overflow: auto;
+    background: #fff;
+    // margin-right: 10px;
+    padding: 10px 0px;
+
+    .MuiTabs-scroller {
+      overflow: auto !important;
+    }
+
+    button.MuiTab-root {
+      box-shadow: none;
+      border-bottom: 1px solid #f1f1f1;
+      border-radius: 0px;
+      margin: 0;
+      word-break: break-all;
+      margin-right: 8px !important;
+      transition: .5s all ease;
+      opacity: 1;
+      color: #525252;
+      max-width: 100%;
+      border: 0px;
+
+      &:hover {
+        background-color: $vermilion;
+        color: $white;
+      }
+    }
+  }
+}
+
+.custom-tabs .css-19kzrtu {
+  padding: 0;
+  border: 0;
+  margin-top: 10px;
+}
+
+.custom-tabs .MuiTabs-flexContainer.css-heg063-MuiTabs-flexContainer {
+  // flex-wrap: wrap;
+  // margin: 5px 0px;
+  flex-wrap: nowrap;
+  margin: 5px 0px;
+  overflow: auto;
+  padding-bottom: 4px;
+}
+
+.custom-tabs .MuiBox-root.css-1gsv261 {
+  border: 0px;
+}
+
+.flex-wrap-tabs .MuiTabs-flexContainer {
+  flex-wrap: wrap;
+}
+
+
+.custom-dropdown .Mui-selected {
+  color: grey !important;
+  background: #ffffff !important;
+}
+
+.right-main-box {
+  max-width:  calc(100% - 192px);
+  margin-left: auto;
+  padding: 10px 14px 0px 14px;
+  transition: 0.5s all ease;
+
+
+  @media only screen and (max-width: 767px) {
+    padding: 50px 15px 0px 15px;
+    max-width: calc(100% );
+  }
+}
+
+.onboarding-sidebar {
+  height: calc(100vh - 52px);
+  border-right: 1px solid #f1f1f1;
+  width: 270px;
+  padding-right: 10px;
+
+  @media only screen and (max-width: 767px) {
+    height: initial;
+    margin-bottom: 10px;
+    width: 100%;
+
+    .navi {
+      display: flex;
+      flex-wrap: nowrap;
+      width: 100%;
+      overflow: auto;
+
+      .MuiButtonBase-root {
+        min-width: auto;
+
+        .MuiTypography-root {
+          white-space: nowrap;
+        }
+      }
+
+    }
+  }
+
+
+  .navi {
+    .active {
+      background: #d42027 !important;
+      border: 1px solid #d42027 !important;
+      color: #fff;
+      border-radius: 2px;
+
+      svg {
+        color: #fff;
+      }
+    }
+
+    .disabled {
+      opacity: .5;
+      cursor: not-allowed;
+      pointer-events: none;
+    }
+  }
+}
+
+@media only screen and (max-width: 575px) {
+  .custom-tabs .tabs-vertical {
+    width: 100%;
+    height: auto;
+  }
+}

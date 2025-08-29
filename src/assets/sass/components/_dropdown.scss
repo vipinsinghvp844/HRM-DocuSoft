@@ -1,0 +1,99 @@
+.select-dropdown {
+    button {
+        background: $white;
+        font-size: 14px;
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        width: 100%;
+        text-transform: capitalize;
+        white-space: nowrap;
+        text-overflow: ellipsis;
+        overflow: hidden;
+        max-width: 150px;
+
+        &:hover svg {
+            opacity: 1;
+            visibility: visible;
+        }
+
+        svg {
+            opacity: 0;
+            visibility: hidden;
+            transition: .5s all ease;
+        }
+    }
+}
+
+
+.custom-dropdown {
+    .MuiPaper-root.MuiPaper-elevation {
+        box-shadow: 0 9px 20px rgb(0 0 0 / 14%);
+
+        .MuiAutocomplete-popper {
+            transform: translate(12px, 55px) !important;
+
+            .MuiAutocomplete-listbox {
+                height: 200px;
+            }
+        }
+    }
+
+    ul li {
+        font-size: 12px;
+        text-align: left;
+        transition: .5s all ease;
+
+        svg {
+            font-size: 16px;
+        }
+
+        &:hover {
+            background: $vermilion !important;
+            color: $white;
+
+            svg {
+                color: $white;
+            }
+        }
+    }
+}
+
+.custom-select-dropdown .base-Popper-root.MuiAutocomplete-popper.MuiAutocomplete-popperDisablePortal {
+    box-shadow: none;
+    width: 110% !important;
+    // margin-left: -12px !important;
+    // padding: 15px;
+
+}
+
+.custom-select-dropdown {
+    height: 248px;
+    width: 200px;
+    padding: 10px;
+}
+
+.custom-select-dropdown .base-Popper-root.MuiAutocomplete-popper.MuiAutocomplete-popperDisablePortal .MuiPaper-elevation.MuiAutocomplete-paper {
+    box-shadow: none !important;
+    border-radius: 0px !important;
+    background: #fff;
+}
+
+.custom-autocomplete .MuiInputBase-root {
+    font-size: 12px;
+    /* Input box font size */
+}
+
+.custom-autocomplete .MuiAutocomplete-option {
+    font-size: 12px;
+    /* Dropdown options font size */
+}
+
+.custom-autocomplete .MuiInputLabel-root {
+    font-size: 12px;
+    /* Label font size */
+}
+
+.daterangepicker .ranges li.active {
+    background: #d42027 !important;
+}

@@ -236,3 +236,8 @@ width:100% !important;
   /* font-weight: bold !important; */
   color: #fff !important;
 }
+
+.highlighted-row {
+  background-color: #fffae6 !important; /* halka yellow highlight */
+  font-weight: bold;
+}
