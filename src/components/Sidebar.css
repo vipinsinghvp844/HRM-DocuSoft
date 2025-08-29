@@ -58,7 +58,7 @@ h2 {
 
 .sidebar {
   padding: 5px;
-  background: #fafafa;
+  /* background: #fafafa; */
   border-radius: 12px;
   width: 250px;
 }
@@ -127,6 +127,7 @@ span .badge .bg-danger{
 }
 .sidebar.nav .nav-link{
   width: 100%;
+  text-decoration: none;
 }
 /*active side bar navlink*/
 
