@@ -13,8 +13,18 @@ import LoaderSpiner from "./LoaderSpiner";
 import { useDispatch, useSelector } from "react-redux";
 import { GetAttendanceDataActionByDate } from "../../redux/actions/EmployeeDetailsAction";
 import EditEmployeeAttendance from "./EditEmployeeAttendance";
+import DataGrid, {
+  Column,
+  Paging,
+  FilterRow,
+  HeaderFilter,
+  SearchPanel,
+} from "devextreme-react/data-grid";
+import { Link } from "react-router-dom";
+
 function OverviewAttendance() {
   const [attendanceRecords, setAttendanceRecords] = useState([]);
+  
 
   const currentDate = new Date().toISOString().split("T")[0]; // Format to YYYY-MM-DD
   const [isLoading, setIsLoading] = useState("false");
@@ -103,6 +113,83 @@ function OverviewAttendance() {
   }
 
   return (
+    // <Container className="my-4">
+    //   <Row className="mb-4 d-flex">
+    //     <Col md={1}>
+    //       <i
+    //         className="bi bi-arrow-left-circle"
+    //         onClick={() => window.history.back()}
+    //         style={{
+    //           cursor: "pointer",
+    //           fontSize: "32px",
+    //           color: "#343a40",
+    //         }}
+    //       ></i>
+    //     </Col>
+    //     <Col md={9}>
+    //       <h3 className="mt-2">Today Attendance</h3>
+    //     </Col>
+    //     <Col md={2}>
+    //       <Button onClick={handleShow}>Edit Ateendance</Button>
+    //     </Col>
+    //     <Offcanvas show={show} onHide={handleClose} placement="end">
+    //       <Offcanvas.Header closeButton>
+    //         <Offcanvas.Title>Edit Attendance</Offcanvas.Title>
+    //       </Offcanvas.Header>
+    //       <Offcanvas.Body>
+    //         <EditEmployeeAttendance />
+    //       </Offcanvas.Body>
+    //     </Offcanvas>
+    //   </Row>
+    //   <Table striped bordered hover responsive>
+    //     <thead>
+    //       <tr>
+    //         <th>No.</th>
+    //         <th> ID</th>
+    //         <th>Date</th>
+    //         <th>Name</th>
+    //         <th>Clock In</th>
+    //         <th>Clock Out</th>
+    //         <th>Break In</th>
+    //         <th>Break Out</th>
+    //       </tr>
+    //     </thead>
+
+    //     <tbody>
+    //       {isLoading ? (
+    //         <tr className="">
+    //           <td colSpan="9" className="text-center">
+    //             <div
+    //               className="d-flex justify-content-center align-items-center"
+    //               style={{ height: "200px" }}
+    //             >
+    //               <LoaderSpiner />
+    //             </div>
+    //           </td>
+    //         </tr>
+    //       ) : attendanceRecords.length > 0 ? (
+    //         attendanceRecords.map((record, index) => (
+    //           <tr key={index}>
+    //             <td>{index + 1}</td>
+    //             <td>{record.user_id}</td>
+    //             <td>{record.date}</td>
+    //             <td>{record.user_name || "N/A"}</td>
+    //             <td>{record.clock_in}</td>
+    //             <td>{record.clock_out}</td>
+    //             <td>{record.break_in}</td>
+    //             <td>{record.break_out}</td>
+    //           </tr>
+    //         ))
+    //       ) : (
+    //         <tr>
+    //           <td colSpan="8" className="text-center">
+    //             No Today Attendance
+    //           </td>
+    //         </tr>
+    //       )}
+    //     </tbody>
+    //   </Table>
+    // </Container>
     <Container className="my-4">
       <Row className="mb-4 d-flex">
         <Col md={1}>
@@ -131,54 +218,38 @@ function OverviewAttendance() {
           </Offcanvas.Body>
         </Offcanvas>
       </Row>
-      <Table striped bordered hover responsive>
-        <thead>
-          <tr>
-            <th>No.</th>
-            <th> ID</th>
-            <th>Date</th>
-            <th>Name</th>
-            <th>Clock In</th>
-            <th>Clock Out</th>
-            <th>Break In</th>
-            <th>Break Out</th>
-          </tr>
-        </thead>
-
-        <tbody>
-          {isLoading ? (
-            <tr className="">
-              <td colSpan="9" className="text-center">
-                <div
-                  className="d-flex justify-content-center align-items-center"
-                  style={{ height: "200px" }}
-                >
-                  <LoaderSpiner />
-                </div>
-              </td>
-            </tr>
-          ) : attendanceRecords.length > 0 ? (
-            attendanceRecords.map((record, index) => (
-              <tr key={index}>
-                <td>{index + 1}</td>
-                <td>{record.user_id}</td>
-                <td>{record.date}</td>
-                <td>{record.user_name || "N/A"}</td>
-                <td>{record.clock_in}</td>
-                <td>{record.clock_out}</td>
-                <td>{record.break_in}</td>
-                <td>{record.break_out}</td>
-              </tr>
-            ))
-          ) : (
-            <tr>
-              <td colSpan="8" className="text-center">
-                No Today Attendance
-              </td>
-            </tr>
-          )}
-        </tbody>
-      </Table>
+      <div style={{ overflowX: "auto" }}>
+        <DataGrid
+          dataSource={attendanceRecords}
+          keyExpr="user_id"
+          showBorders={true}
+          rowAlternationEnabled={true}
+          className="shadow-sm rounded"
+          height="auto"
+          columnAutoWidth={true}
+          wordWrapEnabled={true}
+          columnHidingEnabled={true}
+        >
+          <SearchPanel visible={true} placeholder="Search..." />
+          <FilterRow visible={true} />
+          <HeaderFilter visible={true} />
+          <Paging defaultPageSize={5} />
+          <Column
+            caption="#"
+            width={50}
+            cellRender={({ rowIndex }) => rowIndex + 1}
+          />
+          <Column dataField="user_id" caption="ID" />
+          <Column dataField="user_name" caption="User Name" />
+          <Column dataField="date" caption="Date" dataType="date" />
+          <Column dataField="clock_in" caption="Check In" />
+          <Column dataField="clock_out" caption="Check Out" />
+          <Column dataField="break_in" caption="Break In" />
+          <Column dataField="break_out" caption="Break Out" />
+          <Column dataField="total_break" caption="Total Break" />
+          <Column dataField="total_work" caption="Total Work" />
+        </DataGrid>
+      </div>
     </Container>
   );
 }

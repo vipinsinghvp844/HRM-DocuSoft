@@ -4,15 +4,12 @@ import { useNavigate, Link } from "react-router-dom";
 import { Container, Row, Col, Form, Button } from "react-bootstrap";
 import { useFormik } from "formik";
 import Spinner from "./LoaderSpiner";
-import axios from "axios";
 import "./Login.css"; // Import the CSS file
-import { LoginUserReduser } from "../../redux/redecer/AllReducers";
 import { useDispatch, useSelector } from "react-redux";
 import {
   FetchUserProfileAction,
   LoginUserAction,
 } from "../../redux/actions/dev-aditya-action";
-import { use } from "react";
 import { setValueForSideBarClick } from "../../redux/redecer/EmployeeDetailReducers";
 
 const Login = ({ onLogin }) => {
@@ -21,14 +18,6 @@ const Login = ({ onLogin }) => {
   const [errorMessage, setErrorMessage] = useState("");
   const navigate = useNavigate();
   const dispatch = useDispatch();
-  const store = useSelector(({ loginUser }) => {
-    loginUser;
-  });
-  const { TotalUsers, TotalAttendance, TotalEmployeeInLeave } = useSelector(
-    ({ EmployeeDetailReducers }) => EmployeeDetailReducers
-  );
-  const inactiveUserDocument = TotalUsers.user_state;
-  // console.log(inactiveUserDocument,"TotalUsers inactive");
 
   const formik = useFormik({
     initialValues: {
@@ -46,8 +35,7 @@ const Login = ({ onLogin }) => {
 
         const userRole = user.roles && user.roles[0] ? user.roles[0] : null;
         if (userRole) {
-          const profilePick = await dispatch(FetchUserProfileAction());
-          if (profilePick.status == 200) {
+          await dispatch(FetchUserProfileAction());
             onLogin(userRole);
 
             // Redirect based on the role
@@ -60,7 +48,7 @@ const Login = ({ onLogin }) => {
             } else {
               navigate("/default-dashboard");
             }
-          }
+          
         }
       } catch (error) {
         if (error.response.data.code === "[jwt_auth] incorrect_password") {
@@ -75,11 +63,10 @@ const Login = ({ onLogin }) => {
           setErrorMessage("Login failed. Please try again later.");
         }
         setShowPopup(true);
-          // console.log(error, "============error");
           
       } finally {
         setLoading(false);
-        setSubmitting(false); // Ensure formik.isSubmitting is reset
+        setSubmitting(false); 
       }
     },
   });
@@ -124,6 +111,14 @@ const Login = ({ onLogin }) => {
     };
   }, [showPopup]);
 
+  const showPass = () => {
+    var x = document.getElementById("myInput");
+    if (x.type === "password") {
+      x.type = "text";
+    } else {
+      x.type = "password";
+    }
+  };
   return (
     <Container fluid className="maincontainer">
       <Row className="w-100">
@@ -138,7 +133,7 @@ const Login = ({ onLogin }) => {
         >
           <div className="cardcontainer">
             <h2 className="text-center mb-4">Login</h2>
-            <Form onSubmit={formik.handleSubmit}>
+            <Form onSubmit={formik.handleSubmit} >
               <Form.Group className="mb-3" controlId="formBasicEmail">
                 <Form.Control
                   name="email"
@@ -149,8 +144,9 @@ const Login = ({ onLogin }) => {
                   required
                 />
               </Form.Group>
-              <Form.Group className="mb-3" controlId="formBasicPassword">
+              <Form.Group className="mb-3" controlId="myInput">
                 <Form.Control
+                  // id="myInput"
                   name="password"
                   type="password"
                   placeholder="Type your password"
@@ -158,6 +154,16 @@ const Login = ({ onLogin }) => {
                   onChange={formik.handleChange}
                   required
                 />
+                <div className="d-flex align-items-center p-2">
+                 
+                    <input
+                      type="checkbox"
+                      onClick={showPass}
+                      className="me-2"
+                    />
+                    <label className="mb-0 text-white">Show Password</label>
+                  </div>
+         
               </Form.Group>
               <div className="d-flex justify-content-end mb-3">
                 <Link
@@ -199,11 +205,7 @@ const Login = ({ onLogin }) => {
                   >
                     Forget Your Password
                   </Link> */}
-                  <Button
-                    onClick={() => setShowPopup(false)}
-                  >
-                    Try Again
-                  </Button>
+                  <Button onClick={() => setShowPopup(false)}>Try Again</Button>
                 </div>
               </div>
             )}

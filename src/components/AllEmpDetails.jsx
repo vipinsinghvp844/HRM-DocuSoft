@@ -10,6 +10,13 @@ import { useDispatch, useSelector } from "react-redux";
 import { FetchAllUserProfileAction } from "../../redux/actions/dev-aditya-action";
 import { toast } from "react-toastify";
 import { GetTotalUserAction } from "../../redux/actions/EmployeeDetailsAction";
+import DataGrid, {
+  Column,
+  Paging,
+  FilterRow,
+  HeaderFilter,
+  SearchPanel,
+} from "devextreme-react/data-grid";
 
 const AllEmpDetails = () => {
   const [employees, setEmployees] = useState([]);
@@ -103,6 +110,111 @@ const AllEmpDetails = () => {
   
 
   return (
+    // <Container className="all-emp-details">
+    //   <Row className="mb-4 d-flex">
+    //     <Col md={1}>
+    //       <i
+    //         className="bi bi-arrow-left-circle"
+    //         onClick={() => window.history.back()}
+    //         style={{
+    //           cursor: "pointer",
+    //           fontSize: "32px",
+    //           color: "#343a40",
+    //         }}
+    //       ></i>
+    //     </Col>
+    //     <Col md={9}>
+    //       <h3 className="mt-2">All Employee Details</h3>
+    //     </Col>
+    //     <Col className="text-right">
+    //       {(userRole === "admin"  ||
+    //         userRole === "hr") && (
+    //             <Link to={"/add-employee"}>
+    //               <Button variant="warning" className="add-employee-button">
+    //                 Add Employee
+    //               </Button>
+    //             </Link>
+    //           )}
+    //     </Col>
+    //   </Row>
+
+    //   {errorMessage && <Alert variant="danger">{errorMessage}</Alert>}
+
+    //   <Table striped bordered hover>
+    //     <thead>
+    //       <tr>
+    //         <th>No.</th>
+    //         <th>Profile</th>
+    //         <th>First Name</th>
+    //         <th>DOB</th>
+    //         <th>Address</th>
+    //         <th>Email</th>
+    //         <th>Mobile</th>
+    //         <th>Role</th>
+    //         <th>UState</th>
+    //         <th>Actions</th>
+    //       </tr>
+    //     </thead>
+    //     <tbody>
+    //       {loading ? (
+    //         <tr>
+    //           <td colSpan="10" className="text-center">
+    //             <div
+    //               className="d-flex justify-content-center align-items-center"
+    //               style={{ height: "200px" }}
+    //             >
+    //               <LoaderSpiner />
+    //             </div>
+    //           </td>
+    //         </tr>
+    //       ) : (
+    //         employees.map((employee, index) => (
+    //           <tr key={employee.id}>
+    //             <td>{index + 1}</td>
+    //             <td>
+    //               <img
+    //                 src={getProfileImage(employee.id)}
+    //                 alt="Profile"
+    //                 className="popup-profile-image"
+    //                 style={{ objectFit: "cover" }}
+    //               />
+    //             </td>
+    //             <td>{employee.first_name}</td>
+    //             <td>{employee.dob}</td>
+    //             <td>{employee.address}</td>
+    //             <td>{employee.email}</td>
+    //             <td>{employee.mobile}</td>
+    //             <td>{employee.role}</td>
+    //             <td>
+    //               <ToggleButton
+    //                 checked={employee.user_state === "active"}
+    //                 onToggle={() =>
+    //                   toggleUserStatus(employee.id, employee.user_state)
+    //                 }
+    //               />
+    //             </td>
+    //             <td>
+    //               <Button
+    //                 variant="warning"
+    //                 onClick={() => handleEditClick(employee.id)}
+    //                 className="edit-button"
+    //               >
+    //                 Edit
+    //               </Button>
+    //             </td>
+    //           </tr>
+    //         ))
+    //       )}
+    //     </tbody>
+    //   </Table>
+
+    //   <EditEmployee
+    //     employeeId={selectedEmployeeId}
+    //     show={showEditModal}
+    //     handleClose={handleCloseEditModal}
+    //   />
+    // </Container>
+
     <Container className="all-emp-details">
       <Row className="mb-4 d-flex">
         <Col md={1}>
@@ -120,92 +232,60 @@ const AllEmpDetails = () => {
           <h3 className="mt-2">All Employee Details</h3>
         </Col>
         <Col className="text-right">
-          {(userRole === "admin"  ||
-            userRole === "hr") && (
-                <Link to={"/add-employee"}>
-                  <Button variant="warning" className="add-employee-button">
-                    Add Employee
-                  </Button>
-                </Link>
-              )}
+          {(userRole === "admin" || userRole === "hr") && (
+            <Link to={"/add-employee"}>
+              <Button variant="warning" className="add-employee-button">
+                Add Employee
+              </Button>
+            </Link>
+          )}
         </Col>
       </Row>
 
-      {errorMessage && <Alert variant="danger">{errorMessage}</Alert>}
-
-      <Table striped bordered hover>
-        <thead>
-          <tr>
-            <th>No.</th>
-            <th>Profile</th>
-            <th>First Name</th>
-            <th>DOB</th>
-            <th>Address</th>
-            <th>Email</th>
-            <th>Mobile</th>
-            <th>Role</th>
-            <th>UState</th>
-            <th>Actions</th>
-          </tr>
-        </thead>
-        <tbody>
-          {loading ? (
-            <tr>
-              <td colSpan="10" className="text-center">
-                <div
-                  className="d-flex justify-content-center align-items-center"
-                  style={{ height: "200px" }}
+      <div style={{ overflowX: "auto" }}>
+        <DataGrid
+          dataSource={employees}
+          keyExpr="id"
+          showBorders={true}
+          rowAlternationEnabled={true}
+          className="shadow-sm rounded"
+          height="auto"
+          columnAutoWidth={true}
+          wordWrapEnabled={true}
+          columnHidingEnabled={true}
+        >
+          <SearchPanel visible={true} placeholder="Search..." />
+          <FilterRow visible={true} />
+          <HeaderFilter visible={true} />
+          <Paging defaultPageSize={10} />
+          <Column
+            caption="#"
+            width={50}
+            cellRender={({ rowIndex }) => rowIndex + 1}
+          />
+          <Column dataField="first_name" caption="User Name" />
+          <Column dataField="dob" caption="DOB" />
+          <Column dataField="address" caption="Address" />
+          <Column dataField="email" caption="E-Mail" dataType="email" />
+          <Column dataField="mobile" caption="Mobile" />
+          <Column dataField="role" caption="Role" />
+          <Column dataField="user_state" caption="UState" />
+          <Column
+            caption="Actions"
+            cellRender={({ data }) => (
+              <>
+                <Button
+                  variant="warning"
+                  onClick={() => handleEditClick(data.id)}
+                  className="edit-button"
                 >
-                  <LoaderSpiner />
-                </div>
-              </td>
-            </tr>
-          ) : (
-            employees.map((employee, index) => (
-              <tr key={employee.id}>
-                <td>{index + 1}</td>
-                <td>
-                  <img
-                    src={getProfileImage(employee.id)}
-                    alt="Profile"
-                    className="popup-profile-image"
-                    style={{ objectFit: "cover" }}
-                  />
-                </td>
-                <td>{employee.first_name}</td>
-                <td>{employee.dob}</td>
-                <td>{employee.address}</td>
-                <td>{employee.email}</td>
-                <td>{employee.mobile}</td>
-                <td>{employee.role}</td>
-                <td>
-                  <ToggleButton
-                    checked={employee.user_state === "active"}
-                    onToggle={() =>
-                      toggleUserStatus(employee.id, employee.user_state)
-                    }
-                  />
-                </td>
-                <td>
-                  <Button
-                    variant="warning"
-                    onClick={() => handleEditClick(employee.id)}
-                    className="edit-button"
-                  >
-                    Edit
-                  </Button>
-                </td>
-              </tr>
-            ))
-          )}
-        </tbody>
-      </Table>
-
-      <EditEmployee
-        employeeId={selectedEmployeeId}
-        show={showEditModal}
-        handleClose={handleCloseEditModal}
-      />
+                  Edit
+                </Button>
+              </>
+            )}
+          />
+        </DataGrid>
+      </div>
     </Container>
   );
 };

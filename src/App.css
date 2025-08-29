@@ -85,15 +85,25 @@ form {
 .right-main-box {
   width: calc(100% - 250px);
   margin-left: auto;
-  /* padding: 65px 30px 31px 30px; */
   padding: 10px 14px 0px 14px;
   transition: .5s all ease;
 }
-@media (max-width: 480px) {
-.right-main-box{
-width:100% !important;
+
+/* Tablet screens */
+@media (max-width: 991px) {
+  .right-main-box {
+    width: calc(100% - 200px); /* sidebar thoda chhota */
+  }
 }
+
+/* Mobile screens */
+@media (max-width: 767px) {
+  .right-main-box {
+    width: 100% !important;
+    margin-left: 0; /* sidebar niche ya hide ho jaye */
+  }
 }
+
 
 .main-client-details-filter button {
   height: 35px;

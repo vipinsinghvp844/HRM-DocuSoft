@@ -16,20 +16,21 @@ import AddAttendance from "./AddAttendance";
 import LoaderSpiner from "./LoaderSpiner";
 import "./ManageAttendance.css"; // Import the custom CSS file
 import { useDispatch, useSelector } from "react-redux";
+import DataGrid, {
+  Column,
+  Paging,
+  FilterRow,
+  HeaderFilter,
+  SearchPanel,
+} from "devextreme-react/data-grid";
 
 const ManageAttendance = () => {
-  const [currentPage, setCurrentPage] = useState(1);
-  const itemsPerPage = 10; // Items to show per page
   const [employees, setEmployees] = useState([]);
-  const [errorMessage, setErrorMessage] = useState("");
-  // const [loading, setLoading] = useState(true);
   const navigate = useNavigate();
   const [show, setShow] = useState(false);
-  const [isLoading, setIsLoading] = useState("false");
   const handleClose = () => setShow(false);
   const handleShow = () => setShow(true);
-  const dispatch = useDispatch();
-  const { TotalUsers, TotalAttendance, TotalEmployeeInLeave } = useSelector(
+  const { TotalUsers } = useSelector(
     ({ EmployeeDetailReducers }) => EmployeeDetailReducers
   );
 
@@ -37,18 +38,12 @@ const ManageAttendance = () => {
     const fetchEmployees = async () => {
       setIsLoading(true);
       try {
-        // const response = await axios.get(
-        //   `${import.meta.env.VITE_API_CUSTOM_USERS}`
-        // );
         const employeeUsers = TotalUsers.filter(
           (user) => user.role === "employee" || user.role === "hr"
         );
-        // console.log(employeeUsers, "======check hr");
-
         setEmployees(employeeUsers);
       } catch (error) {
         console.error("Error fetching employees:", error);
-        setErrorMessage("Failed to fetch employees.");
       } finally {
         setIsLoading(false);
       }
@@ -59,13 +54,6 @@ const ManageAttendance = () => {
 
   const handleAttendanceDetails = async (userId) => {
     try {
-      // const response = await axios.get(
-      //   `${import.meta.env.VITE_API_CUSTOM_USERS}/${userId}`, {
-      //     headers: {
-      //       Authorization: `Bearer ${localStorage.getItem("authtoken")}`,
-      //     }
-      //   }
-      // );
       navigate(`/employee-attendance/${userId}`, {
         state: {
           attendanceDetails: employees,
@@ -73,14 +61,10 @@ const ManageAttendance = () => {
       });
     } catch (error) {
       console.error("Error fetching attendance details:", error);
-      setErrorMessage("Failed to fetch attendance details.");
     }
   };
   const handlePersonalDetails = async (userId) => {
     try {
-      // const response = await axios.get(
-      //   `${import.meta.env.VITE_API_CUSTOM_USERS}/${userId}`
-      // );
       navigate(`/personal-detail/${userId}`, {
         state: {
           personalDetails: employees,
@@ -88,20 +72,9 @@ const ManageAttendance = () => {
       });
     } catch (error) {
       console.error("Error fetching personal details:", error);
-      setErrorMessage("Failed to fetch personal details.");
     }
   };
 
-  const startIndex = (currentPage - 1) * itemsPerPage;
-  const endIndex = startIndex + itemsPerPage;
-  const currentUsers = employees.slice(startIndex, endIndex);
-
-  const handlePageChange = (pageNumber) => {
-    setCurrentPage(pageNumber);
-  };
-
-  const totalPages = Math.ceil(employees.length / itemsPerPage);
-  // console.log(totalPages, "pagepage");
 
   return (
     <Container className="manage-attendance-container">
@@ -129,74 +102,58 @@ const ManageAttendance = () => {
           </Offcanvas>
         </Col>
       </Row>
-      <Row className="check">
-        {errorMessage && <Alert variant="danger">{errorMessage}</Alert>}
-        {isLoading ? (
-          <div className="d-flex justify-content-center align-items-center">
-            <LoaderSpiner animation="border" />
-          </div>
-        ) : (
-          <Table striped bordered hover responsive>
-            <thead>
-              <tr>
-                <th>No.</th>
-                <th>User ID</th>
-                <th>First Name</th>
-                <th>Last Name</th>
-                <th>Email</th>
-                <th>Mobile</th>
-                <th>Role</th>
-                <th>Actions</th>
-              </tr>
-            </thead>
-            <tbody>
-              {currentUsers.map((employee, index) => (
-                <tr key={employee.id}>
-                  <td>{startIndex + index + 1}</td>
-                  <td>{employee.id}</td>
-                  <td>{employee.first_name}</td>
-                  <td>{employee.last_name}</td>
-                  <td>{employee.email}</td>
-                  <td>{employee.mobile}</td>
-                  <td>{employee.role}</td>
-                  <td>
-                    <Button
-                      variant="info"
-                      className="action-button"
-                      onClick={() => handlePersonalDetails(employee.id)}
-                      title="View Personal Report"
-                    >
-                      <FaEye />
-                    </Button>
-                    <Button
-                      variant="info"
-                      className="action-button"
-                      onClick={() => handleAttendanceDetails(employee.id)}
-                      title="View Attendance Report"
-                    >
-                      <i className="bi bi-calendar-check"></i>
-                    </Button>
-                  </td>
-                </tr>
-              ))}
-            </tbody>
-          </Table>
-        )}
-        <div>
-          {Array.from({ length: totalPages }, (_, index) => (
-            <Button
-              key={index + 1}
-              variant="light"
-              className={`page-button ${
-                currentPage === index + 1 ? "active" : ""
-              }`}
-              onClick={() => handlePageChange(index + 1)}
-            >
-              {index + 1}
-            </Button>
-          ))}
-        </div>
-      </Row>
+      <div style={{ overflowX: "auto" }}>
+        <DataGrid
+          dataSource={employees}
+          keyExpr="id"
+          showBorders={true}
+          rowAlternationEnabled={true}
+          className="shadow-sm rounded"
+          height="auto"
+          columnAutoWidth={true}
+          wordWrapEnabled={true}
+          columnHidingEnabled={true}
+        >
+          <SearchPanel visible={true} placeholder="Search..." />
+          <FilterRow visible={true} />
+          <HeaderFilter visible={true} />
+          <Paging defaultPageSize={10} />
+          <Column
+            caption="#"
+            width={50}
+            cellRender={({ rowIndex }) => rowIndex + 1}
+          />
+          <Column dataField="id" caption="ID" />
+          <Column dataField="first_name" caption="User Name" />
+          <Column dataField="last_name" caption="Last Name" />
+          <Column dataField="email" caption="E-Mail" dataType="email" />
+          <Column dataField="mobile" caption="Mobile" />
+          <Column dataField="role" caption="Role" />
+          <Column
+            caption="Actions"
+            cellRender={({ data }) => (
+              <>
+                <Button
+                  variant="info"
+                  className="action-button"
+                  onClick={() => handlePersonalDetails(data.id)}
+                  title="View Personal Report"
+                >
+                  <FaEye />
+                </Button>
+                <Button
+                  variant="info"
+                  className="action-button"
+                  onClick={() => handleAttendanceDetails(data.id)}
+                  title="View Attendance Report"
+                >
+                  <i className="bi bi-calendar-check"></i>
+                </Button>
+              </>
+            )}
+          />
+        </DataGrid>
+      </div>
     </Container>
   );
 };
