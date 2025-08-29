@@ -3,6 +3,8 @@ import { Table, Container, Row, Col, Button, Card } from "react-bootstrap";
 import { useDispatch } from "react-redux";
 import { GetAttendanceDataActionById } from "../../redux/actions/EmployeeDetailsAction";
 import LoaderSpiner from "./LoaderSpiner";
+import { Select, MenuItem, FormControl, InputLabel } from '@mui/material';
+
 
 // Utility function to format time in HH:MM format
 const formatDuration = (minutes) => {
@@ -176,7 +178,7 @@ const AttendanceRecord = () => {
   const years = Array.from({ length: 5 }, (_, i) => selectedYear - 2 + i);
 
   return (
-    <Container className="border rounded shadow-sm p-3">
+    <Container-fluid className="border rounded shadow-sm p-3">
       <Row className="mb-4 d-flex">
         <Col md={1}>
           <i
@@ -217,18 +219,38 @@ const AttendanceRecord = () => {
       {/* Month & Year Selector */}
       <Row className="mb-3">
         <Col className="d-flex justify-content-end">
-          <CustomDropdown
-            title={`Select Month: ${selectedMonth}`}
-            options={months}
-            onSelect={handleMonthChange}
-          />
-          <CustomDropdown
-            title={`Select Year: ${selectedYear}`}
-            options={years}
-            onSelect={handleYearChange}
-          />
-        </Col>
+          <FormControl variant="outlined" size="small" sx={{ minWidth: 150, mr: 2 }}>
+            <InputLabel>Select Month</InputLabel>
+            <Select
+              value={selectedMonth}
+              onChange={(e) => handleMonthChange(e.target.value)}
+              label="Select Month"
+            >
+              {months.map((month) => (
+                <MenuItem key={month} value={month}>
+                  {month}
+                </MenuItem>
+              ))}
+            </Select>
+          </FormControl>
+          
+          <FormControl variant="outlined" size="small" sx={{ minWidth: 150, mr: 2 }}>
+            <InputLabel>Select Year</InputLabel>
+            <Select
+              value={selectedYear}
+              onChange={(e) => handleYearChange(e.target.value)}
+              label="Select Year"
+            >
+              {years.map((year) => (
+                <MenuItem key={year} value={year}>
+                  {year}
+                </MenuItem>
+              ))}
+            </Select>
+          </FormControl>    
+              </Col>
       </Row>
+
 
       {/* Attendance Table */}
       <Row>
@@ -296,7 +318,7 @@ const AttendanceRecord = () => {
           </tbody>
         </Table>
       </Row>
-    </Container>
+    </Container-fluid>
   );
 };
 
