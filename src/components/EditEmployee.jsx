@@ -1,6 +1,9 @@
 import React, { useState, useEffect } from "react";
 import { Modal, Button, Form, Alert, Container, Row, Col } from "react-bootstrap";
 import axios from "axios";
+import { GetTotalUserAction } from "../../redux/actions/EmployeeDetailsAction";
+import { useDispatch, useSelector } from "react-redux";
+import { toast } from "react-toastify";
 
 const EditEmployee = ({ employeeId, show, handleClose }) => {
   const [employee, setEmployee] = useState({
@@ -14,31 +17,23 @@ const EditEmployee = ({ employeeId, show, handleClose }) => {
     address: "",
     user_state:"",
   });
-  const [errorMessage, setErrorMessage] = useState("");
-  const [successMessage, setSuccessMessage] = useState("");
+  const dispatch = useDispatch();
+    const { TotalUsers } = useSelector(
+      ({ EmployeeDetailReducers }) => EmployeeDetailReducers
+    );
 
   useEffect(() => {
-    const fetchEmployee = async () => {
-      try {
-        if (employeeId) {
-          const response = await axios.get(`${import.meta.env.VITE_API_CUSTOM_USERS}/${employeeId}`);
-          setEmployee(response.data);
-        }
-      } catch (error) {
-        console.error("Error fetching employee:", error);
-        if (error.response && error.response.status === 404) {
-          setErrorMessage("Employee not found.");
-        } else {
-          setErrorMessage("Failed to fetch employee details.");
-        }
-      }
-    };
-
-    if (show && employeeId) {
-      fetchEmployee();
-    }
-  }, [show, employeeId]);
-
+     console.log(employeeId,"id");
+     
+     if (show && employeeId && TotalUsers?.length > 0) {
+       const selectedUser = TotalUsers.find((u) => u.id === employeeId);
+       if (selectedUser) {
+         setEmployee(selectedUser);
+       } else {
+         toast.error("Employee not found.");
+       }
+     }
+   }, [show, employeeId, TotalUsers]);
   const handleInputChange = (e) => {
     const { name, value } = e.target;
     setEmployee({ ...employee, [name]: value });
@@ -48,11 +43,12 @@ const EditEmployee = ({ employeeId, show, handleClose }) => {
     e.preventDefault();
     try {
       await axios.put(`${import.meta.env.VITE_API_CUSTOM_USERS}/${employeeId}`, employee);
-      setSuccessMessage("Employee details updated successfully.");
+      toast.success("Employee details updated successfully.");
       handleClose();
+      const response = await dispatch(GetTotalUserAction());
     } catch (error) {
       console.error("Error updating employee:", error);
-      setErrorMessage("Failed to update employee details.");
+      toast.error("Failed to update employee details.");
     }
   };
 
@@ -62,8 +58,6 @@ const EditEmployee = ({ employeeId, show, handleClose }) => {
         <Modal.Title>Edit Employee Details</Modal.Title>
       </Modal.Header>
       <Modal.Body>
-        {errorMessage && <Alert variant="danger">{errorMessage}</Alert>}
-        {successMessage && <Alert variant="success">{successMessage}</Alert>}
         <Form onSubmit={handleSubmit}>
           <Container>
             <Row>

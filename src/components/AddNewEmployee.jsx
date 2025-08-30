@@ -1,6 +1,5 @@
 import React, { useState, useEffect } from "react";
 import { Col, Container, Row, Form, Button, Alert } from "react-bootstrap";
-import axios from "axios";
 import "./AddNewEmployee.css"; // Import the CSS file
 import { toast } from "react-toastify";
 import { useDispatch } from "react-redux";
@@ -16,14 +15,12 @@ const AddNewEmployee = () => {
   const [address, setAddress] = useState("");
   const [mobile, setMobile] = useState("");
   const [dob, setDob] = useState("");
-  const [userState, setUserState] = useState("active"); // Add this line to set user state as active by default
+  const [userState, setUserState] = useState("active");
   const [userEmail, setUserEmail] = useState("");
   const [userPassword, setUserPassword] = useState("");
   const [selectedUserRole, setSelectedUserRole] = useState("");
-  const [errorMessage, setErrorMessage] = useState("");
   const [userRoleOptions, setUserRoleOptions] = useState([]);
   const currentUserRole = localStorage.getItem('role');
-  const [isLoading, setIsLoading] = useState(false);
   const dispatch = useDispatch();
 
   useEffect(() => {
@@ -56,15 +53,6 @@ const AddNewEmployee = () => {
         
       }));
     }));
-    // const response = await axios.post(
-    //   `${import.meta.env.VITE_API_REGISTER}`, // Correct API URL here
-    //   userData,
-    //   {
-    //     headers: {
-    //       Authorization: `Bearer ${localStorage.getItem("authtoken")}`,
-    //     }
-    //   }
-    // );
 
     if (response.status === 200) {
       toast.success("User added successfully!");
