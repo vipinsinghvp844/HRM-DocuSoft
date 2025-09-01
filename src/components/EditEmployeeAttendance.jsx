@@ -1,8 +1,8 @@
 import React, { useState, useEffect } from "react";
-import { Form, Button, Container } from "react-bootstrap";
+import { Form, Button, Container, Spinner } from "react-bootstrap";
 import axios from "axios";
 import { useDispatch, useSelector } from "react-redux";
-import { GetAttendanceDataActionByDate, GetTotalUserAction } from "../../redux/actions/EmployeeDetailsAction";
+import { EditAttDeatilByAdminHr, GetAttendanceDataActionByDate, GetTotalUserAction } from "../../redux/actions/EmployeeDetailsAction";
 import { toast } from "react-toastify";
 
 const EditEmployeeAttendance = () => {
@@ -13,6 +13,7 @@ const EditEmployeeAttendance = () => {
   const [attendance, setAttendance] = useState({});
   const [showDropdown, setShowDropdown] = useState(false);
   const [prevAttendance, setPrevAttendance] = useState({});
+  const [isLoading, setIsLoading] = useState(false);
   const dispatch = useDispatch();
 
   useEffect(() => {
@@ -95,72 +96,92 @@ const EditEmployeeAttendance = () => {
     }
   };
 
-  const handleSubmit = async (e) => {
-    e.preventDefault();
-    const updateRequests = [];
-    const updatedTypes = [];
+const handleSubmit = async (e) => {
+  e.preventDefault();
+  const updateRequests = [];
+  const updatedTypes = [];
 
-    if (attendance.clock_in_record_id && attendance.clock_in !==prevAttendance.clock_in) {
-      updateRequests.push({
-        user_id: userId,
-        record_id: attendance.clock_in_record_id,
-        time: attendance.clock_in,
-      });
-      updatedTypes.push("Check_in");
-    }
-    if (attendance.break_in_record_id && attendance.break_in !==prevAttendance.break_in) {
-      updateRequests.push({
-        user_id: userId,
-        record_id: attendance.break_in_record_id,
-        time: attendance.break_in,
-      });
-      updatedTypes.push("Break_in");
-    }
-    if (
-      attendance.break_out_record_id &&
-      attendance.break_out !== prevAttendance.break_out
-    ) {
-      updateRequests.push({
-        user_id: userId,
-        record_id: attendance.break_out_record_id,
-        time: attendance.break_out,
-        type: "break_out",
-      });
-      updatedTypes.push("Break_out");
-    }
-    if (
-      attendance.clock_out_record_id &&
-      attendance.break_out !== prevAttendance.clock_out
-    ) {
-      updateRequests.push({
-        user_id: userId,
-        record_id: attendance.clock_out_record_id,
-        time: attendance.clock_out,
-        type: "clock_out",
-      });
-      updatedTypes.push("Check_out");
-    }
-    if (updateRequests.length === 0) {
-      toast.info("No changes detected!");
-      return;
-    }
+  if (
+    attendance.clock_in_record_id &&
+    attendance.clock_in !== prevAttendance.clock_in
+  ) {
+    updateRequests.push({
+      user_id: userId,
+      record_id: attendance.clock_in_record_id,
+      time: attendance.clock_in,
+      type: "clock_in",
+    });
+    updatedTypes.push("Check_in");
+  }
 
-    try {
-      await Promise.all(
-        updateRequests.map((payload) =>
-          axios.put(`${import.meta.env.VITE_API_ATTENDANCE}`, payload, {
-            headers: {
-              Authorization: `Bearer ${localStorage.getItem("authtoken")}`,
-            },
+  if (
+    attendance.break_in_record_id &&
+    attendance.break_in !== prevAttendance.break_in
+  ) {
+    updateRequests.push({
+      user_id: userId,
+      record_id: attendance.break_in_record_id,
+      time: attendance.break_in,
+      type: "break_in",
+    });
+    updatedTypes.push("Break_in");
+  }
+
+  if (
+    attendance.break_out_record_id &&
+    attendance.break_out !== prevAttendance.break_out
+  ) {
+    updateRequests.push({
+      user_id: userId,
+      record_id: attendance.break_out_record_id,
+      time: attendance.break_out,
+      type: "break_out",
+    });
+    updatedTypes.push("Break_out");
+  }
+
+  if (
+    attendance.clock_out_record_id &&
+    attendance.clock_out !== prevAttendance.clock_out 
+  ) {
+    updateRequests.push({
+      user_id: userId,
+      record_id: attendance.clock_out_record_id,
+      time: attendance.clock_out,
+      type: "clock_out",
+    });
+    updatedTypes.push("Check_out");
+  }
+
+  if (updateRequests.length === 0) {
+    toast.info("No changes detected!");
+    return;
+  }
+
+  try {
+    setIsLoading(true);
+
+    await Promise.all(
+      updateRequests.map((payload) =>
+        dispatch(
+          EditAttDeatilByAdminHr(payload, async (data) => {
+            await dispatch(GetAttendanceDataActionByDate());
           })
         )
-      );
-      const response = await dispatch(GetAttendanceDataActionByDate());
-      toast.success(`${updatedTypes.join(", ")} Attendance updated successfully!`);
-    } catch (error) {
-      console.error("Error updating attendance", error);
-    }
-  };
+      )
+    );
+
+    toast.success(
+      `${updatedTypes.join(", ")} Attendance updated successfully!`
+    );
+  } catch (error) {
+    console.error("Error updating attendance", error);
+    toast.error("Failed to update attendance!");
+  } finally {
+    setIsLoading(false);
+  }
+};
+
 
   return (
     <Container className="edit-attendance-container">
@@ -243,8 +264,21 @@ const EditEmployeeAttendance = () => {
             }
           />
         </Form.Group>
-        <Button variant="primary" type="submit">
-          Update Attendance
+        <Button variant="primary" type="submit" disabled={isLoading}>
+          {isLoading ? (
+            <>
+              <Spinner
+                as="span"
+                animation="border"
+                size="sm"
+                role="status"
+                aria-hidden="true"
+              />{" "}
+              Updating...
+            </>
+          ) : (
+            "Update Attendance"
+          )}
         </Button>
       </Form>
     </Container>

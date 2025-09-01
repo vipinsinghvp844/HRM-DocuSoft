@@ -38,16 +38,20 @@ function OverviewAttendance() {
 
   useEffect(() => {
     fetchAttendanceRecords();
+       dispatch(GetAttendanceDataActionByDate());
+    
   }, []);
 
   const fetchAttendanceRecords = async () => {
     setIsLoading(true);
     try {
-      const data = getAttendanceByDate;
+      // const data = getAttendanceByDate;
+      // console.log(data);
+      
 
-      const todayRecord = data.filter((record) => record.date === currentDate);
+      // const todayRecord = data.filter((record) => record.date === currentDate);
 
-      const combinedData = todayRecord.reduce((acc, record) => {
+      const combinedData = getAttendanceByDate.reduce((acc, record) => {
         let userRecord = acc.find(
           (item) => item.user_id === record.user_id && item.date === record.date
         );

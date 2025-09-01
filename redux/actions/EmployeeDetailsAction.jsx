@@ -206,6 +206,29 @@ export const submitAttendanceAction = (payload) => async (dispatch) => {
   }
 };
 
+export const EditAttDeatilByAdminHr = (payload, callback) => async (dispatch) => {
+  try {
+    const response = await axios.put(
+      `${import.meta.env.VITE_API_ATTENDANCE}`,
+      payload,
+      {
+        headers: {
+          Authorization: `Bearer ${localStorage.getItem("authtoken")}`,
+        },
+      }
+    );
+
+     if (response?.data) {
+      //  dispatch(fetchAllNotificationsReduser(response.data));
+
+       callback(response.data);
+     }// return the response so it can be awaited
+  } catch (error) {
+    console.error("Error performing action", error);
+    // toast.error("An error occurred. Please try again.");
+  }
+};
+
 export const LeaveRequestChangeAction = (payload) => async (dispatch) => {
   try {
     const response = await axios.put(

@@ -23,8 +23,6 @@ const EditEmployee = ({ employeeId, show, handleClose }) => {
     );
 
   useEffect(() => {
-     console.log(employeeId,"id");
-     
      if (show && employeeId && TotalUsers?.length > 0) {
        const selectedUser = TotalUsers.find((u) => u.id === employeeId);
        if (selectedUser) {
@@ -107,7 +105,6 @@ const EditEmployee = ({ employeeId, show, handleClose }) => {
                     name="username"
                     value={employee.username}
                     onChange={handleInputChange}
-                    
                     disabled
                   />
                 </Form.Group>
@@ -130,12 +127,17 @@ const EditEmployee = ({ employeeId, show, handleClose }) => {
                 <Form.Group controlId="formRole">
                   <Form.Label>Role</Form.Label>
                   <Form.Control
-                    type="text"
+                    as="select"
                     name="role"
                     value={employee.role}
                     onChange={handleInputChange}
                     required
-                  />
+                  >
+                    <option value="">-- Select Role --</option>
+                    <option value="employee">Employee</option>
+                    <option value="hr">HR</option>
+                    <option value="admin">Admin</option>
+                  </Form.Control>
                 </Form.Group>
               </Col>
             </Row>

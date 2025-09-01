@@ -36,7 +36,6 @@ const ManageAttendance = () => {
 
   useEffect(() => {
     const fetchEmployees = async () => {
-      setIsLoading(true);
       try {
         const employeeUsers = TotalUsers.filter(
           (user) => user.role === "employee" || user.role === "hr"
@@ -45,7 +44,6 @@ const ManageAttendance = () => {
       } catch (error) {
         console.error("Error fetching employees:", error);
       } finally {
-        setIsLoading(false);
       }
     };
 
