@@ -72,6 +72,7 @@ function App() {
     localStorage.removeItem("user");
   };
 
+
   useEffect(() => {
     const storedUser = localStorage.getItem("user");
     if (storedUser) {
