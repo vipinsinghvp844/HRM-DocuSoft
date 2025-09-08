@@ -13,7 +13,14 @@ import "./AttendanceCsv.css";
 import { useSelector } from "react-redux";
 import * as XLSX from "xlsx";
 import { saveAs } from "file-saver";
-  import ExcelJS from "exceljs";
+import ExcelJS from "exceljs";
+  import DataGrid, {
+    Column,
+    Paging,
+    FilterRow,
+    HeaderFilter,
+    SearchPanel,
+  } from "devextreme-react/data-grid";
 
 const AttendanceCsv = () => {
   const [employees, setEmployees] = useState([]);
@@ -291,66 +298,6 @@ const AttendanceCsv = () => {
     setIsFullScreen(!isFullScreen);
   };
 
-  //expoet excel
- 
-  // const exportToExcel = () => {
-  //   const worksheetData = [];
-
-  //   // Header row
-  //   const headers = [
-  //     "SR No.",
-  //     "Emp-Name",
-  //     ...datesInMonth.map((date) => format(date, "d")),
-  //     "Total Days",
-  //     "Absent",
-  //     "Leave",
-  //     "Present",
-  //     "Holidays",
-  //     "Wk-Offs",
-  //     "Total Work",
-  //     "Total Break",
-  //   ];
-  //   worksheetData.push(headers);
-
-  //   // Rows
-  //   employees.forEach((employee, index) => {
-  //     const totals = calculateTotals(employee.id);
-  //     const dailyStatus = datesInMonth.map((date) => {
-  //       const formattedDate = format(date, "yyyy-MM-dd");
-  //       return getAttendanceStatus(employee.id, formattedDate);
-  //     });
-
-  //     worksheetData.push([
-  //       index + 1,
-  //       employee.username,
-  //       ...dailyStatus,
-  //       datesInMonth.length,
-  //       totals.absentCount,
-  //       totals.leaveCount,
-  //       totals.presentCount,
-  //       totals.holidayCount,
-  //       totals.weekOffCount,
-  //       convertMinutes(totals.totalWorkMinutes),
-  //       convertMinutes(totals.totalBreakMinutes),
-  //     ]);
-  //   });
-
-  //   // Convert to Excel
-  //   const worksheet = XLSX.utils.aoa_to_sheet(worksheetData);
-  //   const workbook = XLSX.utils.book_new();
-  //   XLSX.utils.book_append_sheet(workbook, worksheet, "Attendance");
-
-  //   // Save file
-  //   const excelBuffer = XLSX.write(workbook, {
-  //     bookType: "xlsx",
-  //     type: "array",
-  //   });
-  //   saveAs(
-  //     new Blob([excelBuffer], { type: "application/octet-stream" }),
-  //     `attendance_${month + 1}-${year}.xlsx`
-  //   );
-  // };
-
 
 
   // export to excel color 
@@ -535,9 +482,7 @@ const AttendanceCsv = () => {
             >
               <i className="bi bi-download"></i> Export CSV
             </Button>
-            {/* <Button variant="warning" className="ms-2" onClick={exportToExcel}>
-              <i className="bi bi-file-earmark-excel"></i> Export Excel
-            </Button> */}
+
             <Button
               variant="warning"
               className="ms-2"
@@ -551,7 +496,7 @@ const AttendanceCsv = () => {
 
       {/* Attendance Table */}
       <Row>
-        <Table responsive bordered className="text-center mt-3">
+        {/* <Table responsive bordered className="text-center mt-3">
           <thead>
             <tr>
               <th>SR No. </th>
@@ -588,7 +533,7 @@ const AttendanceCsv = () => {
                   <td>{index + 1}</td>
                   <td>{employee.username}</td>
 
-                  {/* Daily Status */}
+                  {/* Daily Status 
                   {datesInMonth.map((date) => {
                     const formattedDate = format(date, "yyyy-MM-dd");
                     const status = getAttendanceStatus(
@@ -617,9 +562,9 @@ const AttendanceCsv = () => {
                         {status}
                       </td>
                     );
-                  })}
+                  })} */}
 
-                  {/* Summary Columns */}
+                  {/* Summary Columns
                   <td>{datesInMonth.length}</td>
                   <td>{totals.absentCount}</td>
                   <td>{totals.leaveCount}</td>
@@ -632,7 +577,103 @@ const AttendanceCsv = () => {
               );
             })}
           </tbody>
-        </Table>
+        </Table> */}
+
+        <DataGrid
+          dataSource={employeeList}
+          keyExpr="id"
+          showBorders={true}
+          rowAlternationEnabled={true}
+          className="shadow-sm rounded"
+          height="auto"
+          columnAutoWidth={true}
+          wordWrapEnabled={true}
+          columnHidingEnabled={true}
+        >
+          <SearchPanel visible={true} placeholder="Search..." />
+          <FilterRow visible={true} />
+          <HeaderFilter visible={true} />
+          <Paging defaultPageSize={20} />
+
+          {/* Serial Number */}
+          <Column
+            caption="SR No."
+            width={70}
+            cellRender={({ rowIndex }) => rowIndex + 1}
+          />
+
+          <Column dataField="username" caption="Emp-Name" />
+
+          {/* Dynamic Date Columns */}
+          {datesInMonth.map((date) => {
+            const formattedDate = format(date, "yyyy-MM-dd");
+            const dayNumber = format(date, "d"); // 1, 2, 3
+            const dayName = format(date, "EEE"); // Mon, Tue...
+
+            return (
+              <Column
+                key={formattedDate}
+                caption={`${dayNumber}\n${dayName}`} // shows day + short day name
+                alignment="center"
+                cellRender={({ data }) => {
+                  const status = getAttendanceStatus(data.id, formattedDate);
+
+                  const className =
+                    status === "P"
+                      ? "bg-success text-white coustomclass"
+                      : status === "A"
+                      ? "bg-danger text-white coustomclass"
+                      : status === "PL"
+                      ? "bg-warning text-dark coustomclass"
+                      : status === "UL"
+                      ? "bg-info text-dark coustomclass"
+                      : status === "H"
+                      ? "bg-info text-white coustomclass"
+                      : status === "WO"
+                      ? "bg-secondary text-white coustomclass"
+                      : "ram";
+
+                  return <div className={className}>{status}</div>;
+                }}
+              />
+            );
+          })}
+
+          {/* Summary Columns */}
+          <Column caption="Total Days" cellRender={() => datesInMonth.length} />
+          <Column
+            caption="Absent"
+            cellRender={({ data }) => calculateTotals(data.id).absentCount}
+          />
+          <Column
+            caption="Leave"
+            cellRender={({ data }) => calculateTotals(data.id).leaveCount}
+          />
+          <Column
+            caption="Present"
+            cellRender={({ data }) => calculateTotals(data.id).presentCount}
+          />
+          <Column
+            caption="Holidays"
+            cellRender={({ data }) => calculateTotals(data.id).holidayCount}
+          />
+          <Column
+            caption="Wk-Offs"
+            cellRender={({ data }) => calculateTotals(data.id).weekOffCount}
+          />
+          <Column
+            caption="Total Work"
+            cellRender={({ data }) =>
+              convertMinutes(calculateTotals(data.id).totalWorkMinutes)
+            }
+          />
+          <Column
+            caption="Total Break"
+            cellRender={({ data }) =>
+              convertMinutes(calculateTotals(data.id).totalBreakMinutes)
+            }
+          />
+        </DataGrid>
       </Row>
     </Container>
   );

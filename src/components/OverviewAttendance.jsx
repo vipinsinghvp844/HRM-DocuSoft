@@ -160,7 +160,7 @@ function OverviewAttendance() {
           <SearchPanel visible={true} placeholder="Search..." />
           <FilterRow visible={true} />
           <HeaderFilter visible={true} />
-          <Paging defaultPageSize={5} />
+          <Paging defaultPageSize={20} />
           <Column
             caption="#"
             width={50}

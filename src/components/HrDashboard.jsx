@@ -18,6 +18,7 @@ import {
   GetOfficeShiftsAction,
 } from "../../redux/actions/EmployeeDetailsAction";
 import { FetchAllUserProfileAction } from "../../redux/actions/dev-aditya-action";
+import CalendarComponent from "./CalendarComponent .jsx";
 
 const HrDashboard = () => {
   const [currentDate, setCurrentDate] = useState("");
@@ -65,12 +66,7 @@ const HrDashboard = () => {
       <div className="topbar">
         <Row className="align-items-center justify-content-between">
           <Col>
-            <h3 className="text-center">Welcome to HR Dashboard</h3>
-          </Col>
-          <Col xs="auto" className="notification">
-            <Link to={"/notification"}>
-              <IoIosNotifications className="Notificationicon" />
-            </Link>
+            <h3 className="text-center">Welcome to Dashboard</h3>
           </Col>
         </Row>
       </div>
@@ -108,6 +104,7 @@ const HrDashboard = () => {
         </Col>
       </Row>
       <MarkAttendance />
+      <CalendarComponent />
     </Container>
   );
 };

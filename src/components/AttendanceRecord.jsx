@@ -73,6 +73,7 @@ const AttendanceRecord = () => {
         const data = await dispatch(
           GetAttendanceDataActionById(selectedMonth, selectedYear)
         );
+console.log(data,"+++++++++");
 
         const sortedData = data.sort(
           (a, b) => new Date(b.date) - new Date(a.date)

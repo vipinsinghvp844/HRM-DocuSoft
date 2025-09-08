@@ -4,6 +4,7 @@ import { Container, Row, Col, Card, Form, Button, ListGroup } from 'react-bootst
 import Calendar from 'react-calendar';
 import 'react-calendar/dist/Calendar.css';
 import './EmHolidays.css'; // Assuming you have a custom CSS file for additional styles
+import CalendarComponent from './CalendarComponent ';
 
 
 const EmHolidays = () => {
@@ -157,9 +158,10 @@ const EmHolidays = () => {
         </Col>
         <Col md={6}>
           <Card>
-            <Card.Header as="h4">Calendar View</Card.Header>
+            {/* <Card.Header as="h4">Calendar View</Card.Header> */}
             <Card.Body>
-              <Calendar tileContent={tileContent} />
+              {/* <Calendar tileContent={tileContent} /> */}
+              <CalendarComponent />
             </Card.Body>
           </Card>
         </Col>

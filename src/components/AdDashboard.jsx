@@ -61,7 +61,7 @@ const AdDashboard = () => {
       <Row className="mb-4">
         <Col xs={12} md={6} className="mb-3">
           <Card className="dashboard-card">
-            <h2 className="card-title">Public Holidays</h2>
+            {/* <h2 className="card-title">Holidays</h2> */}
             {/* <iframe
               src="https://calendar.google.com/calendar/embed?height=600&wkst=1&ctz=Asia%2FKolkata&showPrint=0&src=dmlwaW5zaW5naHZwODQ0QGdtYWlsLmNvbQ&src=M2VjZjEzZjUyNGE2YWM2YTlhMzc2ZTNlYzRiMGZhNGMxM2VkMDc2MGI0NDcxNGRhZjc1NjMzNTIwYWRkOTMzN0Bncm91cC5jYWxlbmRhci5nb29nbGUuY29t&src=ZW4tZ2IuaW5kaWFuI2hvbGlkYXlAZ3JvdXAudi5jYWxlbmRhci5nb29nbGUuY29t&src=ZW4tZ2IudWsjaG9saWRheUBncm91cC52LmNhbGVuZGFyLmdvb2dsZS5jb20&src=aHQzamxmYWFjNWxmZDYyNjN1bGZoNHRxbDhAZ3JvdXAuY2FsZW5kYXIuZ29vZ2xlLmNvbQ&color=%23039BE5&color=%23616161&color=%230B8043&color=%234285F4&color=%23B39DDB"
               className="calendercss"
