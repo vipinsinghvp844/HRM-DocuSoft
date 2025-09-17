@@ -9,6 +9,8 @@ import {
   // TotalAttendanceReduser,
 } from "../redecer/AllReducers";
 import { toast } from "react-toastify";
+import api from "../../src/components/api"
+
 
 const token = localStorage.getItem("authtoken");
 
@@ -20,7 +22,11 @@ const header = {
 
 export const LoginUserAction = (obj12) => async (dispatch) => {
   try {
-    const res = await axios.post(`${import.meta.env.VITE_API_AUTH}`, {
+    // const res = await axios.post(`${import.meta.env.VITE_API_AUTH}`, {
+    //   username: obj12.email,
+    //   password: obj12.password,
+    // });
+    const res = await api.post(`/custom-jwt/v1/login`, {
       username: obj12.email,
       password: obj12.password,
     });
@@ -32,8 +38,8 @@ export const LoginUserAction = (obj12) => async (dispatch) => {
       const userRole = user.roles && user.roles[0] ? user.roles[0] : null;
 
       if (userRole) {
-        localStorage.setItem('password' , obj12.password )
-        localStorage.setItem("authtoken", user.token);
+        localStorage.setItem("authtoken", user.access_token);
+        localStorage.setItem("refreshtoken", user.refresh_token);
         localStorage.setItem("user_email", user.user_email);
         localStorage.setItem("user_name", user.user_display_name);
         localStorage.setItem("role", userRole);
@@ -55,7 +61,7 @@ export const LoginUserAction = (obj12) => async (dispatch) => {
 export const FetchUserProfileAction = (body) => async (dispatch) => {
   try {
     const token = localStorage.getItem("authtoken");
-    const profileResponse = await axios.get(
+    const profileResponse = await api.get(
       `${import.meta.env.VITE_API_PROFILE_GET}`,
       {
         headers: {
@@ -142,7 +148,11 @@ export const ChangePasswordAction = (obj) => async (dispatch) => {
   try {
     const response = await axios.post(
       import.meta.env.VITE_API_CHANGE_PASSWORD,
-      obj
+      obj,{
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      }
     );
     // console.log(response?.data?.message);
     toast.success(response?.data?.message);

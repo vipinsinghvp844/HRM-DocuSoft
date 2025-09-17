@@ -199,12 +199,14 @@ export const submitAttendanceAction = (payload) => async (dispatch) => {
       }
     );
 
-    return response.data; // return the response so it can be awaited
+    // console.log("Redux Response:", response.data);
+    return response.data; // success case
   } catch (error) {
-    console.error("Error performing action", error);
-    // toast.error("An error occurred. Please try again.");
+    // console.error("Redux API Error:", error?.response || error);
+    throw error.response || error;
   }
 };
+
 
 export const EditAttDeatilByAdminHr = (payload, callback) => async (dispatch) => {
   try {

@@ -7,6 +7,13 @@ import {
   GetEmployeeLeaveDetailAction,
 } from "../../redux/actions/EmployeeDetailsAction";
 import "./LeaveBalance.css";
+import DataGrid, {
+  Column,
+  Paging,
+  FilterRow,
+  HeaderFilter,
+  SearchPanel,
+} from "devextreme-react/data-grid";
 
 const LeaveBalance = () => {
   const dispatch = useDispatch();
@@ -109,52 +116,43 @@ const LeaveBalance = () => {
           <h3 className="mt-2">Employee Leave Balance</h3>
         </Col>
       </Row>
-      <h2 className="leave-balance-header">Leave Balance</h2>
-        <Table striped bordered hover className="leave-balance-table">
-          <thead>
-            <tr>
-              <th>User ID</th>
-              <th>User Name</th>
-              <th>Year</th>
-              <th>Total Leave</th>
-              <th>Leave Taken</th>
-              <th>Leave Type</th>
-              <th>Balance Leave</th>
-            </tr>
-          </thead>
-            <tbody>
-          {loading ? (
-            <tr>
-              <td colSpan="10" className="text-center">
-                <div
-                  className="d-flex justify-content-center align-items-center"
-                  style={{ height: "200px" }}
-                >
-                  <LoaderSpiner />
-                </div>
-              </td>
-            </tr>
-          ) :  leaveBalances.length > 0 ? (
-            leaveBalances.map((balance) => (
-              <tr key={`${balance.user_id}-${balance.leave_type}`}>
-                <td>{balance.user_id}</td>
-                <td>{balance.user_name}</td>
-                <td>{balance.year}</td>
-                <td>{balance.total_leave}</td>
-                <td>{balance.taken_leave}</td>
-                <td>{balance.leave_type}</td>
-                <td>{balance.balance_leave}</td>
-              </tr>
-            ))
-          ):(
-            <tr>
-              <td colSpan="10" className="text-center">
-                <h4>No Employee Can Take Leave</h4>
-              </td>
-            </tr>
-            )}
-          </tbody>
-        </Table>
+{loading ? (
+      <div className="d-flex justify-content-center align-items-center" style={{ minHeight: "200px" }}>
+        <LoaderSpiner />
+      </div>
+    ) : error ? (
+      <p className="text-danger text-center">{error}</p>
+    ) : (
+     
+      <DataGrid
+        dataSource={leaveBalances}
+        keyExpr="user_id"
+        showBorders={true}
+        rowAlternationEnabled={true}
+        className="shadow-sm rounded"
+        height="auto"
+        columnAutoWidth={true}
+        wordWrapEnabled={true}
+        columnHidingEnabled={true}
+      >
+        <SearchPanel visible={true} placeholder="Search..." />
+        <FilterRow visible={true} />
+        <HeaderFilter visible={true} />
+        <Paging defaultPageSize={20} />
+        <Column
+          caption="#"
+          width={50}
+          cellRender={({ rowIndex }) => rowIndex + 1}
+        />
+        <Column dataField="user_id" caption="User Id" />
+        <Column dataField="user_name" caption="User Name" />
+        <Column dataField="year" caption="Year" />
+        <Column dataField="total_leave" caption="Total Leave" />
+        <Column dataField="taken_leave" caption="Taken Leave" />
+        <Column dataField="leave_type" caption="Leave Type" />
+        <Column dataField="balance_leave" caption="Balance Leave" />
+      </DataGrid>
+    )}
 
     </div>
   );

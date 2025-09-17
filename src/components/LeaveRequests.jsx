@@ -108,7 +108,7 @@ const LeaveRequests = ({ setPendingCount }) => {
             reason_for_leave: request.reason_for_leave || "No reason provided",
             status: request.status || "Pending",
             hr_note: request.hr_note || "",
-            totalLeaveDays: calculateTotalLeaveDays(
+            total_leave_days: calculateTotalLeaveDays(
               request.start_date,
               request.end_date
             ),
@@ -282,7 +282,7 @@ const LeaveRequests = ({ setPendingCount }) => {
           <SearchPanel visible={true} placeholder="Search..." />
           <FilterRow visible={true} />
           <HeaderFilter visible={true} />
-          <Paging defaultPageSize={5} />
+          <Paging defaultPageSize={20} />
           <Column
             caption="#"
             width={50}
@@ -294,7 +294,7 @@ const LeaveRequests = ({ setPendingCount }) => {
           <Column dataField="start_date" caption="Start Date" dataType="date" />
           <Column dataField="end_date" caption="End Date" dataType="date" />
           <Column dataField="reason_for_leave" caption="Reason" />
-          <Column dataField="total_leave_days" caption="Days" width={70} />
+          <Column dataField="total_leave_days" caption="Days" />
           <Column dataField="status" caption="Status" />
           <Column dataField="hr_note" caption="HR Note" />
 

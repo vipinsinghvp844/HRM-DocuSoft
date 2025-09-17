@@ -3,6 +3,14 @@ import { Table, Container, Row, Col, Button, Card } from "react-bootstrap";
 import { useParams } from "react-router-dom";
 import axios from "axios";
 import LoaderSpiner from "./LoaderSpiner";
+import DataGrid, {
+  Column,
+  Paging,
+  FilterRow,
+  HeaderFilter,
+  SearchPanel,
+  MasterDetail,
+} from "devextreme-react/data-grid";
 
 // ===== Utils =====
 const padZero = (num) => String(num).padStart(2, "0");
@@ -145,10 +153,12 @@ const EmployeeAttendance = () => {
           return acc;
         }, []);
 
+        console.log(combinedData,"data");
+        
         setWorkDuration(convertMinutes(totalWorkMinutes));
         setBreakDuration(convertMinutes(totalBreakMinutes));
         setAttendanceData(
-          combinedData.sort((a, b) => new Date(b.date) - new Date(a.date))
+          combinedData
         );
       } catch (error) {
         console.error("Error fetching data:", error);
@@ -219,7 +229,7 @@ const EmployeeAttendance = () => {
 
       {/* Attendance Table */}
       <Row>
-        <Table striped bordered hover responsive>
+        {/* <Table striped bordered hover responsive>
           <thead style={{ background: "#f8f9fa" }}>
             <tr>
               <th>Date</th>
@@ -247,7 +257,7 @@ const EmployeeAttendance = () => {
                   <td>{record.clock_in}</td>
                   <td>{record.clock_out}</td>
                   <td>{record.total_work}</td>
-                  <td colSpan="3">
+                  <td colSpan="3"> 
                     {record.breaks.length === 0 ? (
                       <span style={{ color: "#888" }}>No Breaks</span>
                     ) : (
@@ -274,7 +284,53 @@ const EmployeeAttendance = () => {
               </tr>
             )}
           </tbody>
-        </Table>
+        </Table> */}
+
+          <div style={{ overflowX: "auto" }}>
+                <DataGrid
+                  // ref={gridRef}
+                  dataSource={attendanceData}
+                  keyExpr="user_id"
+                  showBorders={true}
+                  rowAlternationEnabled={true}
+                  className="shadow-sm rounded"
+                  height="auto"
+                  columnAutoWidth={true}
+                  wordWrapEnabled={true}
+                  columnHidingEnabled={true}
+                  // onRowPrepared={onRowPrepared}
+                >
+                  <SearchPanel visible={true} placeholder="Search..." />
+                  <FilterRow visible={true} />
+                  <HeaderFilter visible={true} />
+                  <Paging defaultPageSize={20} />
+                  <Column
+                    caption="#"
+                    width={50}
+                    cellRender={({ rowIndex }) => rowIndex + 1}
+                  />
+                  <Column dataField="date" caption="Date" dataType="date"/>
+                  <Column dataField="user_name" caption="User Name" />
+                  <Column dataField="clock_in" caption="Check In" />
+                  <Column dataField="clock_out" caption="Check Out"  />
+                  <Column dataField="total_work" caption="Total Work" />
+                   <MasterDetail
+        enabled={true}
+        component={({ data }) => (
+          <DataGrid
+            dataSource={data.data.breaks}
+            showBorders={true}
+            columnAutoWidth={true}
+          >
+            <Column dataField="break_in" caption="Break In" />
+            <Column dataField="break_out" caption="Break Out" />
+            <Column dataField="total_break" caption="Total Break" />
+          </DataGrid>
+        )}
+      />
+         
+                </DataGrid>
+              </div>
       </Row>
     </Container>
   );

@@ -73,7 +73,6 @@ const Login = ({ onLogin }) => {
 
   useEffect(() => {
     let authToken = localStorage.getItem("authtoken");
-
     if (authToken) {
       let userRole = localStorage.getItem('role')
 
@@ -89,9 +88,6 @@ const Login = ({ onLogin }) => {
         } else {
           navigate("/default-dashboard");
         }
-
-     
-
     }
   }, []);
 

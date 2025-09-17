@@ -2,11 +2,9 @@ import React, { useState, useEffect } from "react";
 import { Col, Row, Tabs, Tab, Container, Card, Alert } from "react-bootstrap";
 import MarkAttendance from "./MarkAttendance";
 import "./EmDashboard.css"; // Import custom CSS
-// import {
-//   GetAttendanceDataAction,
-//   GetEmployeeLeaveDetailAction,
-//   GetTotalUserAction,
-// } from "../../redux/actions/EmployeeDetailsAction";
+import {
+  GetEmployeeLeaveDetailActionById
+} from "../../redux/actions/EmployeeDetailsAction";
 import { useDispatch } from "react-redux";
 
 function EmployeeDashboard() {
@@ -15,6 +13,7 @@ function EmployeeDashboard() {
   const dispatch = useDispatch();
 
   useEffect(() => {
+    dispatch(GetEmployeeLeaveDetailActionById())
     const user_name = localStorage.getItem("user_name");
 
     if (user_name) {

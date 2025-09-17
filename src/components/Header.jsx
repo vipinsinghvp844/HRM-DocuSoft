@@ -79,23 +79,6 @@ const Header = ({ onLogout }) => {
   }, []);
 
   useEffect(() => {
-    if (window.performance) {
-      if (performance.navigation.type == 1) {
-        const requestData = {
-          email: localStorage.getItem("user_email"),
-          password: localStorage.getItem("password"),
-        };
-
-        dispatch(LoginUserAction(requestData))
-          .then(async (response1) => {})
-          .catch((error) => {
-            console.log("error", error);
-          });
-      }
-    }
-  }, []);
-
-  useEffect(() => {
     const fetchUserProfile = async () => {
       try {
         const profileImage = await dispatch(FetchAllUserProfileAction());

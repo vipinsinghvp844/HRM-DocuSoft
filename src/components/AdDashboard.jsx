@@ -6,11 +6,6 @@ import TodayOnLeave from './TodayOnLeave';
 import TodayAbsent from './TodayAbsent';
 import './AdDashboard.css'; // Import custom CSS
 import { useDispatch } from 'react-redux';
-
-import FullCalendar from "@fullcalendar/react";
-import dayGridPlugin from "@fullcalendar/daygrid";
-import timeGridPlugin from "@fullcalendar/timegrid";
-import interactionPlugin from "@fullcalendar/interaction";
 import CalendarComponent from './CalendarComponent ';
 
 const AdDashboard = () => {

@@ -54,7 +54,7 @@ const MarkAttendance = () => {
   const [time, setTime] = useState("");
   const intervalRef = useRef(null);
   const [timeDisabled, setTimeDisabled] = useState(false);
- 
+
   useEffect(() => {
     setTimeDisabled(true);
 
@@ -100,34 +100,6 @@ const MarkAttendance = () => {
 
     return `${hours}:${minutes}:${seconds} ${period} `;
   }
-
-  const fetchData = async () => {
-    try {
-      const requestData = {
-        email: localStorage.getItem("user_email"),
-        password: localStorage.getItem("password"),
-      };
-
-      if (ValueForSideBarClick == 0) {
-        dispatch(LoginUserAction(requestData)).then(async (response1) => {
-          dispatch(setValueForSideBarClick(1));
-          if (token) {
-            // dispatch(SetCounterSliceForSideBarClick(false))
-            performDataAction();
-          }
-        });
-      } else {
-        if (token) {
-          performDataAction();
-        }
-      }
-    } catch (error) {
-      console.error("Error fetching data", error);
-      toast.error(
-        "Failed to fetch attendance records please hard refresh the page"
-      );
-    }
-  };
 
   async function performDataAction() {
     try {
@@ -183,9 +155,7 @@ const MarkAttendance = () => {
 
 
   useEffect(() => {
-    if (token) {
-      fetchData();
-    }
+   performDataAction();
   }, []);
 
   const handleAction = (action) => {
@@ -194,21 +164,22 @@ const MarkAttendance = () => {
   };
 
   const confirmAction = async () => {
-    setModalVisible(false);
-    setDisableButton(false);
+  setModalVisible(false);
+  setDisableButton(false);
+  setIsLoading(true);
 
-    setIsLoading(true);
-    const payload = {
-      user_id: userId,
-      user_name: userName,
-      date: currentDate,
-      time: time,
-      type: modalAction,
-    };
+  const payload = {
+    user_id: userId,
+    user_name: userName,
+    date: currentDate,
+    time: time,
+    type: modalAction,
+  };
 
-
-    try {
-      const response = await dispatch(submitAttendanceAction(payload));
+  try {
+    const response = await dispatch(submitAttendanceAction(payload));
+    const resData = response?.data || response;
+    if (resData?.status === "success") {
       if (modalAction === "clock_in") {
         setCheckInTime(time);
         setCheckInDisabled(true);
@@ -234,14 +205,26 @@ const MarkAttendance = () => {
         setCheckOutDisabled(false);
         toast.info("Break ended successfully!");
       }
-      fetchData();
-   
 
-    } catch (error) {
-      console.error("Error performing action", error);
-      toast.error("An error occurred. Please try again.");
+      fetchData();
+    } else {
+      toast.error(resData?.message || "Something went wrong!");
     }
-  };
+  } catch (error) {
+  // console.error("Frontend API Error:", error);
+  const errorMessage =
+    error?.data?.message ||       
+    error?.data?.data?.message ||
+    error?.statusText ||            
+    "An error occurred. Please try again.";
+
+  toast.error(errorMessage);
+} finally {
+    setIsLoading(false);
+  }
+};
+
+
 
   return (
     <>
@@ -328,10 +311,10 @@ const MarkAttendance = () => {
                   <td colSpan="2">
                     {breakInTimes.length > 0
                       ? breakInTimes.map((breakIn, index) => (
-                          <p key={index}>
-                            {breakIn} - {breakOutTimes[index] || "--:--:--"}
-                          </p>
-                        ))
+                        <p key={index}>
+                          {breakIn} - {breakOutTimes[index] || "--:--:--"}
+                        </p>
+                      ))
                       : "--:--:--"}
                   </td>
                   <td>{totalBreakDuration}</td>

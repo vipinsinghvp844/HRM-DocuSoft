@@ -20,7 +20,10 @@ import ExcelJS from "exceljs";
     FilterRow,
     HeaderFilter,
     SearchPanel,
+    Export,
   } from "devextreme-react/data-grid";
+  import jsPDF from "jspdf";
+import { exportDataGrid as exportDataGridToPdf } from "devextreme/pdf_exporter";
 
 const AttendanceCsv = () => {
   const [employees, setEmployees] = useState([]);
@@ -34,6 +37,16 @@ const AttendanceCsv = () => {
   const { TotalUsers } = useSelector(
     ({ EmployeeDetailReducers }) => EmployeeDetailReducers
   );
+   const onExporting = (e) => {
+    const doc = new jsPDF();
+
+    exportDataGridToPdf({
+      jsPDFDocument: doc,
+      component: e.component,
+    }).then(() => {
+      doc.save("DataGrid.pdf");
+    });
+  };
 
   // Convert minutes → hr:min
   const convertMinutes = (totalMinutes) => {
@@ -496,89 +509,6 @@ const AttendanceCsv = () => {
 
       {/* Attendance Table */}
       <Row>
-        {/* <Table responsive bordered className="text-center mt-3">
-          <thead>
-            <tr>
-              <th>SR No. </th>
-              <th>Emp-Name</th>
-              {datesInMonth.map((date) => (
-                <th key={date}>{format(date, "d")}</th>
-              ))}
-              <th>Total Days</th>
-              <th>Absent</th>
-              <th>Leave</th>
-              <th>Present</th>
-              <th>Holidays</th>
-              <th>Wk-Offs</th>
-              <th>Total Work</th>
-              <th>Total Break</th>
-            </tr>
-            <tr>
-              <th colSpan="2"></th>
-              {datesInMonth.map((date) => (
-                <th key={date} className="fontsizetest">
-                  {format(date, "EEE")}
-                </th>
-              ))}
-              <th colSpan="7"></th>
-            </tr>
-          </thead>
-
-          <tbody>
-            {employeeList.map((employee, index) => {
-              const totals = calculateTotals(employee.id);
-
-              return (
-                <tr key={employee.id}>
-                  <td>{index + 1}</td>
-                  <td>{employee.username}</td>
-
-                  {/* Daily Status 
-                  {datesInMonth.map((date) => {
-                    const formattedDate = format(date, "yyyy-MM-dd");
-                    const status = getAttendanceStatus(
-                      employee.id,
-                      formattedDate
-                    );
-                    return (
-                      <td
-                        key={date}
-                        className={
-                          status === "P"
-                            ? "bg-success text-white coustomclass"
-                            : status === "A"
-                            ? "bg-danger text-white coustomclass"
-                            : status === "PL"
-                            ? "bg-warning text-dark coustomclass"
-                            : status === "UL"
-                            ? "bg-info text-dark coustomclass"
-                            : status === "H"
-                            ? "bg-info text-white coustomclass"
-                            : status === "WO"
-                            ? "bg-secondary text-white coustomclass"
-                            : "ram"
-                        }
-                      >
-                        {status}
-                      </td>
-                    );
-                  })} */}
-
-                  {/* Summary Columns
-                  <td>{datesInMonth.length}</td>
-                  <td>{totals.absentCount}</td>
-                  <td>{totals.leaveCount}</td>
-                  <td>{totals.presentCount}</td>
-                  <td>{totals.holidayCount}</td>
-                  <td>{totals.weekOffCount}</td>
-                  <td>{convertMinutes(totals.totalWorkMinutes)}</td>
-                  <td>{convertMinutes(totals.totalBreakMinutes)}</td>
-                </tr>
-              );
-            })}
-          </tbody>
-        </Table> */}
-
         <DataGrid
           dataSource={employeeList}
           keyExpr="id"
@@ -589,6 +519,7 @@ const AttendanceCsv = () => {
           columnAutoWidth={true}
           wordWrapEnabled={true}
           columnHidingEnabled={true}
+          onExporting={onExporting}
         >
           <SearchPanel visible={true} placeholder="Search..." />
           <FilterRow visible={true} />
@@ -598,7 +529,7 @@ const AttendanceCsv = () => {
           {/* Serial Number */}
           <Column
             caption="SR No."
-            width={70}
+            width={30}
             cellRender={({ rowIndex }) => rowIndex + 1}
           />
 
@@ -607,8 +538,8 @@ const AttendanceCsv = () => {
           {/* Dynamic Date Columns */}
           {datesInMonth.map((date) => {
             const formattedDate = format(date, "yyyy-MM-dd");
-            const dayNumber = format(date, "d"); // 1, 2, 3
-            const dayName = format(date, "EEE"); // Mon, Tue...
+            const dayNumber = format(date, "d");
+            const dayName = format(date, "EEE"); 
 
             return (
               <Column
@@ -673,6 +604,7 @@ const AttendanceCsv = () => {
               convertMinutes(calculateTotals(data.id).totalBreakMinutes)
             }
           />
+           <Export enabled={true} />
         </DataGrid>
       </Row>
     </Container>

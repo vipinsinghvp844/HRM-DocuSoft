@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from "react";
 import { Form, Button, Alert, Container } from "react-bootstrap";
 import axios from "axios";
-import "./AddAttendance.css"; // Import the CSS file
+import "./AddAttendance.css";
 import { useSelector } from "react-redux";
 import { toast } from "react-toastify";
 
@@ -16,6 +16,7 @@ const AddAttendance = ({ currentUserRole }) => {
   const [employees, setEmployees] = useState([]);
   const [showDropdown, setShowDropdown] = useState(false);
   const [hasClockedIn, setHasClockedIn] = useState(false);
+  const [hasClockedOut, setHasClockedOut] = useState(false);
    const { TotalUsers } = useSelector(
      ({ EmployeeDetailReducers }) => EmployeeDetailReducers
   );
@@ -53,11 +54,13 @@ const AddAttendance = ({ currentUserRole }) => {
      );
 
      const hasClockIn = response.data.some(record => record.type === "clock_in");
+     const hasClockOut = response.data.some(record => record.type === "clock_out");
      setHasClockedIn(hasClockIn);
+     setHasClockedOut(hasClockOut)
    } catch (error) {
-     if (error.response && error.response.status === 404) {
-       setHasClockedIn(false);
-      //  console.log("No attendance found for this user and date.");
+    if (error.response && error.response.status === 404) {
+      setHasClockedIn(false);
+      setHasClockedOut(false);
      } else {
        console.error("Error checking attendance:", error);
      }
@@ -69,7 +72,7 @@ const AddAttendance = ({ currentUserRole }) => {
     setUserId(employee.id);
     setShowDropdown(false);
     
-    await checkUserAttendance(employee.id, date); // Ensure state is updated before rendering
+    await checkUserAttendance(employee.id, date);
   };
 
   const handleSubmit = async (e) => {
@@ -94,13 +97,12 @@ const AddAttendance = ({ currentUserRole }) => {
       });
       // setMessage("Attendance added successfully!");
       toast.success("Attendance added successfully!");
-      // Reset the form
       setUserName("");
       setUserId("");
       setClockInTime("");
       setClockOutTime("");
       setHasClockedIn(false);
-      setShowDropdown(false); // Hide dropdown after successful submission
+      setShowDropdown(false); 
     } catch (error) {
       toast.error("Error adding attendance. Please try again.");
       // setMessage("Error adding attendance. Please try again.");
@@ -111,66 +113,79 @@ const AddAttendance = ({ currentUserRole }) => {
   return (
     <Container className="add-attendance-container">
       <Form onSubmit={handleSubmit}>
-        <Form.Group controlId="formUserName">
-          <Form.Label>User Name</Form.Label>
-          <div className="dropdown-wrapper">
-            <Form.Control
-              type="text"
-              placeholder="Click to select user name"
-              value={userName}
-              onChange={(e) => setUserName(e.target.value)}
-              onClick={() => setShowDropdown(!showDropdown)}
-              required
-            />
-            {showDropdown && (
-              <ul className="dropdown-menu">
-                {employees.map((employee) => (
-                  <li
-                    key={employee.id}
-                    className="dropdown-item"
-                    onClick={() => handleUserSelection(employee)}
-                  >
-                    {employee.username}
-                  </li>
-                ))}
-              </ul>
-            )}
-          </div>
-        </Form.Group>
-        <Form.Group controlId="formDate">
-          <Form.Label>Date</Form.Label>
+  <Form.Group controlId="formUserName">
+    <Form.Label>User Name</Form.Label>
+    <div className="dropdown-wrapper">
+      <Form.Control
+        type="text"
+        placeholder="Click to select user name"
+        value={userName}
+        onChange={(e) => setUserName(e.target.value)}
+        onClick={() => setShowDropdown(!showDropdown)}
+        required
+      />
+      {showDropdown && (
+        <ul className="dropdown-menu">
+          {employees.map((employee) => (
+            <li
+              key={employee.id}
+              className="dropdown-item"
+              onClick={() => handleUserSelection(employee)}
+            >
+              {employee.username}
+            </li>
+          ))}
+        </ul>
+      )}
+    </div>
+  </Form.Group>
+
+  <Form.Group controlId="formDate">
+    <Form.Label>Date</Form.Label>
+    <Form.Control
+      type="date"
+      value={date}
+      onChange={(e) => setDate(e.target.value)}
+      required
+    />
+  </Form.Group>
+
+  {hasClockedIn && hasClockedOut ? (
+    <Alert variant="info" className="mt-3">
+      ✅ Attendance already completed for today
+    </Alert>
+  ) : (
+    <>
+      {!hasClockedIn ? (
+        <Form.Group controlId="formClockInTime">
+          <Form.Label>Clock In Time</Form.Label>
           <Form.Control
-            type="date"
-            value={date}
-            onChange={(e) => setDate(e.target.value)}
+            type="time"
+            value={clockInTime}
+            onChange={(e) => setClockInTime(e.target.value)}
             required
           />
         </Form.Group>
-        {!hasClockedIn ? (
-          <Form.Group controlId="formClockInTime">
-            <Form.Label>Clock In Time</Form.Label>
-            <Form.Control
-              type="time"
-              value={clockInTime}
-              onChange={(e) => setClockInTime(e.target.value)}
-              required
-            />
-          </Form.Group>
-        ) : (
-          <Form.Group controlId="formClockOutTime">
-            <Form.Label>Clock Out Time</Form.Label>
-            <Form.Control
-              type="time"
-              value={clockOutTime}
-              onChange={(e) => setClockOutTime(e.target.value)}
-              required
-            />
-          </Form.Group>
-        )}
-        <Button variant="primary" type="submit" className="submit-button">
-          {hasClockedIn ? "Add Check Out Time" : "Add Check In Time"}
-        </Button>
-      </Form>
+      ) : (
+        <Form.Group controlId="formClockOutTime">
+          <Form.Label>Clock Out Time</Form.Label>
+          <Form.Control
+            type="time"
+            value={clockOutTime}
+            onChange={(e) => setClockOutTime(e.target.value)}
+            required
+          />
+        </Form.Group>
+      )}
+
+      {/* Button */}
+      <Button variant="primary" type="submit" className="submit-button">
+        {hasClockedIn ? "Add Check Out Time" : "Add Check In Time"}
+      </Button>
+    </>
+  )}
+</Form>
+
     </Container>
   );
 };
