@@ -63,4 +63,9 @@
     width: 100%;
     margin-bottom: 10px;
   }
+  .all-emp-details .add-employee-button,
+  .all-emp-details .full-detail-button {
+    width: 100%;
+    margin-bottom: 10px;
+  }
 }

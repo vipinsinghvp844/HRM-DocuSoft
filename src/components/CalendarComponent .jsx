@@ -8,6 +8,7 @@ import { Form, Modal, Button, Card, Spinner } from "react-bootstrap";
 import tippy from "tippy.js";
 import "tippy.js/dist/tippy.css";
 import dayjs from "dayjs";
+import api from "./api";
 
 const CalendarComponent = () => {
   const [events, setEvents] = useState([]);
@@ -31,13 +32,13 @@ const CalendarComponent = () => {
   const fetchHolidays = async () => {
     setIsLoading(true);
     try {
-      const response = await axios.get(`${import.meta.env.VITE_API_HOLIDAYS}`, {
+      const response = await api.get(`${import.meta.env.VITE_API_HOLIDAYS}`, {
         headers: {
           Authorization: `Bearer ${localStorage.getItem("authtoken")}`,
         },
       });
 
-     const formattedEvents = response.data.map((holiday) => ({
+     const formattedEvents = response?.data?.map((holiday) => ({
        id: holiday.id,
        title: holiday.holiday_name,
        start: holiday.holiday_date,
@@ -99,7 +100,7 @@ const CalendarComponent = () => {
     setIsLoading(true);
     e.preventDefault();
     try {
-      await axios.post(`${import.meta.env.VITE_API_HOLIDAYS}`, HoliDayData, {
+      await api.post(`${import.meta.env.VITE_API_HOLIDAYS}`, HoliDayData, {
         headers: {
           Authorization: `Bearer ${localStorage.getItem("authtoken")}`,
         },
@@ -124,7 +125,7 @@ const CalendarComponent = () => {
     setIsLoading(true);
     e.preventDefault();
     try {
-      await axios.put(
+      await api.put(
         `${import.meta.env.VITE_API_HOLIDAYS}/${selectedEvent.id}`,
         HoliDayData,
         {
@@ -147,7 +148,7 @@ const CalendarComponent = () => {
       return;
     setIsLoading(true);
     try {
-      await axios.delete(
+      await api.delete(
         `${import.meta.env.VITE_API_HOLIDAYS}/${selectedEvent.id}`,
         {
           headers: {
@@ -226,7 +227,7 @@ const CalendarComponent = () => {
           eventDidMount={eventDidMount}
           eventDrop={async (info) => {
             try {
-              await axios.put(
+              await api.put(
                 `${import.meta.env.VITE_API_HOLIDAYS}/${info.event.id}`,
                 {
                   holiday_name: info.event.title,
@@ -255,7 +256,7 @@ const CalendarComponent = () => {
               const adjustedEnd = info.event.end
                 ? dayjs(info.event.end).subtract(1, "day").format("YYYY-MM-DD")
                 : info.event.startStr;
-              await axios.put(
+              await api.put(
                 `${import.meta.env.VITE_API_HOLIDAYS}/${info.event.id}`,
                 {
                   holiday_name: info.event.title,

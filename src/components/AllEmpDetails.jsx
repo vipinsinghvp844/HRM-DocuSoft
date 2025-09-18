@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from "react";
 import { Table, Button, Container, Alert, Row, Col } from "react-bootstrap";
 import { Link } from "react-router-dom";
+import { useNavigate } from "react-router-dom";
 import axios from "axios";
 import EditEmployee from "./EditEmployee";
 import ToggleButton from "./ToggleButton";
@@ -17,6 +18,7 @@ import DataGrid, {
   HeaderFilter,
   SearchPanel,
 } from "devextreme-react/data-grid";
+import api from "./api";
 
 const AllEmpDetails = () => {
   const [employees, setEmployees] = useState([]);
@@ -24,6 +26,8 @@ const AllEmpDetails = () => {
   const [showEditModal, setShowEditModal] = useState(false);
   const [selectedEmployeeId, setSelectedEmployeeId] = useState(null);
   const [loading, setLoading] = useState(true);
+  const navigate = useNavigate();
+
 
   const placeholderImage = import.meta.env.VITE_PLACEHOLDER_IMAGE;
   const dispatch = useDispatch();
@@ -35,26 +39,6 @@ const AllEmpDetails = () => {
   const employeeUsers = TotalUsers.filter(
     (user) => user.role === "employee" || user.role === "hr"
   );
-
-  // useEffect(() => {
-  //   const fetchEmployees = async () => {
-  //     setLoading(true);
-  //     try {
-  //       const response = await dispatch(GetTotalUserAction());
-  //       const employeeUsers = TotalUsers.filter(
-  //         (user) => user.role === "employee" || user.role === "hr"
-  //       );
-  //       setEmployees(employeeUsers);
-  //     } catch (error) {
-  //       console.error("Error fetching employees:", error);
-  //       setErrorMessage("Failed to fetch employees.");
-  //     } finally {
-  //       setLoading(false);
-  //     }
-  //   };
-
-  //   fetchEmployees();
-  // }, [dispatch]);
 
   const getProfileImage = (userId) => {
     if (!AllProfilesImage) return placeholderImage;
@@ -84,7 +68,7 @@ const AllEmpDetails = () => {
 
     if (confirmToggle) {
       try {
-        await axios.put(
+        await api.put(
           `${import.meta.env.VITE_API_CUSTOM_USERS}/${employeeId}`,
           { user_state: newState },
           {
@@ -105,6 +89,20 @@ const AllEmpDetails = () => {
         console.error("Error updating user state:", error);
         setErrorMessage("Failed to update user state.");
       }
+    }
+  };
+
+  // full detail with card profile
+
+  const handleFullDetail = async (userId) => {
+    try {
+      navigate(`/show-full-profile/${userId}`, {
+        state: {
+          fullDetails: employees,
+        },
+      });
+    } catch (error) {
+      console.error("Error fetching attendance details:", error);
     }
   };
 
@@ -168,7 +166,9 @@ const AllEmpDetails = () => {
                   src={getProfileImage(data.id)}
                   alt="Profile"
                   className="popup-profile-image"
-                  style={{ objectFit: "cover" }}
+                  style={{ objectFit: "cover", cursor:"pointer" }}
+                  // onClick={() => handleFullDetail(data.id)}
+
                 />
               </>
             )}
@@ -204,6 +204,20 @@ const AllEmpDetails = () => {
               </>
             )}
           />
+          {/* <Column
+            caption="Actions"
+            cellRender={({ data }) => (
+              <>
+                <Button
+                  variant="warning"
+                  onClick={() => handleFullDetail(data.id)}
+                  className="full-detail-button"
+                >
+                  Full Details
+                </Button>
+              </>
+            )}
+          /> */}
         </DataGrid>
       </div>
       <EditEmployee

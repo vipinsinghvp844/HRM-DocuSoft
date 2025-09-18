@@ -3,6 +3,7 @@ import { Alert, Button, Col, Container, Form, Row } from "react-bootstrap";
 import { useSelector } from "react-redux";
 import axios from "axios";
 import { toast } from "react-toastify";
+import api from "./api";
 const AdminAddEmpLeave = () => {
   const [userName, setUserName] = useState("");
   const [userId, setUserId] = useState("");
@@ -81,7 +82,7 @@ const AdminAddEmpLeave = () => {
         hr_note: "",
       };
 
-      await axios.post(`${import.meta.env.VITE_API_LEAVE}`, payload, {
+      await api.post(`${import.meta.env.VITE_API_LEAVE}`, payload, {
         headers: {
           Authorization: `Bearer ${localStorage.getItem("authtoken")}`,
         },

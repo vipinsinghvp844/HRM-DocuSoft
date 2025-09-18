@@ -11,6 +11,7 @@ import {
 } from "react-bootstrap";
 import jsPDF from "jspdf";
 import { toast } from "react-toastify";
+import api from "./api";
 
 function ManageDocument() {
   const [users, setUsers] = useState([]);
@@ -25,12 +26,12 @@ function ManageDocument() {
 
   const fetchUsers = async () => {
     try {
-      const response = await axios.get(import.meta.env.VITE_API_CUSTOM_USERS, {
+      const response = await api.get(import.meta.env.VITE_API_CUSTOM_USERS, {
         headers: {
           Authorization: `Bearer ${localStorage.getItem("authtoken")}`,
         },
       });
-      const filteredUsers = response.data.filter(
+      const filteredUsers = response?.data?.filter(
         (user) => user.role === "employee" || user.role === "hr"
       );
       setUsers(filteredUsers);
@@ -49,7 +50,7 @@ function ManageDocument() {
   };
 
   const handleDownload = (userId, documentType) => {
-    axios
+    api
       .get(`${import.meta.env.VITE_API_LETTER}/${userId}/${documentType}`, {
         headers: {
           Authorization: `Bearer ${localStorage.getItem("authtoken")}`,
@@ -68,7 +69,7 @@ function ManageDocument() {
   };
 
   const handleDelete = (userId, documentType) => {
-    axios
+    api
       .delete(`${import.meta.env.VITE_API_LETTER}/${userId}/${documentType}`, {
         headers: {
           Authorization: `Bearer ${localStorage.getItem("authtoken")}`,
@@ -85,7 +86,7 @@ function ManageDocument() {
 
   const fetchDocumentData = async (userId, documentType, actionType) => {
     try {
-      const response = await axios.get(
+      const response = await api.get(
         `${import.meta.env.VITE_API_LETTER}/${userId}/${documentType}`,
         {
           headers: {
@@ -120,7 +121,7 @@ function ManageDocument() {
         selectedDocument.userId
       }/${selectedDocument.documentType}`;
 
-      await axios.put(
+      await api.put(
         url,
         { content: documentContent },
         {

@@ -13,6 +13,7 @@ import "./HrManageHolidays.css";
 import { GetHolidayAction } from "../../redux/actions/EmployeeDetailsAction";
 import { useDispatch, useSelector } from "react-redux";
 import LoaderSpiner from "./LoaderSpiner";
+import api from "./api";
 
 
 const ManageHolidays = () => {
@@ -67,7 +68,7 @@ const ManageHolidays = () => {
   const handleAddHoliday = async (e) => {
     e.preventDefault();
     try {
-      const response = await axios.post(
+      const response = await api.post(
         `${import.meta.env.VITE_API_HOLIDAYS}`,
         newHoliday, {
           headers: {
@@ -91,7 +92,7 @@ const ManageHolidays = () => {
 
   const handleUpdateHoliday = async (id, updatedHoliday) => {
     try {
-      const response = await axios.put(
+      const response = await api.put(
         `${import.meta.env.VITE_API_HOLIDAYS}/${id}`, {
           headers: {
             Authorization: `Bearer ${localStorage.getItem("authtoken")}`,
@@ -108,7 +109,7 @@ const ManageHolidays = () => {
 
   const handleDeleteHoliday = async (id) => {
     try {
-      const response = await axios.delete(
+      const response = await api.delete(
         `${import.meta.env.VITE_API_HOLIDAYS}/${id}`, {
           headers: {
             Authorization: `Bearer ${localStorage.getItem("authtoken")}`,

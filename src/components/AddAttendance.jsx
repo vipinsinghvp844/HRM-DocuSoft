@@ -4,6 +4,7 @@ import axios from "axios";
 import "./AddAttendance.css";
 import { useSelector } from "react-redux";
 import { toast } from "react-toastify";
+import api from "./api";
 
 const AddAttendance = ({ currentUserRole }) => {
   const [userName, setUserName] = useState("");
@@ -45,7 +46,7 @@ const AddAttendance = ({ currentUserRole }) => {
 
  const checkUserAttendance = async (userId, date) => {
    try {
-     const response = await axios.get(`${import.meta.env.VITE_API_ATTENDANCE}`, {
+     const response = await api.get(`${import.meta.env.VITE_API_ATTENDANCE}`, {
        params: { user_id: userId, date },
        headers: {
          Authorization: `Bearer ${localStorage.getItem("authtoken")}`,
@@ -90,7 +91,7 @@ const AddAttendance = ({ currentUserRole }) => {
         type: hasClockedIn ? "clock_out" : "clock_in",
       };
 
-      await axios.post(`${import.meta.env.VITE_API_ATTENDANCE}`, payload, {
+      await api.post(`${import.meta.env.VITE_API_ATTENDANCE}`, payload, {
         headers: {
           Authorization: `Bearer ${localStorage.getItem("authtoken")}`,
         },

@@ -3,6 +3,7 @@ import { Nav, Container, Offcanvas, Button } from "react-bootstrap";
 import { NavLink } from "react-router-dom";
 import axios from "axios";
 import "./Sidebar.css"; 
+import api from "./api";
 
 
 const Sidebar = ({ userRole, pendingCount }) => {
@@ -13,7 +14,7 @@ const Sidebar = ({ userRole, pendingCount }) => {
   useEffect(() => {
     const fetchUserStatus = async () => {
       try {
-        const response = await axios.get(
+        const response = await api.get(
           `${import.meta.env.VITE_API_CUSTOM_USERS}/${userId}`
         );
         setUserStatus(response.data.user_state);

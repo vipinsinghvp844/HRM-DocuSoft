@@ -38,7 +38,7 @@ const OfferLetter = () => {
 
   // Fetch usernames on component mount
   useEffect(() => {
-    axios.get(import.meta.env.VITE_API_CUSTOM_USERS, {
+    api.get(import.meta.env.VITE_API_CUSTOM_USERS, {
       headers: {
         Authorization: `Bearer ${localStorage.getItem('authtoken')}`,
       },

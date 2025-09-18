@@ -3,6 +3,7 @@ import { Form, Button, Container, Col, Row } from "react-bootstrap";
 import axios from "axios";
 import { useSelector } from "react-redux";
 import { toast } from "react-toastify";
+import api from "./api";
 
 const AddEmployeeDetails = () => {
   const [userName, setUserName] = useState("");
@@ -94,7 +95,7 @@ const AddEmployeeDetails = () => {
         ...formData,
       };
 
-      const response = await axios.post(
+      const response = await api.post(
         `${import.meta.env.VITE_API_PERSONAL_INFO}`,
         payload
       );

@@ -2,6 +2,7 @@ import React, { useState, useEffect } from "react";
 import { Spinner, Alert, Card, OverlayTrigger, Tooltip } from "react-bootstrap";
 import axios from "axios";
 import { FaUserTimes } from "react-icons/fa";
+import api from "./api";
 
 function TodayOnLeave() {
   const [onLeaveCount, setOnLeaveCount] = useState(0);
@@ -16,7 +17,7 @@ function TodayOnLeave() {
 
   const fetchOnLeaveCount = async () => {
     try {
-      const leaveResponse = await axios.get(
+      const leaveResponse = await api.get(
         `${import.meta.env.VITE_API_LEAVE}`, {
           headers: {
             Authorization: `Bearer ${localStorage.getItem("authtoken")}`,

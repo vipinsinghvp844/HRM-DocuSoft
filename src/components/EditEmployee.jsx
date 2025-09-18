@@ -4,6 +4,7 @@ import axios from "axios";
 import { GetTotalUserAction } from "../../redux/actions/EmployeeDetailsAction";
 import { useDispatch, useSelector } from "react-redux";
 import { toast } from "react-toastify";
+import api from "./api";
 
 const EditEmployee = ({ employeeId, show, handleClose }) => {
   const [employee, setEmployee] = useState({
@@ -40,7 +41,7 @@ const EditEmployee = ({ employeeId, show, handleClose }) => {
   const handleSubmit = async (e) => {
     e.preventDefault();
     try {
-      await axios.put(`${import.meta.env.VITE_API_CUSTOM_USERS}/${employeeId}`, employee);
+      await api.put(`${import.meta.env.VITE_API_CUSTOM_USERS}/${employeeId}`, employee);
       toast.success("Employee details updated successfully.");
       handleClose();
       const response = await dispatch(GetTotalUserAction());

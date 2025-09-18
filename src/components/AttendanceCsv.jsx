@@ -24,6 +24,7 @@ import ExcelJS from "exceljs";
   } from "devextreme-react/data-grid";
   import jsPDF from "jspdf";
 import { exportDataGrid as exportDataGridToPdf } from "devextreme/pdf_exporter";
+import api from "./api";
 
 const AttendanceCsv = () => {
   const [employees, setEmployees] = useState([]);
@@ -70,7 +71,7 @@ const AttendanceCsv = () => {
 
     const fetchAttendanceData = async () => {
       try {
-        const response = await axios.get(
+        const response = await api.get(
           `${import.meta.env.VITE_API_GET_ATTENDANCE}?month=${
             month + 1
           }&year=${year}`,
@@ -88,7 +89,7 @@ const AttendanceCsv = () => {
 
     const fetchLeaveData = async () => {
       try {
-        const response = await axios.get(import.meta.env.VITE_API_LEAVE, {
+        const response = await api.get(import.meta.env.VITE_API_LEAVE, {
           params: { month: month + 1, year },
           headers: {
             Authorization: `Bearer ${localStorage.getItem("authtoken")}`,
@@ -102,7 +103,7 @@ const AttendanceCsv = () => {
 
     const fetchHolidays = async () => {
       try {
-        const response = await axios.get(import.meta.env.VITE_API_HOLIDAYS, {
+        const response = await api.get(import.meta.env.VITE_API_HOLIDAYS, {
           params: { year },
           headers: {
             Authorization: `Bearer ${localStorage.getItem("authtoken")}`,

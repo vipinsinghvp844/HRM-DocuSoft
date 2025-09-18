@@ -5,6 +5,7 @@ import Calendar from 'react-calendar';
 import 'react-calendar/dist/Calendar.css';
 import './EmHolidays.css'; // Assuming you have a custom CSS file for additional styles
 import CalendarComponent from './CalendarComponent ';
+import api from './api';
 
 
 const EmHolidays = () => {
@@ -21,7 +22,7 @@ const EmHolidays = () => {
 
   const fetchHolidays = async () => {
     try {
-      const response = await axios.get(`${import.meta.env.VITE_API_HOLIDAYS}`, {
+      const response = await api.get(`${import.meta.env.VITE_API_HOLIDAYS}`, {
         headers: {
           Authorization: `Bearer ${localStorage.getItem('authtoken')}`,
         },

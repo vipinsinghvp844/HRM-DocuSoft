@@ -14,6 +14,7 @@ import {
   fetchNotificationsAll,
   unseenUserandMessagecount,
 } from "../../redux/actions/EmployeeDetailsAction";
+import api from "./api";
 
 const Header = ({ onLogout }) => {
   const { TotalNotifications, AllUnseenUserAndMessages } = useSelector(
@@ -118,7 +119,7 @@ const Header = ({ onLogout }) => {
 
     if (authtoken && userId) {
       try {
-        await axios.post(
+        await api.post(
           `${import.meta.env.VITE_API_ON_OFF_USER_STATUS}`,
           { user_id: userId, status: "offline" },
           { headers: { Authorization: `Bearer ${authtoken}` } }

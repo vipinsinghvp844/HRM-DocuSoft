@@ -65,7 +65,7 @@ const ChatBox = () => {
 
   const handleEditMessage = async (messageId) => {
     try {
-      const response = await axios.put(
+      const response = await api.put(
         `${import.meta.env.VITE_API_CHATTING}/${messageId}`,
         {
           message: editedMessage,
@@ -94,7 +94,7 @@ const ChatBox = () => {
   //delete message by sender user
   const handleDeleteMessage = async (messageId) => {
     try {
-      await axios.delete(
+      await api.delete(
         `${import.meta.env.VITE_SOFT_DELETED_MESSAGE}/${messageId}`,
         {
           headers: {

@@ -8,7 +8,7 @@ function ReceiveLetter() {
   const userId = localStorage.getItem('user_id');
 
   useEffect(() => {
-    axios.get(`${import.meta.env.VITE_API_LETTER}/${userId}`, {
+    api.get(`${import.meta.env.VITE_API_LETTER}/${userId}`, {
       headers: {
         Authorization: `Bearer ${localStorage.getItem('authtoken')}`,
       },

@@ -12,6 +12,7 @@ import DataGrid, {
   HeaderFilter,
   SearchPanel,
 } from "devextreme-react/data-grid";
+import api from "./api";
 
 const EmployeeViewLeave = () => {
   const [requests, setRequests] = useState([]);
@@ -75,7 +76,7 @@ const EmployeeViewLeave = () => {
     const userId = localStorage.getItem("user_id");
     setDeleting(true);
     try {
-      await axios.delete(
+      await api.delete(
         `${import.meta.env.VITE_API_LEAVE}/${userId}?id=${deleteRequestId}`,
         {
           data: { user_id: loggedInUserId },
@@ -162,7 +163,8 @@ const EmployeeViewLeave = () => {
               caption="Apply Date"
               dataType="date"
             />
-            <Column dataField="leave_type" caption="Leave Type" />
+            <Column dataField="paid_leave_count" caption="Paid Count" />
+            <Column dataField="unpaid_leave_count" caption="Unpaid Count" />
             <Column
               dataField="start_date"
               caption="Start Date"

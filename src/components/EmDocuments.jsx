@@ -3,6 +3,7 @@ import { Container, Row, Col, Button, Table } from 'react-bootstrap';
 import axios from 'axios';
 import { toast } from 'react-toastify';
 import LoaderSpiner from "./LoaderSpiner";
+import api from './api';
 
 function EmDocuments() {
   const [documents, setDocuments] = useState([]);
@@ -19,7 +20,7 @@ function EmDocuments() {
     setIsLoading(true);
     
   try {
-    const response = await axios.get(
+    const response = await api.get(
       `${import.meta.env.VITE_API_LETTER}/${userId}`,
       {
         headers: {

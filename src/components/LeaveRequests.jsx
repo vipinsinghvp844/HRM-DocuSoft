@@ -219,7 +219,7 @@ const LeaveRequests = ({ setPendingCount }) => {
     if (!deleteRequest) return;
 
     try {
-      await axios.delete(
+      await api.delete(
         `${import.meta.env.VITE_API_LEAVE}/${deleteRequest.id}`,
         {
           headers: {

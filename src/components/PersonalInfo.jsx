@@ -47,7 +47,7 @@ const PersonalInfo = () => {
 
     try {
       const token = localStorage.getItem("authtoken");
-      await axios.put(
+      await api.put(
         `${import.meta.env.VITE_API_CUSTOM_USERS}/${userId}`,
         userInfo,
         {

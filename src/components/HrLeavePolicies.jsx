@@ -5,6 +5,7 @@ import './HrLeavePolicies.css';
 import { format, parseISO } from 'date-fns';
 import { toast } from 'react-toastify';
 import LoaderSpiner from "./LoaderSpiner";
+import api from './api';
 
 const LeavePolicies = () => {
   const [leavePolicies, setLeavePolicies] = useState([]);
@@ -24,13 +25,13 @@ const LeavePolicies = () => {
   const fetchLeavePolicies = async () => {
     try {
       setIsLoading(true);
-      const response = await axios.get(`${import.meta.env.VITE_API_LEAVE_POLICIES}`, {
+      const response = await api.get(`${import.meta.env.VITE_API_LEAVE_POLICIES}`, {
         headers: {
           Authorization: `Bearer ${localStorage.getItem('authtoken')}`,
         },
       });
       // Convert leave_year to a date format if necessary
-      const formattedPolicies = response.data.map((policy) => ({
+      const formattedPolicies = response?.data?.map((policy) => ({
         ...policy,
         leave_year: policy.leave_year ? format(parseISO(policy.leave_year), 'yyyy-MM-dd') : '',
       }));
@@ -54,13 +55,13 @@ const LeavePolicies = () => {
     e.preventDefault();
     try {
       if (editMode) {
-        await axios.put(`${import.meta.env.VITE_API_LEAVE_POLICIES}/${editId}`, form, {
+        await api.put(`${import.meta.env.VITE_API_LEAVE_POLICIES}/${editId}`, form, {
           headers: {
             Authorization: `Bearer ${localStorage.getItem('authtoken')}`,
           },
         });
       } else {
-        await axios.post(`${import.meta.env.VITE_API_LEAVE_POLICIES}`, form, {
+        await api.post(`${import.meta.env.VITE_API_LEAVE_POLICIES}`, form, {
           headers: {
             Authorization: `Bearer ${localStorage.getItem('authtoken')}`,
           },
@@ -93,7 +94,7 @@ const LeavePolicies = () => {
 
   const handleDelete = async (id) => {
     try {
-      await axios.delete(`${import.meta.env.VITE_API_LEAVE_POLICIES}/${id}`, {
+      await api.delete(`${import.meta.env.VITE_API_LEAVE_POLICIES}/${id}`, {
         headers: {
           Authorization: `Bearer ${localStorage.getItem('authtoken')}`,
         },

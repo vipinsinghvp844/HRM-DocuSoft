@@ -77,7 +77,9 @@ export const WebSocketProvider = ({ children }) => {
         const authtoken = localStorage.getItem("authtoken");
         const response = await axios.get(
           `${import.meta.env.VITE_API_ON_OFF_ALL_USER_STATUS}`,
-          { headers: { Authorization: `Bearer ${authtoken}` } }
+          { 
+            headers: { Authorization: `Bearer ${authtoken}` } 
+          }
         );
 // console.log(response.data);
 

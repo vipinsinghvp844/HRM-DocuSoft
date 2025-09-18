@@ -5,18 +5,17 @@ import {
   Col,
   Form,
   Button,
-  Alert,
   Card,
   Spinner,
 } from "react-bootstrap";
-import axios from "axios";
-import "./EmApplyLeave.css"; // Assuming you have a custom CSS file for additional styles
+import "./EmApplyLeave.css"; 
 import { toast } from "react-toastify";
 import { useDispatch } from "react-redux";
 import {
   SubmitLeave,
   GetEmployeeLeaveDetailActionById,
 } from "../../redux/actions/EmployeeDetailsAction";
+import api from "./api";
 
 const ApplyLeave = () => {
   const dispatch = useDispatch();
@@ -45,12 +44,12 @@ const ApplyLeave = () => {
 
   const checkExistingLeaveRequests = async (userId, startDate, endDate) => {
     try {
-      const response = await axios.get(
+      const response = await api.get(
         `${import.meta.env.VITE_API_LEAVE}/${userId}`, {
-          headers: {
-            Authorization: `Bearer ${localStorage.getItem("authtoken")}`,
-          }
+        headers: {
+          Authorization: `Bearer ${localStorage.getItem("authtoken")}`,
         }
+      }
       );
       const leaveRequests = response.data;
       // Check if any leave requests overlap with the new request
@@ -67,12 +66,10 @@ const ApplyLeave = () => {
       return false;
     }
   };
-
-  
   const handleSubmit = async (event) => {
 
-     event.preventDefault();
-     setIsLoading(true);
+    event.preventDefault();
+    setIsLoading(true);
 
     const user_name = localStorage.getItem("user_name");
     const user_id = localStorage.getItem("user_id");
@@ -81,16 +78,20 @@ const ApplyLeave = () => {
       toast.info("User not logged in. Please log in and try again.");
       return;
     }
+    const totalLeave = (parseInt(leaveDays?.paidLeave) || 0) + (parseInt(leaveDays?.unpaidLeave) || 0);
+    if (totalLeave <= 0) {
+      toast.warn("Please enter at least 1 day of leave (paid or unpaid).");
+      setIsLoading(false);
+      return;
+    }
 
     // Check if start date is in the past
     if (isDateInPast(startDate)) {
-      // setError("Start date cannot be in the past.");
       toast.info("Start date cannot be in the past.");
       return;
     }
 
     if (!isStartDateBeforeEndDate(startDate, endDate)) {
-      // setError("Start date cannot be after end date.");
       toast.info("Start date cannot be after end date.");
 
       return;
@@ -103,7 +104,6 @@ const ApplyLeave = () => {
       endDate
     );
     if (hasExistingRequest) {
-      // setError("Leave request already exists for the specified dates.");
       toast.warn("Leave request already exists for the specified dates.");
 
       return;
@@ -115,30 +115,32 @@ const ApplyLeave = () => {
       setLevaDays({ unpaidLeave: 0, paidLeave: 0 });
     };
 
-    const newLeaveRequest = {
-      "user_id": user_id,
-      "user_name": user_name,
-      "apply_date": currentDate,
-      "start_date": startDate,
-      "end_date": endDate,
-      "reason_for_leave": reasonForLeave,
-      "total_leave_days": (parseInt(leaveDays?.paidLeave) || 0) + (parseInt(leaveDays?.unpaidLeave) || 0),
-      "paid_leave_days": parseInt(leaveDays?.paidLeave) || 0,
-      "status": "Pending",
-      "actions": "Submitted",
-      "hr_note": ""
-    };
 
-    // console.log('set Paid leave days', newLeaveRequest)
+
+    const newLeaveRequest = {
+  user_id: user_id,
+  user_name: user_name,
+  apply_date: currentDate,
+  start_date: startDate,
+  end_date: endDate,
+  reason_for_leave: reasonForLeave,
+  total_leave_days: totalLeave,
+  paid_leave_count: parseInt(leaveDays?.paidLeave) || 0, 
+  unpaid_leave_count: parseInt(leaveDays?.unpaidLeave) || 0,
+  status: "Pending",
+  action: "Submitted",
+  hr_note: ""
+};
+
 
     try {
-     
+
       const response = await dispatch(
         SubmitLeave(newLeaveRequest,
           async (data) => {
-          await dispatch(GetEmployeeLeaveDetailActionById());
-        }
-      ));
+            await dispatch(GetEmployeeLeaveDetailActionById());
+          }
+        ));
       toast.success("Leave request submitted successfully.");
       resetForm();
     } catch (error) {
@@ -146,17 +148,15 @@ const ApplyLeave = () => {
       toast.error("Error submitting leave request. Please try again later.");
     } finally {
       setIsLoading(false);
-      
+
     }
   };
 
-  const formateEndDate = (value , paidLeave , unPaidLeave) => {
-    // console.log('formateEndDate' , value)
+  const formateEndDate = (value, paidLeave, unPaidLeave) => {
     let selectedDate = new Date(value);
     let paidLeaveNumber = Number(paidLeave) || 0;
     let unpaidLeavenumber = Number(unPaidLeave) || 0;
     let totalLeaveDays = (paidLeaveNumber || unpaidLeavenumber) ? paidLeaveNumber + unpaidLeavenumber - 1 : 0;
-    // console.log('formateEndDate', totalLeaveDays)
     selectedDate.setDate(selectedDate.getDate() + totalLeaveDays);
     let formattedEndDate = selectedDate.toISOString().split('T')[0];
     return formattedEndDate

@@ -36,7 +36,7 @@ const EmployeePerDetail = () => {
   useEffect(() => {
     const fetchEmployeeDetails = async () => {
       try {
-        const response = await axios.get(
+        const response = await api.get(
           `${import.meta.env.VITE_API_PERSONAL_INFO}/${id}`
         );
         // console.log(response.data);
@@ -63,7 +63,7 @@ const EmployeePerDetail = () => {
   useEffect(() => {
     const fetchBasicDetails = async () => {
       try {
-        const response = await axios.get(
+        const response = await api.get(
           `${import.meta.env.VITE_API_CUSTOM_USERS}/${id}`
         );
         setBasicInfo(response.data);
@@ -89,7 +89,7 @@ const EmployeePerDetail = () => {
   const handleSave = async () => {
     try {
       if (modalType === "Basic Info") {
-        await axios.put(
+        await api.put(
           `${import.meta.env.VITE_API_CUSTOM_USERS}/${id}`,
           currentEditData
         );
@@ -101,7 +101,7 @@ const EmployeePerDetail = () => {
         // } else {
         //   currentEditData.status = "Active";
         // }
-        await axios.put(
+        await api.put(
           `${import.meta.env.VITE_API_PERSONAL_INFO}/${id}`,
           currentEditData
         );

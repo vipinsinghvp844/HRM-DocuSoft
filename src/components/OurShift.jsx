@@ -2,6 +2,7 @@ import React, { useEffect, useState } from 'react';
 import axios from 'axios';
 import { Table, Spinner, Alert, Container, Row, Col } from 'react-bootstrap';
 import LoaderSpiner from "./LoaderSpiner";
+import api from './api';
 
 function OurShift() {
   const [shifts, setShifts] = useState([]);
@@ -23,8 +24,8 @@ const padZero = (num) => num.toString().padStart(2, "0");
   const fetchShifts = async () => {
     setLoading(true);
     try {
-      const response = await axios.get(`${import.meta.env.VITE_API_SHIFTS}`);
-      setShifts(response.data);
+      const response = await api.get(`${import.meta.env.VITE_API_SHIFTS}`);
+      setShifts(response?.data);
     } catch (error) {
       console.error('Error fetching shifts:', error);
       setLoading(false);

@@ -11,6 +11,7 @@ import DataGrid, {
   SearchPanel,
   MasterDetail,
 } from "devextreme-react/data-grid";
+import api from "./api";
 
 // ===== Utils =====
 const padZero = (num) => String(num).padStart(2, "0");
@@ -90,7 +91,7 @@ const EmployeeAttendance = () => {
     const fetchData = async () => {
       setIsLoading(true);
       try {
-        const { data } = await axios.get(
+        const { data } = await api.get(
           `${
             import.meta.env.VITE_API_GET_ATTENDANCE
           }/${userId}/?month=${formattedMonth}&year=${selectedYear}`,

@@ -84,7 +84,7 @@ function HrShift() {
 
   const deleteShift = async (shiftId) => {
     try {
-      await axios.delete(`${import.meta.env.VITE_API_SHIFTS}/${shiftId}`);
+      await api.delete(`${import.meta.env.VITE_API_SHIFTS}/${shiftId}`);
       setShifts(shifts.filter((shift) => shift.id !== shiftId));
       toast.success("Shift deleted successfully");
     } catch (error) {
@@ -111,12 +111,12 @@ function HrShift() {
       };
 
       if (isUpdating) {
-        await axios.put(
+        await api.put(
           `${import.meta.env.VITE_API_SHIFTS}/${currentShiftId}`,
           newShift
         );
       } else {
-        await axios.post(`${import.meta.env.VITE_API_SHIFTS}`, newShift);
+        await api.post(`${import.meta.env.VITE_API_SHIFTS}`, newShift);
       }
 
       fetchShifts();

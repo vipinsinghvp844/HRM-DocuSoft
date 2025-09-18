@@ -4,49 +4,76 @@ const api = axios.create({
   baseURL: "https://devsite.digitalpractice.net/devsite/wp-json",
 });
 
-// ✅ Request interceptor - har request me access token bhejega
+let isRefreshing = false;
+let failedQueue = [];
+
+const processQueue = (error, token = null) => {
+  failedQueue.forEach((prom) => {
+    if (error) {
+      prom.reject(error);
+    } else {
+      prom.resolve(token);
+    }
+  });
+  failedQueue = [];
+};
+
+// Request interceptor - har request me access token bhejega
 api.interceptors.request.use((config) => {
-  const token = localStorage.getItem("access_token");
+  const token = localStorage.getItem("authtoken");
   if (token) {
     config.headers.Authorization = `Bearer ${token}`;
   }
   return config;
 });
 
-// ✅ Response interceptor - agar 401 mila to refresh token call karega
+// Response interceptor
 api.interceptors.response.use(
   (response) => response,
   async (error) => {
     const originalRequest = error.config;
 
-    // agar 401 mila aur retry nahi hua hai
     if (error.response?.status === 401 && !originalRequest._retry) {
+      if (isRefreshing) {
+        // refresh already running → queue me daal do
+        return new Promise(function (resolve, reject) {
+          failedQueue.push({ resolve, reject });
+        })
+          .then((token) => {
+            originalRequest.headers.Authorization = "Bearer " + token;
+            return api(originalRequest);
+          })
+          .catch((err) => {
+            return Promise.reject(err);
+          });
+      }
+
       originalRequest._retry = true;
+      isRefreshing = true;
 
       try {
-        const refreshToken = localStorage.getItem("refresh_token");
-        if (!refreshToken) {
-          throw new Error("No refresh token found");
-        }
+        const refreshToken = localStorage.getItem("refreshtoken");
+        if (!refreshToken) throw new Error("No refresh token found");
 
-        // refresh token se naya access token le aao
         const res = await axios.post(
           "https://devsite.digitalpractice.net/devsite/wp-json/custom-jwt/v1/refresh",
           { refresh_token: refreshToken }
         );
 
         const newAccessToken = res.data.access_token;
-        localStorage.setItem("access_token", newAccessToken);
+        localStorage.setItem("authtoken", newAccessToken);
 
-        // naya token headers me daal kar dobara original request bhej do
-        originalRequest.headers.Authorization = `Bearer ${newAccessToken}`;
+        api.defaults.headers.common["Authorization"] = "Bearer " + newAccessToken;
+        processQueue(null, newAccessToken);
+
         return api(originalRequest);
-
       } catch (refreshError) {
-        console.error("Refresh token expired or invalid", refreshError);
-        // Yaha user ko logout kara sakte ho
+        processQueue(refreshError, null);
         localStorage.clear();
-        window.location.href = "/login";
+        window.location.href = "/";
+        return Promise.reject(refreshError);
+      } finally {
+        isRefreshing = false;
       }
     }
 

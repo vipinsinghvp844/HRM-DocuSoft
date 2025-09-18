@@ -3,6 +3,7 @@ import axios from "axios";
 import { Table, Spinner, Container, Row, Col } from "react-bootstrap";
 import LoaderSpiner from "./LoaderSpiner";
 import { toast } from "react-toastify";
+import api from "./api";
 
 const LeaveEntitlements = () => {
   const [leavePolicies, setLeavePolicies] = useState([]);
@@ -28,7 +29,7 @@ const LeaveEntitlements = () => {
 
   const fetchLeavePolicies = async () => {
     try {
-      const response = await axios.get(
+      const response = await api.get(
         `${import.meta.env.VITE_API_LEAVE_POLICIES}`,
         {
           headers: {
@@ -44,7 +45,7 @@ const LeaveEntitlements = () => {
 
   const fetchLeaveRequests = async () => {
     try {
-      const response = await axios.get(`${import.meta.env.VITE_API_LEAVE}`, {
+      const response = await api.get(`${import.meta.env.VITE_API_LEAVE}`, {
         headers: {
           Authorization: `Bearer ${localStorage.getItem("authtoken")}`,
         },
