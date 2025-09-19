@@ -24,6 +24,7 @@ import DataGrid, {
   HeaderFilter,
   SearchPanel,
 } from "devextreme-react/data-grid";
+import api from "./api"
 
 const LeaveRequests = ({ setPendingCount }) => {
   const location = useLocation();
@@ -102,7 +103,8 @@ const LeaveRequests = ({ setPendingCount }) => {
             apply_date: request.apply_date || "N/A",
             user_name: request.user_name || "Unknown",
             user_id: request.user_id || "N/A",
-            leave_type: request.leave_type || "N/A",
+            paid_leave_count: request.paid_leave_count || "N/A",
+            unpaid_leave_count: request.unpaid_leave_count || "N/A",
             start_date: request.start_date || null,
             end_date: request.end_date || null,
             reason_for_leave: request.reason_for_leave || "No reason provided",
@@ -122,7 +124,7 @@ const LeaveRequests = ({ setPendingCount }) => {
             validRequest.status = "Reject";
             validRequest.hr_note = "Auto-rejected as the leave date has passed";
 
-            axios
+            api
               .put(
                 `${import.meta.env.VITE_API_LEAVE}/${validRequest.id}`,
                 validRequest,
@@ -174,13 +176,13 @@ const LeaveRequests = ({ setPendingCount }) => {
       ...selectedRequest,
       status: action,
       hr_note: note,
-      totalLeaveDays: calculateTotalLeaveDays(
+      total_leave_days: calculateTotalLeaveDays(
         selectedRequest.start_date,
         selectedRequest.end_date
       ),
     };
 
-    axios
+    api
       .put(
         `${import.meta.env.VITE_API_LEAVE}/${selectedRequest.id}`,
         updatedRequest,
@@ -290,7 +292,8 @@ const LeaveRequests = ({ setPendingCount }) => {
           />
           <Column dataField="user_name" caption="User Name" />
           <Column dataField="apply_date" caption="Apply Date" dataType="date" />
-          <Column dataField="leave_type" caption="Leave Type" />
+          <Column dataField="paid_leave_count" caption="Paid Count" />
+          <Column dataField="unpaid_leave_count" caption="Unpaid Count" />
           <Column dataField="start_date" caption="Start Date" dataType="date" />
           <Column dataField="end_date" caption="End Date" dataType="date" />
           <Column dataField="reason_for_leave" caption="Reason" />

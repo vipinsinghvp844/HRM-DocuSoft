@@ -14,7 +14,7 @@ import "react-toastify/dist/ReactToastify.css";
 import Header from "./components/Header";
 import AdDashboard from "./components/AdDashboard";
 import HrDashboard from "./components/HrDashboard";
-import HrShift from "./components/HrShift";
+import HrShift from "./components/HrShift"; 
 import LeaveRequests from "./components/LeaveRequests";
 import LeaveEntitlements from "./components/LeaveEntitlements";
 import AllEmpDetails from "./components/AllEmpDetails";
