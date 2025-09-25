@@ -84,8 +84,6 @@ const LeaveRequests = ({ setPendingCount }) => {
 
   useEffect(() => {
     const fetchAndProcessRequests = async () => {
-      setLoading(true);
-
       try {
         let fetchedRequests = [];
 
@@ -153,8 +151,6 @@ const LeaveRequests = ({ setPendingCount }) => {
         setPendingCount(pendingCount);
       } catch (error) {
         console.error("Error fetching leave requests:", error);
-      } finally {
-        setLoading(false);
       }
     };
 
@@ -243,6 +239,7 @@ const LeaveRequests = ({ setPendingCount }) => {
       setDeleteRequest(null);
     }
   };
+console.log(loading,"loading");
 
   return (
     <Container fluid className="p-3">
@@ -255,19 +252,16 @@ const LeaveRequests = ({ setPendingCount }) => {
           ></i>
         </Col>
         <Col md={7}>
-          <h3 className="mb-0">My Leave Requests</h3>
+          <h3 className="mb-0">Leave Requests</h3>
         </Col>
         <Col className="text-end ">
-          {/* <Button variant="secondary" onClick={resetFilters} className="me-2">
-            Reset Filters
-          </Button> */}
           <Link to={"/add-employee-leaves"}>
             <Button>Add Leaves</Button>{" "}
           </Link>
         </Col>
       </Row>
 
-      <div style={{ overflowX: "auto" }}>
+      <div style={{position: "relative", overflowX: "auto" }}>
         <DataGrid
           // ref={gridRef}
           dataSource={requests}
@@ -275,7 +269,7 @@ const LeaveRequests = ({ setPendingCount }) => {
           showBorders={true}
           rowAlternationEnabled={true}
           className="shadow-sm rounded"
-          height="auto"
+          height="500px"
           columnAutoWidth={true}
           wordWrapEnabled={true}
           columnHidingEnabled={true}
@@ -346,6 +340,27 @@ const LeaveRequests = ({ setPendingCount }) => {
             )}
           />
         </DataGrid>
+         {loading && (
+            <div
+              style={{
+                position: "absolute",
+                top: "50%",
+                left: "50%",
+                transform: "translate(-50%, -50%)",
+                background: "rgba(255,255,255,0.6)",
+                width: "100%",
+                height: "100%",
+                display: "flex",
+                alignItems: "center",
+                justifyContent: "center",
+                zIndex:10,
+              }}
+            >
+              <div role="status"> 
+                <LoaderSpiner />  
+              </div>
+            </div>
+          )}
       </div>
 
       <Modal

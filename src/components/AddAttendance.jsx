@@ -1,87 +1,82 @@
 import React, { useState, useEffect } from "react";
 import { Form, Button, Alert, Container } from "react-bootstrap";
-import axios from "axios";
 import "./AddAttendance.css";
-import { useSelector } from "react-redux";
+import { useDispatch, useSelector } from "react-redux";
 import { toast } from "react-toastify";
 import api from "./api";
+import { submitAttendanceAction } from "../../redux/actions/EmployeeDetailsAction";
 
 const AddAttendance = ({ currentUserRole }) => {
+  const dispatch = useDispatch();
+  const { TotalUsers } = useSelector(({ EmployeeDetailReducers }) => EmployeeDetailReducers);
+
   const [userName, setUserName] = useState("");
   const [userId, setUserId] = useState("");
-  const [date, setDate] = useState("");
+  const [date, setDate] = useState(new Date().toISOString().split("T")[0]);
   const [clockInTime, setClockInTime] = useState("");
   const [clockOutTime, setClockOutTime] = useState("");
-  const [message, setMessage] = useState("");
-  const [userRole, setUserRole] = useState("");
   const [employees, setEmployees] = useState([]);
   const [showDropdown, setShowDropdown] = useState(false);
   const [hasClockedIn, setHasClockedIn] = useState(false);
   const [hasClockedOut, setHasClockedOut] = useState(false);
-   const { TotalUsers } = useSelector(
-     ({ EmployeeDetailReducers }) => EmployeeDetailReducers
-  );
-  // console.log(TotalUsers, "TotalUsers======");
-  
 
   useEffect(() => {
-    const currentDate = new Date().toISOString().split("T")[0];
-    setDate(currentDate);
+    const employeeUsers = TotalUsers.filter(
+      (user) => ["employee", "hr"].includes(user.role)
+    );
+    setEmployees(employeeUsers);
+  }, [TotalUsers]);
 
-    const storedUserRole = localStorage.getItem("role");
-    setUserRole(storedUserRole || "");
+  const checkUserAttendance = async (userId, date) => {
+    try {
+      const { data } = await api.get(`${import.meta.env.VITE_API_ATTENDANCE}`, {
+        params: { user_id: userId, date },
+        headers: { Authorization: `Bearer ${localStorage.getItem("authtoken")}` },
+      });
 
-    const fetchEmployees = async () => {
-      try {
-        const response = TotalUsers;
-        const employeeUsers = response.filter(user => user.role === "employee" || user.role === "hr");
-        setEmployees(employeeUsers);
-      } catch (error) {
-        console.error("Error fetching employees:", error);
+      let clockIn = false, clockOut = false;
+      data.forEach((record) => {
+        if (record.type === "clock_in") clockIn = true;
+        if (record.type === "clock_out") clockOut = true;
+      });
+
+      setHasClockedIn(clockIn);
+      setHasClockedOut(clockOut);
+    } catch (error) {
+      if (error.response?.status === 404) {
+        setHasClockedIn(false);
+        setHasClockedOut(false);
+      } else {
+        console.error("Error checking attendance:", error);
       }
-    };
-
-    fetchEmployees();
-  }, []);
-
- const checkUserAttendance = async (userId, date) => {
-   try {
-     const response = await api.get(`${import.meta.env.VITE_API_ATTENDANCE}`, {
-       params: { user_id: userId, date },
-       headers: {
-         Authorization: `Bearer ${localStorage.getItem("authtoken")}`,
-       },
-     }
-     );
-
-     const hasClockIn = response.data.some(record => record.type === "clock_in");
-     const hasClockOut = response.data.some(record => record.type === "clock_out");
-     setHasClockedIn(hasClockIn);
-     setHasClockedOut(hasClockOut)
-   } catch (error) {
-    if (error.response && error.response.status === 404) {
-      setHasClockedIn(false);
-      setHasClockedOut(false);
-     } else {
-       console.error("Error checking attendance:", error);
-     }
-   }
-};
+    }
+  };
 
   const handleUserSelection = async (employee) => {
     setUserName(employee.username);
     setUserId(employee.id);
     setShowDropdown(false);
-    
     await checkUserAttendance(employee.id, date);
+  };
+
+  const resetForm = () => {
+    setUserName("");
+    setUserId("");
+    setClockInTime("");
+    setClockOutTime("");
+    setHasClockedIn(false);
+    setHasClockedOut(false);
+    setShowDropdown(false);
   };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    if (currentUserRole === "hr" && userRole !== "employee") {
-      setMessage("HR can only add attendance for employees.");
+
+    if (!userId) {
+      toast.error("Please select a user.");
       return;
     }
+
     try {
       const payload = {
         user_id: userId,
@@ -91,22 +86,11 @@ const AddAttendance = ({ currentUserRole }) => {
         type: hasClockedIn ? "clock_out" : "clock_in",
       };
 
-      await api.post(`${import.meta.env.VITE_API_ATTENDANCE}`, payload, {
-        headers: {
-          Authorization: `Bearer ${localStorage.getItem("authtoken")}`,
-        },
-      });
-      // setMessage("Attendance added successfully!");
+      await dispatch(submitAttendanceAction(payload));
       toast.success("Attendance added successfully!");
-      setUserName("");
-      setUserId("");
-      setClockInTime("");
-      setClockOutTime("");
-      setHasClockedIn(false);
-      setShowDropdown(false); 
+      resetForm();
     } catch (error) {
       toast.error("Error adding attendance. Please try again.");
-      // setMessage("Error adding attendance. Please try again.");
       console.error("Error adding attendance:", error);
     }
   };
@@ -114,79 +98,77 @@ const AddAttendance = ({ currentUserRole }) => {
   return (
     <Container className="add-attendance-container">
       <Form onSubmit={handleSubmit}>
-  <Form.Group controlId="formUserName">
-    <Form.Label>User Name</Form.Label>
-    <div className="dropdown-wrapper">
-      <Form.Control
-        type="text"
-        placeholder="Click to select user name"
-        value={userName}
-        onChange={(e) => setUserName(e.target.value)}
-        onClick={() => setShowDropdown(!showDropdown)}
-        required
-      />
-      {showDropdown && (
-        <ul className="dropdown-menu">
-          {employees.map((employee) => (
-            <li
-              key={employee.id}
-              className="dropdown-item"
-              onClick={() => handleUserSelection(employee)}
-            >
-              {employee.username}
-            </li>
-          ))}
-        </ul>
-      )}
-    </div>
-  </Form.Group>
+        <Form.Group controlId="formUserName">
+          <Form.Label>User Name</Form.Label>
+          <div className="dropdown-wrapper">
+            <Form.Control
+              type="text"
+              placeholder="Click to select user name"
+              value={userName}
+              onClick={() => setShowDropdown((prev) => !prev)}
+              readOnly
+              required
+            />
+            {showDropdown && (
+              <ul className="dropdown-menu">
+                {employees.map((employee) => (
+                  <li
+                    key={employee.id}
+                    className="dropdown-item"
+                    onClick={() => handleUserSelection(employee)}
+                  >
+                    {employee.username}
+                  </li>
+                ))}
+              </ul>
+            )}
+          </div>
+        </Form.Group>
 
-  <Form.Group controlId="formDate">
-    <Form.Label>Date</Form.Label>
-    <Form.Control
-      type="date"
-      value={date}
-      onChange={(e) => setDate(e.target.value)}
-      required
-    />
-  </Form.Group>
-
-  {hasClockedIn && hasClockedOut ? (
-    <Alert variant="info" className="mt-3">
-      ✅ Attendance already completed for today
-    </Alert>
-  ) : (
-    <>
-      {!hasClockedIn ? (
-        <Form.Group controlId="formClockInTime">
-          <Form.Label>Clock In Time</Form.Label>
+        <Form.Group controlId="formDate">
+          <Form.Label>Date</Form.Label>
           <Form.Control
-            type="time"
-            value={clockInTime}
-            onChange={(e) => setClockInTime(e.target.value)}
+            type="date"
+            value={date}
+            onChange={(e) => setDate(e.target.value)}
             required
           />
         </Form.Group>
-      ) : (
-        <Form.Group controlId="formClockOutTime">
-          <Form.Label>Clock Out Time</Form.Label>
-          <Form.Control
-            type="time"
-            value={clockOutTime}
-            onChange={(e) => setClockOutTime(e.target.value)}
-            required
-          />
-        </Form.Group>
-      )}
 
-      {/* Button */}
-      <Button variant="primary" type="submit" className="submit-button">
-        {hasClockedIn ? "Add Check Out Time" : "Add Check In Time"}
-      </Button>
-    </>
-  )}
-</Form>
+        {hasClockedIn && hasClockedOut ? (
+          <Alert variant="info" className="mt-3">
+            ✅ Attendance already completed for today
+          </Alert>
+        ) : (
+          <>
+            {!hasClockedIn ? (
+              <Form.Group controlId="formClockInTime">
+                <Form.Label>Clock In Time</Form.Label>
+                <Form.Control
+                  type="time"
+                  value={clockInTime}
+                  onChange={(e) => setClockInTime(e.target.value)}
+                  required
+                />
+              </Form.Group>
+            ) : (
+              <Form.Group controlId="formClockOutTime">
+                <Form.Label>Clock Out Time</Form.Label>
+                <Form.Control
+                  type="time"
+                  value={clockOutTime}
+                  onChange={(e) => setClockOutTime(e.target.value)}
+                  required
+                />
+              </Form.Group>
+            )}
 
+            <Button variant="primary" type="submit" className="submit-button mt-3">
+              {hasClockedIn ? "Add Check Out Time" : "Add Check In Time"}
+            </Button>
+          </>
+        )}
+      </Form>
     </Container>
   );
 };

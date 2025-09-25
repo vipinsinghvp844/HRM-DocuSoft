@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from "react";
-import { Table, Container, Row, Col, Button, Card } from "react-bootstrap";
+import { Table, Container, Row, Col, Button, Card, Spinner } from "react-bootstrap";
 import { useParams } from "react-router-dom";
 import axios from "axios";
 import LoaderSpiner from "./LoaderSpiner";
@@ -92,8 +92,7 @@ const EmployeeAttendance = () => {
       setIsLoading(true);
       try {
         const { data } = await api.get(
-          `${
-            import.meta.env.VITE_API_GET_ATTENDANCE
+          `${import.meta.env.VITE_API_GET_ATTENDANCE
           }/${userId}/?month=${formattedMonth}&year=${selectedYear}`,
           {
             headers: {
@@ -101,6 +100,7 @@ const EmployeeAttendance = () => {
             },
           }
         );
+
 
         let totalWorkMinutes = 0;
         let totalBreakMinutes = 0;
@@ -116,6 +116,7 @@ const EmployeeAttendance = () => {
 
           if (!userRecord) {
             userRecord = {
+              id: record.id,
               user_id: record.user_id,
               user_name: record.user_name,
               date: record.date,
@@ -154,8 +155,7 @@ const EmployeeAttendance = () => {
           return acc;
         }, []);
 
-        console.log(combinedData,"data");
-        
+
         setWorkDuration(convertMinutes(totalWorkMinutes));
         setBreakDuration(convertMinutes(totalBreakMinutes));
         setAttendanceData(
@@ -230,108 +230,67 @@ const EmployeeAttendance = () => {
 
       {/* Attendance Table */}
       <Row>
-        {/* <Table striped bordered hover responsive>
-          <thead style={{ background: "#f8f9fa" }}>
-            <tr>
-              <th>Date</th>
-              <th>User Name</th>
-              <th>Clock In</th>
-              <th>Clock Out</th>
-              <th>Total Work</th>
-              <th colSpan="3" className="text-center">
-                Breaks
-              </th>
-            </tr>
-          </thead>
-          <tbody>
-            {isLoading ? (
-              <tr>
-                <td colSpan="8" className="text-center" style={{ height: 200 }}>
-                  <LoaderSpiner />
-                </td>
-              </tr>
-            ) : attendanceData.length > 0 ? (
-              attendanceData.map((record, index) => (
-                <tr key={index}>
-                  <td>{record.date}</td>
-                  <td>{record.user_name}</td>
-                  <td>{record.clock_in}</td>
-                  <td>{record.clock_out}</td>
-                  <td>{record.total_work}</td>
-                  <td colSpan="3"> 
-                    {record.breaks.length === 0 ? (
-                      <span style={{ color: "#888" }}>No Breaks</span>
-                    ) : (
-                      <Table bordered size="sm" className="mb-0">
-                        <tbody>
-                          {record.breaks.map((b, i) => (
-                            <tr key={i}>
-                              <td>{b.break_in}</td>
-                              <td>{b.break_out}</td>
-                              <td>{b.total_break}</td>
-                            </tr>
-                          ))}
-                        </tbody>
-                      </Table>
-                    )}
-                  </td>
-                </tr>
-              ))
-            ) : (
-              <tr>
-                <td colSpan="8" className="text-center">
-                  No attendance records found.
-                </td>
-              </tr>
-            )}
-          </tbody>
-        </Table> */}
+       <div style={{ position: "relative" }}>
+  <DataGrid
+    dataSource={isLoading ? [] : attendanceData}
+    keyExpr="id"
+    showBorders={true}
+    rowAlternationEnabled={true}
+    className="shadow-sm rounded"
+    height="500px" 
+    columnAutoWidth={true}
+    wordWrapEnabled={true}
+    columnHidingEnabled={true}
+  >
+    <SearchPanel visible={true} placeholder="Search..." />
+    <FilterRow visible={true} />
+    <HeaderFilter visible={true} />
+    <Paging defaultPageSize={20} />
+    <Column caption="#" width={50} cellRender={({ rowIndex }) => rowIndex + 1} />
+    <Column dataField="date" caption="Date" dataType="date" />
+    <Column dataField="user_name" caption="User Name" />
+    <Column dataField="clock_in" caption="Check In" />
+    <Column dataField="clock_out" caption="Check Out" /> 
+    <Column dataField="total_work" caption="Total Work" />
 
-          <div style={{ overflowX: "auto" }}>
-                <DataGrid
-                  // ref={gridRef}
-                  dataSource={attendanceData}
-                  keyExpr="user_id"
-                  showBorders={true}
-                  rowAlternationEnabled={true}
-                  className="shadow-sm rounded"
-                  height="auto"
-                  columnAutoWidth={true}
-                  wordWrapEnabled={true}
-                  columnHidingEnabled={true}
-                  // onRowPrepared={onRowPrepared}
-                >
-                  <SearchPanel visible={true} placeholder="Search..." />
-                  <FilterRow visible={true} />
-                  <HeaderFilter visible={true} />
-                  <Paging defaultPageSize={20} />
-                  <Column
-                    caption="#"
-                    width={50}
-                    cellRender={({ rowIndex }) => rowIndex + 1}
-                  />
-                  <Column dataField="date" caption="Date" dataType="date"/>
-                  <Column dataField="user_name" caption="User Name" />
-                  <Column dataField="clock_in" caption="Check In" />
-                  <Column dataField="clock_out" caption="Check Out"  />
-                  <Column dataField="total_work" caption="Total Work" />
-                   <MasterDetail
-        enabled={true}
-        component={({ data }) => (
-          <DataGrid
-            dataSource={data.data.breaks}
-            showBorders={true}
-            columnAutoWidth={true}
-          >
-            <Column dataField="break_in" caption="Break In" />
-            <Column dataField="break_out" caption="Break Out" />
-            <Column dataField="total_break" caption="Total Break" />
-          </DataGrid>
-        )}
-      />
-         
-                </DataGrid>
-              </div>
+    <MasterDetail
+      enabled={true}
+      component={({ data }) => (
+        <DataGrid
+          dataSource={data.data.breaks}
+          showBorders={true}
+          columnAutoWidth={true}
+        >
+          <Column dataField="break_in" caption="Break In" />
+          <Column dataField="break_out" caption="Break Out" />
+          <Column dataField="total_break" caption="Total Break" />
+        </DataGrid>
+      )}
+    />
+  </DataGrid>
+
+  {isLoading && (
+    <div
+      style={{
+        position: "absolute",
+        top: "50%",
+        left: "50%",
+        transform: "translate(-50%, -50%)",
+        background: "rgba(255,255,255,0.6)",
+        width: "100%",
+        height: "100%",
+        display: "flex",
+        alignItems: "center",
+        justifyContent: "center",
+        zIndex: 10,
+      }}
+    >
+      <div role="status"> 
+        <LoaderSpiner />  
+      </div>
+    </div>
+  )}
+</div>
       </Row>
     </Container>
   );

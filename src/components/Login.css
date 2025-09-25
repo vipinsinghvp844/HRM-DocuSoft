@@ -35,7 +35,7 @@
   text-align: center;
 }
 
-h2.text-center.mb-4{
+h2.text-center.mb-4 {
   color: #fff;
 }
 
@@ -85,4 +85,27 @@ h2.text-center.mb-4{
   right: 10px;
   font-size: 24px;
   cursor: pointer;
+}
+
+.eyecolorhover:hover {
+  background-color: #D42027;
+  color: #fff !important;
+}
+
+.eyecolorhover {
+  background-color: #ffffff00;
+  border-radius: 50%;
+  width: 30px;
+  height: 30px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: background-color 0.3s ease;
+  cursor: pointer;
+  position: absolute;
+  right: 10px;
+  top: 50%;
+  transform: translateY(-50%);
+  font-size: 18px;
+  color: #555;
 }

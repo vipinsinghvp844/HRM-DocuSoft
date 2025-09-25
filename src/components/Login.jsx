@@ -56,7 +56,7 @@ const Login = ({ onLogin }) => {
 
         }
       } catch (error) {
-        if (error.response.data.code === "[jwt_auth] incorrect_password") {
+        if (error?.response?.data?.code === "invalid_login") {
           setErrorMessage("Invalid password. Please try again.");
           setShowPopup(true);
         } else if (error.response.data.code === "[jwt_auth] invalid_email") {
@@ -112,14 +112,6 @@ const Login = ({ onLogin }) => {
     };
   }, [showPopup]);
 
-  // const showPass = () => {
-  //   var x = document.getElementById("myInput");
-  //   if (x.type === "password") {
-  //     x.type = "text";
-  //   } else {
-  //     x.type = "password";
-  //   }
-  // };
   return (
     <Container fluid className="maincontainer">
       <Row className="w-100">
@@ -145,7 +137,7 @@ const Login = ({ onLogin }) => {
                   required
                 />
               </Form.Group>
-              <Form.Group className="mb-3" >
+              <Form.Group className="mb-3 position-relative" >
                 <Form.Control
                   name="password"
                   type={showPassword ? "text" : "password"}
@@ -154,16 +146,19 @@ const Login = ({ onLogin }) => {
                   onChange={formik.handleChange}
                   required
                 />
-                <div className="d-flex align-items-center p-2">
-
-                  <input
-                    type="checkbox"
-                    checked={showPassword}
-                    onChange={() => setShowPassword(!showPassword)}
-                    className="me-2"
-                  />
-                  <label className="mb-0 text-white">Show Password</label>
-                </div>
+                  <i
+                    className={`bi eyecolorhover ${showPassword ? "bi-eye-slash " : "bi-eye"} me-2`}
+                    style={{
+                      cursor: "pointer",
+                      position: "absolute",
+                      right: "1px",  
+                      top: "50%",  
+                      transform: "translateY(-50%)",
+                      fontSize: "18px",
+                      color: "#555"
+                    }}
+                    onClick={() => setShowPassword(!showPassword)}
+                  ></i>
 
               </Form.Group>
               <div className="d-flex justify-content-end mb-3">
@@ -198,14 +193,6 @@ const Login = ({ onLogin }) => {
                     &times;
                   </span>
                   <p>{errorMessage}</p>
-                  {/* <Link
-                    variant="primary"
-                    onClick={() => setShowPopup(false)}
-                    to={"/request-password-reset"}
-                    className="mx-2 "
-                  >
-                    Forget Your Password
-                  </Link> */}
                   <Button onClick={() => setShowPopup(false)}>Try Again</Button>
                 </div>
               </div>

@@ -258,11 +258,14 @@ export const SubmitLeave = (payload, callback) => async () => {
         },
       }
     );
-    if (response.data) {
-      callback(response.data);
-    }
+    
+    // if (response.data) {
+    //   callback(response.data);
+    // }
+    return response;
   } catch (error) {
     console.error("Error performing action", error);
+    throw error;
   }
 };
 

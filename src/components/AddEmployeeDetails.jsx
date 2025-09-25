@@ -10,12 +10,10 @@ const AddEmployeeDetails = () => {
   const [userId, setUserId] = useState("");
   const [employees, setEmployees] = useState([]);
   const [showDropdown, setShowDropdown] = useState(false);
-  const [message, setMessage] = useState("");
   const [formData, setFormData] = useState({
     name_of_bank: "",
     account_number: "",
     name_in_bank: "",
-    // status: "Active",    // Default status Active
     gender: "",
     marital_status: "",
     department: "",
@@ -35,16 +33,13 @@ const AddEmployeeDetails = () => {
     date_of_joining: "",
     date_of_leaving: "",
   });
-  const { TotalUsers, TotalAttendance, TotalEmployeeInLeave } = useSelector(
+  const { TotalUsers } = useSelector(
     ({ EmployeeDetailReducers }) => EmployeeDetailReducers
   );
 
   useEffect(() => {
     const fetchEmployees = async () => {
       try {
-        // const response = await axios.get(
-        //   `${import.meta.env.VITE_API_CUSTOM_USERS}`
-        // );
         const employeeUsers = TotalUsers.filter(
           (user) => user.role === "employee" || user.role === "hr"
         );
@@ -56,21 +51,6 @@ const AddEmployeeDetails = () => {
 
     fetchEmployees();
   }, []);
-
-  //  useEffect(() => {
-  //   // Auto-update status based on date_of_leaving
-  //   if (formData.date_of_leaving) {
-  //     setFormData((prevState) => ({
-  //       ...prevState,
-  //       status: "Inactive",
-  //     }));
-  //   } else {
-  //     setFormData((prevState) => ({
-  //       ...prevState,
-  //       status: "Active",
-  //     }));
-  //   }
-  // }, [formData.date_of_leaving]);
 
   const handleUserSelection = (employee) => {
     setUserName(employee.username);
@@ -128,7 +108,6 @@ const AddEmployeeDetails = () => {
         date_of_leaving: "",
       });
     } catch (error) {
-      // setMessage("Error adding details. Please try again.");
       toast.error("Error adding details. Please try again.");
       console.error("Error adding details:", error);
     }
