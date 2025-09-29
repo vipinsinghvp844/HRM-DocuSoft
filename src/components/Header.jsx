@@ -1,13 +1,11 @@
 import React, { useEffect, useState, useRef } from "react";
-import { Container, Row, Col, Button } from "react-bootstrap";
+import { Container, Row, Col, Button, Offcanvas, Nav } from "react-bootstrap";
 import axios from "axios";
-import { Link, useNavigate } from "react-router-dom";
+import { Link, useNavigate, NavLink } from "react-router-dom";
 import { FaTimes } from "react-icons/fa";
 import "./Header.css";
 import { useDispatch, useSelector } from "react-redux";
 import {
-  LoginUserAction,
-  FetchUserProfileAction,
   FetchAllUserProfileAction,
 } from "../../redux/actions/dev-aditya-action";
 import {
@@ -16,24 +14,216 @@ import {
 } from "../../redux/actions/EmployeeDetailsAction";
 import api from "./api";
 
-const Header = ({ onLogout }) => {
+const Header = ({ onLogout, userRole, pendingCount }) => {
   const { TotalNotifications, AllUnseenUserAndMessages } = useSelector(
     ({ EmployeeDetailReducers }) => EmployeeDetailReducers
   );
-  
-  // const [unreadUserCount, setUnreadUserCount] = useState(0);
   const [unreadCount, setUnreadCount] = useState(0);
   const [profileImage, setProfileImage] = useState("");
   const [showPopup, setShowPopup] = useState(false);
   const navigate = useNavigate();
   const dispatch = useDispatch();
-  const user_name = localStorage.getItem("user_name");
- const placeholderImage = import.meta.env.VITE_PLACEHOLDER_IMAGE;
+  const placeholderImage = import.meta.env.VITE_PLACEHOLDER_IMAGE;
   const popupRef = useRef(null);
   const { loginUserProfile, loginUserData } = useSelector(
     ({ AllReducers }) => AllReducers
   );
+  const [userStatus, setUserStatus] = useState("active");
+  const [show, setShow] = useState(false);
+  const userId = localStorage.getItem("user_id");
 
+
+  useEffect(() => {
+    const fetchUserStatus = async () => {
+      try {
+        const response = await api.get(
+          `${import.meta.env.VITE_API_CUSTOM_USERS}/${userId}`
+        );
+        setUserStatus(response.data.user_state);
+      } catch (error) {
+        console.error("Error fetching user status:", error);
+      }
+    };
+
+    fetchUserStatus();
+  }, [userId]);
+
+
+  const toggleMenu = () => {
+    if (window.innerWidth < 992) {
+      setShow((prev) => !prev);
+    }
+  };
+  const handleNavClick = () => {
+    if (window.innerWidth < 992) {
+      setShow(false);
+    }
+  };
+
+  const sidebarItems = {
+    admin: [
+      {
+        to: "/admin-dashboard",
+        icon: "bi-house-door",
+        label: "Admin Dashboard",
+      },
+      {
+        to: "/today-attendance",
+        icon: "bi-record-btn",
+        label: "Today Attendance",
+      },
+      {
+        to: "/manage-attendance",
+        icon: "bi-kanban",
+        label: "Manage Attendance",
+      },
+      { to: "/all-employee", icon: "bi-people", label: "All Employee" },
+      {
+        to: "/add-employee-details",
+        icon: "bi-file-earmark-spreadsheet",
+        label: "Add Employee Details",
+      },
+      { to: "/add-employee", icon: "bi-person-add", label: "Add User" },
+      {
+        to: "/leave-requests",
+        icon: "bi-person-exclamation",
+        label: "Leave Requests",
+        badge: pendingCount,
+      },
+      {
+        to: "/leave-policies",
+        icon: "bi-person-exclamation",
+        label: "Leave Policies",
+      },
+      {
+        to: "/leave-balance",
+        icon: "bi-person-exclamation",
+        label: "Leave Balance",
+      },
+      { to: "/manage-holidays", icon: "bi-cassette", label: "Manage Holidays" },
+      { to: "/shifts", icon: "bi-emoji-sunglasses", label: "Shifts" },
+      {
+        to: "/attendance-csv",
+        icon: "bi-filetype-csv",
+        label: "Attendance CSV",
+      },
+      {
+        to: "/manage-documents",
+        icon: "bi-file-earmark-check",
+        label: "Manage Documents",
+      },
+    ],
+    hr: [
+      { to: "/hr-dashboard", icon: "bi-house-door", label: "HR Dashboard" },
+      ...(userStatus === "active"
+        ? [
+          {
+            to: "/today-attendance",
+            icon: "bi-record-btn",
+            label: "Today Attendance",
+          },
+          {
+            to: "/manage-attendance",
+            icon: "bi-kanban",
+            label: "Manage Attendance",
+          },
+          {
+            to: "/add-employee-details",
+            icon: "bi-file-earmark-spreadsheet",
+            label: "Add Employee Details",
+          },
+          { to: "/all-employee", icon: "bi-people", label: "All Employee" },
+          {
+            to: "/manage-holidays",
+            icon: "bi-cassette",
+            label: "Manage Holidays",
+          },
+          {
+            to: "/my-leaves",
+            icon: "bi-person-exclamation",
+            label: "My Leaves",
+          },
+          {
+            to: "/leave-requests",
+            icon: "bi-person-exclamation",
+            label: "Leave Requests",
+            badge: pendingCount,
+          },
+          {
+            to: "/leave-policies",
+            icon: "bi-person-exclamation",
+            label: "Leave Policies",
+          },
+          {
+            to: "/leave-balance",
+            icon: "bi-person-exclamation",
+            label: "Leave Balance",
+          },
+          { to: "/shifts", icon: "bi-emoji-sunglasses", label: "Shifts" },
+          {
+            to: "/manage-documents",
+            icon: "bi-file-earmark-check",
+            label: "Manage Documents",
+          },
+          {
+            to: "/attendance-csv",
+            icon: "bi-calendar-check",
+            label: "Attendance Csv",
+          },
+        ]
+        : []),
+      { to: "/documents", icon: "bi-file-earmark-check", label: "Documents" },
+    ],
+    employee: [
+      {
+        to: "/employee-dashboard",
+        icon: "bi-house-door",
+        label: "Employee Dashboard",
+      },
+      ...(userStatus === "active"
+        ? [
+          {
+            to: "/my-Attendance",
+            icon: "bi-person-add",
+            label: "My Attendance",
+          },
+          {
+            to: "/my-leaves",
+            icon: "bi-person-exclamation",
+            label: "My Leaves",
+          },
+          {
+            to: "/leave-entitlements",
+            icon: "bi-person-exclamation",
+            label: "My Balance Leave",
+          },
+          {
+            to: "/holidays",
+            icon: "bi-arrow-up-right-circle",
+            label: "Holidays",
+          },
+          { to: "/our-shift", icon: "bi-emoji-sunglasses", label: "Shift" },
+        ]
+        : []),
+      { to: "/documents", icon: "bi-file-earmark-check", label: "Documents" },
+    ],
+  };
+
+  const renderNavItems = () =>
+    (sidebarItems[userRole] || []).map(({ to, icon, label, badge }, index) => (
+      <Nav.Link
+        key={`${to}-${index}`}
+        as={NavLink}
+        to={to}
+        onClick={handleNavClick}
+        className={({ isActive }) =>
+          isActive ? "active nav-link" : "nav-link"
+        }
+      >
+        <i className={`bi ${icon}`}></i> {label}
+        {badge && <span className="badge bg-danger">{badge}</span>}
+      </Nav.Link>
+    ));
 
   useEffect(() => {
     const fetchNotifications = async () => {
@@ -142,17 +332,46 @@ const Header = ({ onLogout }) => {
   return (
     <>
       <Container fluid className="sticky-top bg-white pb-0 pt-0">
-        <Row>
+        <Row className="align-items-center header-row">
+          <Col>
+            <Button
+              variant="danger"
+              onClick={toggleMenu}
+              className="d-md-none togglemobile"
+            >
+              <i className="bi bi-list"></i>
+            </Button>
+
+            {/* Mobile Sidebar */}
+            <Offcanvas
+              show={show}
+              onHide={toggleMenu}
+              className="sidenav sidenavmobile"
+            >
+              <Offcanvas.Header closeButton>
+                <Offcanvas.Title className="sidebar-logo">
+                  <img
+                    src="/assets/Docusoft-logo-red.svg"
+                    alt="HRM"
+                    className="img-fluid"
+                  />
+                </Offcanvas.Title>
+              </Offcanvas.Header>
+              <Offcanvas.Body>
+                <Nav className="flex-column sidebar">{renderNavItems()}</Nav>
+              </Offcanvas.Body>
+            </Offcanvas>
+          </Col>
           <Col className="d-flex justify-content-end">
-            <div className=" d-flex align-items-center me-5">
-              <Link to="/notification">
+            <div className=" d-flex align-items-center me-4 ">
+              <Link className="position-relative" to="/notification">
                 <i className="bi bi-bell"></i>
                 {unreadCount > 0 && (
                   <span className="notification-badge">{unreadCount}</span>
                 )}
               </Link>
             </div>
-            <div className="d-flex align-items-center me-5">
+            <div className="d-flex align-items-center me-4">
               <Link to="/chat" className="position-relative">
                 <i className="bi bi-chat"></i>
                 {AllUnseenUserAndMessages?.length > 0 &&

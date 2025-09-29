@@ -13,50 +13,9 @@ const TotalUsers = ({ setBirthdayMessages }) => {
   const { TotalUsers } = useSelector(
     ({ EmployeeDetailReducers }) => EmployeeDetailReducers
   );
-  // console.log(TotalUsers, "======store");
-
-  // useEffect(() => {
-  //   axios
-  //     .get(`${import.meta.env.VITE_API_CUSTOM_USERS}`)
-  //     .then((response) => {
-  //       const users = response.data;
-
-  //       // Filter out users with the role of "admin"
-  //       const nonAdminUsers = users.filter((user) => user.role !== "admin");
-  //       setTotalUsers(nonAdminUsers.length);
-
-  //       // Check for birthdays
-  //       const today = new Date();
-  //       const todayMonthDay = `${today.getMonth() + 1}-${today.getDate()}`;
-  //       const birthdayMessages = [];
-
-  //       nonAdminUsers.forEach((user) => {
-  //         const dob = new Date(user.dob);
-  //         const userMonthDay = `${dob.getMonth() + 1}-${dob.getDate()}`;
-  //         if (userMonthDay === todayMonthDay) {
-  //           birthdayMessages.push(`Today is ${user.first_name}'s Birthday!`);
-  //         }
-  //       });
-
-  //       setBirthdayMessages(birthdayMessages);
-  //     })
-  //     .catch((error) => {
-  //       console.error("Error fetching users:", error);
-  //       setError(error.message);
-  //     })
-  //     .finally(() => {});
-  // }, [setBirthdayMessages]);
-
-  // useEffect(() => {
-  //   getData();
-  // }, []);
-
-  // const getData = async () => {
-  //   await dispatch(GetTotalUserAction());
-  // };
-
+ 
   useEffect(() => {
-    const nonAdminUsers = TotalUsers.filter((user) => user.role !== "admin");
+    const nonAdminUsers = TotalUsers.filter((user) => user.role !== "admin" && user.user_state !== "inactive");
     setTotalUsers(nonAdminUsers.length);
 
     // Check for birthdays

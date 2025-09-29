@@ -1,21 +1,16 @@
 import React, { useState, useEffect } from "react";
 import {
-  Table,
   Button,
   Container,
-  Alert,
-  Spinner,
   Row,
   Col,
   Offcanvas,
 } from "react-bootstrap";
-import axios from "axios";
 import { useNavigate } from "react-router-dom";
 import { FaEye } from "react-icons/fa";
 import AddAttendance from "./AddAttendance";
-import LoaderSpiner from "./LoaderSpiner";
 import "./ManageAttendance.css"; // Import the custom CSS file
-import { useDispatch, useSelector } from "react-redux";
+import { useSelector } from "react-redux";
 import DataGrid, {
   Column,
   Paging,

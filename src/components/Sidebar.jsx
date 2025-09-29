@@ -203,35 +203,7 @@ const Sidebar = ({ userRole, pendingCount }) => {
     ));
 
   return (
-    <>
-      {/* Toggle Button for Mobile */}
-      <Button
-        variant="danger"
-        onClick={toggleMenu}
-        className="d-md-none togglemobile"
-      >
-        <i className="bi bi-list"></i>
-      </Button>
-
-      {/* Mobile Sidebar */}
-      <Offcanvas
-        show={show}
-        onHide={toggleMenu}
-        className="sidenav sidenavmobile"
-      >
-        <Offcanvas.Header closeButton>
-          <Offcanvas.Title className="sidebar-logo">
-            <img
-              src="/assets/Docusoft-logo-red.svg"
-              alt="HRM"
-              className="img-fluid"
-            />
-          </Offcanvas.Title>
-        </Offcanvas.Header>
-        <Offcanvas.Body>
-          <Nav className="flex-column sidebar">{renderNavItems()}</Nav>
-        </Offcanvas.Body>
-      </Offcanvas>
+    <>    
 
       {/* Desktop Sidebar (Always Visible) */}
       <div className="d-none d-md-block position-fixed sidenav">

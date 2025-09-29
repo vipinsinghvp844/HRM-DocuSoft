@@ -239,7 +239,6 @@ const LeaveRequests = ({ setPendingCount }) => {
       setDeleteRequest(null);
     }
   };
-console.log(loading,"loading");
 
   return (
     <Container fluid className="p-3">

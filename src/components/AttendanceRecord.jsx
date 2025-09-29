@@ -4,6 +4,14 @@ import { useDispatch } from "react-redux";
 import { GetAttendanceDataActionById } from "../../redux/actions/EmployeeDetailsAction";
 import LoaderSpiner from "./LoaderSpiner";
 import { Select, MenuItem, FormControl, InputLabel } from '@mui/material';
+import DataGrid, {
+  Column,
+  Paging,
+  FilterRow,
+  HeaderFilter,
+  SearchPanel,
+  MasterDetail,
+} from "devextreme-react/data-grid";
 
 
 // Utility function to format time in HH:MM format
@@ -73,7 +81,7 @@ const AttendanceRecord = () => {
         const data = await dispatch(
           GetAttendanceDataActionById(selectedMonth, selectedYear)
         );
-console.log(data,"+++++++++");
+        console.log(data, "+++++++++");
 
         const sortedData = data.sort(
           (a, b) => new Date(b.date) - new Date(a.date)
@@ -87,6 +95,7 @@ console.log(data,"+++++++++");
 
           if (!userRecord) {
             userRecord = {
+              id: record.id,
               user_id: record.user_id,
               user_name: record.user_name,
               date: record.date,
@@ -234,7 +243,7 @@ console.log(data,"+++++++++");
               ))}
             </Select>
           </FormControl>
-          
+
           <FormControl variant="outlined" size="small" sx={{ minWidth: 150, mr: 2 }}>
             <InputLabel>Select Year</InputLabel>
             <Select
@@ -248,76 +257,75 @@ console.log(data,"+++++++++");
                 </MenuItem>
               ))}
             </Select>
-          </FormControl>    
-              </Col>
+          </FormControl>
+        </Col>
       </Row>
 
 
       {/* Attendance Table */}
       <Row>
-        <Table striped bordered hover>
-          <thead>
-            <tr>
-              <th>Date</th>
-              <th>User Name</th>
-              <th>Clock In</th>
-              <th>Clock Out</th>
-              <th>Total Work</th>
-              <th>Breaks</th>
-            </tr>
-          </thead>
-          <tbody>
-            {isLoading ? (
-              <tr>
-                <td colSpan="9" className="text-center">
-                  <div
-                    className="d-flex justify-content-center align-items-center"
-                    style={{ height: "200px" }}
-                  >
-                    <LoaderSpiner />
-                  </div>
-                </td>
-              </tr>
-            ) : attendanceData.length > 0 ? (
-              attendanceData.map((record, index) => (
-                <React.Fragment key={index}>
-                  <tr>
-                    <td>{record.date}</td>
-                    <td>{record.user_name}</td>
-                    <td>{record.clock_in}</td>
-                    <td>{record.clock_out}</td>
-                    <td>{formatDuration(record.total_work || 0)}</td>
-                    <td>
-                      {record.breaks.length === 0 ? (
-                        "No Breaks"
-                      ) : (
-                        <Table bordered size="sm">
-                          <tbody>
-                            {record.breaks.map((breakItem, breakIndex) => (
-                              <tr key={breakIndex}>
-                                <td>{breakItem.break_in}</td>
-                                <td>{breakItem.break_out}</td>
-                                <td>
-                                  {formatDuration(breakItem.total_break || 0)}
-                                </td>
-                              </tr>
-                            ))}
-                          </tbody>
-                        </Table>
-                      )}
-                    </td>
-                  </tr>
-                </React.Fragment>
-              ))
-            ) : (
-              <tr>
-                <td colSpan="9" className="text-center">
-                  No data available for the selected month and year.
-                </td>
-              </tr>
-            )}
-          </tbody>
-        </Table>
+
+        <div style={{ position: "relative" }}>
+          <DataGrid
+            dataSource={isLoading ? [] : attendanceData}
+            keyExpr="id"
+            showBorders={true}
+            rowAlternationEnabled={true}
+            className="shadow-sm rounded"
+            height="500px"
+            columnAutoWidth={true}
+            wordWrapEnabled={true}
+            columnHidingEnabled={true}
+          >
+            <SearchPanel visible={true} placeholder="Search..." />
+            <FilterRow visible={true} />
+            <HeaderFilter visible={true} />
+            <Paging defaultPageSize={20} />
+            <Column caption="#" width={20} cellRender={({ rowIndex }) => rowIndex + 1} />
+            <Column dataField="date" caption="Date" dataType="date" />
+            <Column dataField="user_name" caption="User Name" />
+            <Column dataField="clock_in" caption="Check In" />
+            <Column dataField="clock_out" caption="Check Out" />
+            <Column dataField="total_work" caption="Total Work" />
+
+            <MasterDetail
+              enabled={true}
+              component={({ data }) => (
+                <DataGrid
+                  dataSource={data.data.breaks}
+                  showBorders={true}
+                  columnAutoWidth={true}
+                >
+                  <Column dataField="break_in" caption="Break In" />
+                  <Column dataField="break_out" caption="Break Out" />
+                  <Column dataField="total_break" caption="Total Break" />
+                </DataGrid>
+              )}
+            />
+          </DataGrid>
+
+          {isLoading && (
+            <div
+              style={{
+                position: "absolute",
+                top: "50%",
+                left: "50%",
+                transform: "translate(-50%, -50%)",
+                background: "rgba(255,255,255,0.6)",
+                width: "100%",
+                height: "100%",
+                display: "flex",
+                alignItems: "center",
+                justifyContent: "center",
+                zIndex: 10,
+              }}
+            >
+              <div role="status">
+                <LoaderSpiner />
+              </div>
+            </div>
+          )}
+        </div>
       </Row>
     </Container-fluid>
   );

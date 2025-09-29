@@ -1,6 +1,6 @@
-import React, { useState, useEffect } from "react";
+import { useState, useEffect } from "react";
 import { useDispatch, useSelector } from "react-redux";
-import { Table, Row, Col } from "react-bootstrap";
+import { Row, Col } from "react-bootstrap";
 import LoaderSpiner from "./LoaderSpiner";
 import {
   GetLeavePolicyAction,
@@ -45,62 +45,67 @@ const LeaveBalance = () => {
     }
   }, [leavePolicies, leaveRequests]);
 
-  const calculateLeaveBalances = () => {
-    try {
-      const balances = leaveRequests
-        .filter((request) => request.status === "Accept")
-        .map((request) => {
-          const policy = leavePolicies.find(
-            (policy) =>
-              policy.leave_type === request.leave_type &&
-              policy.leave_year === currentYear
+const calculateLeaveBalances = () => {
+  try {
+    const balances = leaveRequests
+      .filter((request) => request.status === "Accept")
+      .map((request) => {
+        const policy = leavePolicies.find(
+          (policy) =>
+            policy.leave_type === "Paid Leave" && 
+            policy.leave_year === currentYear
+        );
+
+        if (policy) {
+          const totalLeave = parseInt(policy.leave_days, 10);
+
+          // aggregate leaves for this user
+          const userLeaves = leaveRequests.filter(
+            (req) =>
+              req.user_id === request.user_id &&
+              req.status === "Accept"
           );
 
-          if (policy) {
-            const totalLeave = parseInt(policy.leave_days, 10);
-            const takenLeave = leaveRequests
-              .filter(
-                (req) =>
-                  req.user_id === request.user_id &&
-                  req.leave_type === request.leave_type &&
-                  req.status === "Accept"
-              )
-              .reduce(
-                (sum, req) => sum + parseInt(req.total_leave_days, 10),
-                0
-              );
+          const paidLeaveTaken = userLeaves.reduce(
+            (sum, req) => sum + parseInt(req.paid_leave_count || 0, 10),
+            0
+          );
 
-            return {
-              user_id: request.user_id,
-              user_name: request.user_name,
-              leave_type: request.leave_type,
-              year: policy.leave_year,
-              total_leave: totalLeave,
-              taken_leave: takenLeave,
-              balance_leave: totalLeave - takenLeave,
-            };
-          }
-          return null;
-        })
-        .filter(Boolean);
+          const unpaidLeaveTaken = userLeaves.reduce(
+            (sum, req) => sum + parseInt(req.unpaid_leave_count || 0, 10),
+            0
+          );
 
-      const uniqueBalances = balances.reduce((acc, current) => {
-        const existing = acc.find(
-          (item) =>
-            item.user_id === current.user_id &&
-            item.leave_type === current.leave_type
-        );
-        return existing ? acc : [...acc, current];
-      }, []);
+          return {
+            user_id: request.user_id,
+            user_name: request.user_name,
+            year: policy.leave_year,
+            total_leave: totalLeave,
+            paid_leave_count: paidLeaveTaken,
+            unpaid_leave_count: unpaidLeaveTaken,
+            taken_leave: paidLeaveTaken + unpaidLeaveTaken,
+            balance_leave: totalLeave - paidLeaveTaken,
+          };
+        }
+        return null;
+      })
+      .filter(Boolean);
 
-      setLeaveBalances(uniqueBalances);
-    } catch (error) {
-      setError("Error calculating leave balances.");
-      console.error(error);
-    } finally {
-      setLoading(false);
-    }
-  };
+    // remove duplicates (unique user record)
+    const uniqueBalances = balances.reduce((acc, current) => {
+      const existing = acc.find((item) => item.user_id === current.user_id);
+      return existing ? acc : [...acc, current];
+    }, []);
+
+    setLeaveBalances(uniqueBalances);
+  } catch (error) {
+    setError("Error calculating leave balances.");
+    console.error(error);
+  } finally {
+    setLoading(false);
+  }
+};
+
 
   return (
     <div className="leave-balance-container">
@@ -147,9 +152,10 @@ const LeaveBalance = () => {
         <Column dataField="user_id" caption="User Id" />
         <Column dataField="user_name" caption="User Name" />
         <Column dataField="year" caption="Year" />
-        <Column dataField="total_leave" caption="Total Leave" />
+        <Column dataField="total_leave" caption="Total Paid Leave" />
+        <Column dataField="paid_leave_count" caption="Paid Count" />
+        <Column dataField="unpaid_leave_count" caption="Unpaid Count" />
         <Column dataField="taken_leave" caption="Taken Leave" />
-        <Column dataField="leave_type" caption="Leave Type" />
         <Column dataField="balance_leave" caption="Balance Leave" />
       </DataGrid>
     )}

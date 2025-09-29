@@ -41,8 +41,10 @@ const AddEmployeeDetails = () => {
     const fetchEmployees = async () => {
       try {
         const employeeUsers = TotalUsers.filter(
-          (user) => user.role === "employee" || user.role === "hr"
-        );
+  (user) =>
+    (user.role === "employee" || user.role === "hr") &&
+    user.user_state !== "inactive"
+);
         setEmployees(employeeUsers);
       } catch (error) {
         console.error("Error fetching employees:", error);

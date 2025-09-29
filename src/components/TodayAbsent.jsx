@@ -29,7 +29,7 @@ function TodayAbsent() {
       // const usersData = TotalUsers || [];
 
       // Filter out users with the role of "admin"
-      const nonAdminUsers = usersData.filter((user) => user.role !== "admin");
+      const nonAdminUsers = usersData.filter((user) => user.role !== "admin" && user.user_state !== "inactive");
       const totalLeaveUsers = await dispatch(GetEmployeeLeaveDetailAction());
       const onLeaveUsers = totalLeaveUsers?.filter((leave) => {
           const startDate = new Date(leave.start_date)

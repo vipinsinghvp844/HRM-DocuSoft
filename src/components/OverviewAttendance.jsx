@@ -1,15 +1,11 @@
 import React, { useState, useEffect } from "react";
 import {
-  Table,
-  Spinner,
-  Alert,
   Container,
   Row,
   Col,
   Button,
   Offcanvas,
 } from "react-bootstrap";
-import LoaderSpiner from "./LoaderSpiner";
 import { useDispatch, useSelector } from "react-redux";
 import { GetAttendanceDataActionByDate } from "../../redux/actions/EmployeeDetailsAction";
 import EditEmployeeAttendance from "./EditEmployeeAttendance";
@@ -20,13 +16,11 @@ import DataGrid, {
   HeaderFilter,
   SearchPanel,
 } from "devextreme-react/data-grid";
-import { Link } from "react-router-dom";
 
 function OverviewAttendance() {
   const [attendanceRecords, setAttendanceRecords] = useState([]);
   
 
-  const currentDate = new Date().toISOString().split("T")[0]; // Format to YYYY-MM-DD
   const [isLoading, setIsLoading] = useState("false");
   const [show, setShow] = useState(false);
   const handleClose = () => setShow(false);
@@ -45,12 +39,6 @@ function OverviewAttendance() {
   const fetchAttendanceRecords = async () => {
     setIsLoading(true);
     try {
-      // const data = getAttendanceByDate;
-      // console.log(data);
-      
-
-      // const todayRecord = data.filter((record) => record.date === currentDate);
-
       const combinedData = getAttendanceByDate.reduce((acc, record) => {
         let userRecord = acc.find(
           (item) => item.user_id === record.user_id && item.date === record.date
