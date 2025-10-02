@@ -1,11 +1,9 @@
 import React, { useState, useEffect } from 'react';
-import axios from 'axios';
-import { Container, Row, Col, Card, Form, Button, ListGroup } from 'react-bootstrap';
-import Calendar from 'react-calendar';
+import {ListGroup } from 'react-bootstrap';
 import 'react-calendar/dist/Calendar.css';
-import './EmHolidays.css'; // Assuming you have a custom CSS file for additional styles
 import CalendarComponent from './CalendarComponent ';
 import api from './api';
+import { ArrowLeftCircle } from 'lucide-react';
 
 
 const EmHolidays = () => {
@@ -28,8 +26,7 @@ const EmHolidays = () => {
         },
       });
       setHolidays(response.data);
-      setFilteredHolidays(response.data); // Initially set to all holidays
-      // console.log(response.data)
+      setFilteredHolidays(response.data); 
     } catch (error) {
       console.error('Error fetching holidays:', error);
     }
@@ -83,91 +80,89 @@ const EmHolidays = () => {
   };
 
   return (
-    <Container className="mt-4 ">
-      <Row className="mb-4 d-flex">
-        <Col md={1}>
-          <i className="bi bi-arrow-left-circle" onClick={() => window.history.back()} style={{
-          cursor: "pointer",
-          fontSize: "32px",
-          color: "#343a40",
-        }}></i>
-        </Col>
-        <Col md={9} >
-          <h3 className="mt-2">Holidays</h3>
-        </Col>
-      </Row>
+    <div className="pt-4 px-2">
+      <div className="flex md:flex-row items-center justify-between gap-2 mb-6">
+        <button
+          onClick={() => window.history.back()}
+          className="flex items-center text-gray-700 hover:text-gray-900 transition-colors"
+        >
+          <ArrowLeftCircle size={32} className="mr-2" />
+          <span className="hidden md:inline text-lg font-semibold">Back</span>
+        </button>
+        <h3 className="text-xl md:text-2xl font-semibold text-center flex-1">Holidays</h3>
+      </div>
 
-      <Card className="mb-4">
-        <Card.Header as="h4">Filter Holidays</Card.Header>
-        <Card.Body>
-          <Form>
-            <Row className="align-items-end">
-              <Col md={4}>
-                <Form.Group controlId="filterDate">
-                  <Form.Label>Date</Form.Label>
-                  <Form.Control
-                    type="date"
-                    name="date"
-                    value={filters.date}
-                    onChange={handleFilterChange}
-                  />
-                </Form.Group>
-              </Col>
-              <Col md={4}>
-                <Form.Group controlId="filterType">
-                  <Form.Label>Type</Form.Label>
-                  <Form.Control
-                    as="select"
-                    name="type"
-                    value={filters.type}
-                    onChange={handleFilterChange}
-                  >
-                    <option value="">Select Type</option>
-                    <option value="Public Holiday">Public Holiday</option>
-                    <option value="Company Holiday">Company Holiday</option>
-                    <option value="Other">Other</option>
-                  </Form.Control>
-                </Form.Group>
-              </Col>
-              <Col md={4} className="d-flex">
-                <Button variant="primary" className="me-2" onClick={applyFilters}>
-                  Apply Filters
-                </Button>
-                <Button variant="secondary" onClick={resetFilters}>
-                  Reset Filters
-                </Button>
-              </Col>
-            </Row>
-          </Form>
-        </Card.Body>
-      </Card>
+      <div className="bg-white shadow rounded-lg mb-6 p-3">
+        <h4 className="text-lg font-semibold border-b pb-2 mb-4">Filter Holidays</h4>
+        <form>
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-4 items-end">
+            <div className="flex flex-col">
+              <label className="font-medium mb-1">Date</label>
+              <input
+                type="date"
+                name="date"
+                value={filters.date}
+                onChange={handleFilterChange}
+                className="border rounded px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-400"
+              />
+            </div>
 
-      <Row>
-        <Col md={6} className="mb-4">
-          <Card>
-            <Card.Header as="h4">Holiday List</Card.Header>
-            <Card.Body>
-              <ListGroup>
-                {filteredHolidays.length > 0 ? (
-                  filteredHolidays.map((holiday) => renderHolidayListItem(holiday))
-                ) : (
-                  <ListGroup.Item>No holidays available.</ListGroup.Item>
-                )}
-              </ListGroup>
-            </Card.Body>
-          </Card>
-        </Col>
-        <Col md={6}>
-          <Card>
-            {/* <Card.Header as="h4">Calendar View</Card.Header> */}
-            <Card.Body>
-              {/* <Calendar tileContent={tileContent} /> */}
-              <CalendarComponent />
-            </Card.Body>
-          </Card>
-        </Col>
-      </Row>
-    </Container>
+            <div className="flex flex-col">
+              <label className="font-medium mb-1">Type</label>
+              <select
+                name="type"
+                value={filters.type}
+                onChange={handleFilterChange}
+                className="border rounded px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-400"
+              >
+                <option value="">Select Type</option>
+                <option value="Public Holiday">Public Holiday</option>
+                <option value="Company Holiday">Company Holiday</option>
+                <option value="Other">Other</option>
+              </select>
+            </div>
+
+            {/* Buttons */}
+            <div className="flex gap-2">
+              <button
+                type="button"
+                onClick={applyFilters}
+                className="bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-600"
+              >
+                Apply Filters
+              </button>
+              <button
+                type="button"
+                onClick={resetFilters}
+                className="bg-gray-300 text-gray-800 px-4 py-2 rounded hover:bg-gray-400"
+              >
+                Reset Filters
+              </button>
+            </div>
+          </div>
+        </form>
+      </div>
+
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+        <div className="bg-white shadow rounded-lg p-4">
+          <h4 className="text-lg font-semibold border-b pb-2 mb-4">Holiday List</h4>
+          <ul className="divide-y">
+            {filteredHolidays.length > 0 ? (
+              filteredHolidays.map((holiday) => renderHolidayListItem(holiday))
+            ) : (
+              <li className="p-2 text-center text-gray-500">No holidays available.</li>
+            )}
+          </ul>
+        </div>
+
+        <div className="bg-white shadow rounded-lg p-4">
+          <div>
+            <CalendarComponent />
+          </div>
+        </div>
+      </div>
+    </div>
+
   );
 };
 

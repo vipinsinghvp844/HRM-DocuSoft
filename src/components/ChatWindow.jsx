@@ -1,11 +1,18 @@
-import React, { useContext, useEffect, useState } from "react";
-import { Col, Container, Form, Row, Modal, Button, Spinner } from "react-bootstrap";
+import React, { useContext, useEffect } from "react";
+import {
+  Col,
+  Container,
+  Form,
+  Row,
+  Modal,
+  Button,
+  Spinner,
+} from "react-bootstrap";
 import { WebSocketContext } from "./WebSocketContext";
+import "./ChatWindow.css";
 
 const ChatWindow = ({
   selectedUser,
-  // placeholderImage,
-  // AllProfilesImage,
   userId,
   messages,
   isLoading,
@@ -14,7 +21,6 @@ const ChatWindow = ({
   setNewMessage,
   profileImage,
   isSending,
-  // filteredImage,
   chatBoxRef,
   editingMessageId,
   contextMenu,
@@ -24,85 +30,88 @@ const ChatWindow = ({
   editedMessage,
   handleEditMessage,
   handleDeleteMessage,
-  // onEmojiClick,
   EmojiPicker,
   showEmojiPicker,
   setShowEmojiPicker,
-  // setFile,
   showModal,
   file,
   setShowModal,
   preview,
   handleFileChange,
   handleKeyDown,
-  hasMore,
+  onBack,
 }) => {
+  const { userStatus } = useContext(WebSocketContext);
+  const online = userStatus?.[String(selectedUser?.id)]?.status || false;
+  const lastSeen = userStatus?.[String(selectedUser?.id)]?.last_updated;
+
+  // Auto-scroll to bottom when messages update
+  useEffect(() => {
+    if (chatBoxRef.current) {
+      chatBoxRef.current.scrollTop = chatBoxRef.current.scrollHeight;
+    }
+  }, [messages]);
+
+  // Close context menu when clicking outside
+  // inside useEffect
+  useEffect(() => {
+    const handleClickOutside = (e) => {
+      if (contextMenu.visible) {
+        setContextMenu({ ...contextMenu, visible: false });
+      }
+    };
+
+    const handleScroll = () => {
+      if (contextMenu.visible) {
+        setContextMenu({ ...contextMenu, visible: false });
+      }
+    };
+
+    document.addEventListener("click", handleClickOutside);
+    window.addEventListener("scroll", handleScroll);
+
+    return () => {
+      document.removeEventListener("click", handleClickOutside);
+      window.removeEventListener("scroll", handleScroll);
+    };
+  }, [contextMenu, setContextMenu]);
+
+
   if (!selectedUser) {
     return (
-      <div style={{ paddingTop: "25%", paddingLeft: "30%" }}>
+      <div className="chat-empty">
         Please select a user to start chatting.
       </div>
     );
   }
-  const { userStatus } = useContext(WebSocketContext);
-  const online = userStatus[String(selectedUser.id)]?.status || false;
-  const lastSeen = userStatus[String(selectedUser.id)]?.last_updated;
-  useEffect(() => {
-    if (!chatBoxRef.current) return;
-  }, [chatBoxRef]);
-  useEffect(() => {
-    setTimeout(() => {
-      if (chatBoxRef.current) {
-        // console.log("ChatBox Ref Set Successfully:", chatBoxRef.current);
-      } else {
-        console.log("chatBoxRef is STILL null!");
-      }
-    }, 1000);
-  }, []);
+
   return (
-    <div>
-      <div style={{ display: "flex", alignItems: "center" }}>
-        <img
-          src={profileImage}
-          alt="profile"
-          className="rounded-circle me-3"
-          style={{ width: "40px", height: "40px", objectFit: "cover" }}
-        />
+    <div className="chat-window">
+      {/* Header */}
+      <div className="chat-header">
+        {onBack && (
+          <button
+            className="btn  d-md-none"
+            onClick={onBack}
+          >
+            ←
+          </button>
+        )}
+        <img src={profileImage} alt="profile" className="chat-profile-img" />
         <div>
-          <h5>{selectedUser.username}</h5>
-          {/* Show Online or Last Seen */}
+          <h5 className="mb-0">{selectedUser.username}</h5>
           {online === "online" ? (
-            <span style={{ color: "green" }}>Online</span>
+            <span className="chat-status-online">Online</span>
           ) : (
-            <span>{lastSeen}</span>
+            <span className="chat-status-offline">{lastSeen}</span>
           )}
         </div>
       </div>
 
-      <Container
-        className="chat-box"
-        style={{
-          height: "100vh",
-          maxHeight: "500px",
-          overflowY: "auto",
-          backgroundColor: "#87CEEB",
-        }}
-        ref={chatBoxRef}
-      >
+      {/* Messages Box */}
+      <Container className="chat-box" ref={chatBoxRef}>
         {isLoading && (
-          <div
-            style={{
-              position: "absolute",
-              top: 140,
-              left: "70%",
-              transform: "translateX(-50%)",
-              backgroundColor: "rgba(255,255,255,0.8)",
-              padding: "5px 10px",
-              borderRadius: "5px",
-              fontSize: "12px",
-              fontWeight: "bold",
-            }}
-          >
+          <div className="chat-loading">
             <Spinner size="sm" /> Loading messages...
           </div>
         )}
@@ -113,70 +122,59 @@ const ChatWindow = ({
             <p>Start the conversation by sending a message!</p>
           </div>
         ) : (
-            
           messages.map((msg, index) => {
             const isSender = msg.sender_id === String(userId);
-
             const messageTime = new Date(msg.timestamp).toLocaleTimeString(
               "en-US",
-              {
-                hour: "2-digit",
-                minute: "2-digit",
-              }
+              { hour: "2-digit", minute: "2-digit" }
             );
-
-            const messageDate = new Date(msg.timestamp).toLocaleDateString(
-              "en-US"
-            );
+            const messageDate = new Date(
+              msg.timestamp
+            ).toLocaleDateString("en-US");
             const previousMessageDate =
               index > 0
-                ? new Date(messages[index - 1].timestamp).toLocaleDateString(
-                    "en-US"
-                  )
+                ? new Date(
+                  messages[index - 1].timestamp
+                ).toLocaleDateString("en-US")
                 : null;
 
             return (
-              <React.Fragment key={`${msg.id}-${index}`}>
-                {/* Show Date Separator */}
+              <React.Fragment key={msg.id}>
                 {messageDate !== previousMessageDate && (
                   <Row className="justify-content-center">
                     <Col xs="auto">
-                      <div className="text-muted text-center">
-                        <strong>{messageDate}</strong>
-                      </div>
+                      <div className="chat-date-separator">{messageDate}</div>
                     </Col>
                   </Row>
                 )}
 
-                {/* Message with Context Menu */}
                 <Row
-                  className={`my-1 ${
-                    isSender ? "justify-content-end" : "justify-content-start"
-                  }`}
+                  className={`my-1 ${isSender ? "justify-content-end" : "justify-content-start"
+                    }`}
                   onContextMenu={(e) => {
                     e.preventDefault();
+                    const posX = e.clientX + window.scrollX;
+                    const posY = e.clientY + window.scrollY;
+
                     setContextMenu({
                       visible: true,
-                      x: e.pageX,
-                      y: e.pageY,
+                      x: posX,
+                      y: posY,
                       messageId: msg.id,
                     });
                   }}
                 >
                   <Col xs="auto">
+                    {/* Media */}
                     {msg.base64_image_data &&
                       (msg.media_type === "image" ? (
                         <img
                           src={`data:image/jpeg;base64,${msg.base64_image_data}`}
                           alt="Media"
-                          width="200"
-                          height="auto"
-                          style={{
-                            borderRadius: "5px",
-                          }}
+                          className="chat-media"
                         />
                       ) : (
-                        <video controls width="200" height="auto">
+                        <video controls className="chat-media">
                           <source
                             src={`data:video/mp4;base64,${msg.base64_image_data}`}
                             type="video/mp4"
@@ -184,7 +182,8 @@ const ChatWindow = ({
                           Your browser does not support the video tag.
                         </video>
                       ))}
-                    {/* Editable or Static Message */}
+
+                    {/* Editable or Normal Message */}
                     {editingMessageId === msg.id && isSender ? (
                       <input
                         type="text"
@@ -192,24 +191,14 @@ const ChatWindow = ({
                         onChange={(e) => setEditedMessage(e.target.value)}
                         onBlur={() => handleEditMessage(msg.id)}
                         autoFocus
-                        style={{
-                          padding: "10px",
-                          borderRadius: "5px",
-                          border: "1px solid #ccc",
-                        }}
+                        className="chat-edit-input"
                       />
                     ) : (
                       <div
-                        style={{
-                          width: "100%",
-                          overflow: "auto",
-                          display: "flex",
-                        }}
-                        className={`p-2 rounded ${
-                          isSender
-                            ? "bg-success text-white "
-                            : "bg-secondary text-white"
-                        }`}
+                        className={`chat-message ${isSender
+                          ? "chat-message-sent"
+                          : "chat-message-received"
+                          }`}
                       >
                         {msg.message === "This message was deleted" ? (
                           <i key={msg.id}>{msg.message}</i>
@@ -217,18 +206,16 @@ const ChatWindow = ({
                           <div key={msg.id}>{msg.message}</div>
                         )}
 
-                        <i
-                          className="text-muted ms-2"
-                          style={{ fontSize: "0.8rem" }}
-                        >
-                          {messageTime}
-                        </i>
+                        <i className="chat-time">{messageTime}</i>
 
-                        {isSender && msg.read_status === "1" ? (
-                          <i className="bi bi-check2-all text-danger ms-2"></i>
-                        ) : isSender && msg.read_status === "0" ? (
-                          <i className="bi bi-check ms-2"></i>
-                        ) : null}
+                        {isSender &&
+                          (msg.read_status === "1" ? (
+                            <i className="bi bi-check2-all text-primary ms-2"></i>
+                          ) : (
+                            msg.read_status === "0" && (
+                              <i className="bi bi-check ms-2"></i>
+                            )
+                          ))}
                       </div>
                     )}
                   </Col>
@@ -241,25 +228,17 @@ const ChatWindow = ({
         {/* Context Menu */}
         {contextMenu.visible && (
           <div
+            className="chat-context-menu"
             style={{
-              position: "absolute",
-              top: Math.min(contextMenu.y, window.innerHeight - 100),
-              left: Math.min(contextMenu.x, window.innerWidth - 200),
-              background: "white",
-              border: "1px solid #ccc",
-              boxShadow: "0px 4px 6px rgba(0, 0, 0, 0.1)",
-              zIndex: 1000,
-              padding: "5px 0",
+              top: `${contextMenu.y}px`,
+              left: `${contextMenu.x}px`,
             }}
-            onMouseLeave={() =>
-              setContextMenu({ ...contextMenu, visible: false })
-            }
           >
             <div
-              style={{ padding: "5px 10px", cursor: "pointer" }}
+              className="chat-context-item"
               onClick={() => {
                 const messageToEdit = messages.find(
-                  (msg) => msg.id === contextMenu.messageId
+                  (m) => m.id === contextMenu.messageId
                 );
                 setEditedMessage(messageToEdit.message);
                 setEditingMessageId(contextMenu.messageId);
@@ -269,11 +248,7 @@ const ChatWindow = ({
               Edit
             </div>
             <div
-              style={{
-                padding: "5px 10px",
-                cursor: "pointer",
-                color: "red",
-              }}
+              className="chat-context-item text-danger"
               onClick={() => {
                 handleDeleteMessage(contextMenu.messageId);
                 setContextMenu({ ...contextMenu, visible: false });
@@ -283,105 +258,90 @@ const ChatWindow = ({
             </div>
           </div>
         )}
+
       </Container>
 
-      {/* Emoji Picker & Input Field */}
-
-      <Form className="mt-3 d-flex align-items-center">
+      {/* Input Area */}
+      <Form className="chat-input-area">
         {showEmojiPicker && (
-          <div style={{ position: "absolute", bottom: "-30px" }}>
+          <div className="chat-emoji-picker">
             <EmojiPicker
-              onEmojiClick={(emojiObject) =>
-                setNewMessage((prev) => prev + emojiObject.emoji)
+              onEmojiClick={(emoji) =>
+                setNewMessage((prev) => prev + emoji.emoji)
               }
             />
           </div>
         )}
-        <button
+
+        <Button
           type="button"
+          variant="light"
+          className="emoji-btn"
           onClick={() => setShowEmojiPicker(!showEmojiPicker)}
-          style={{
-            background: "transparent",
-            border: "none",
-            fontSize: "1.5rem",
-            cursor: "pointer",
-            marginRight: "1px",
-            position: "absolute",
-          }}
         >
           😊
-        </button>
+        </Button>
+
         <i
-          className="bi bi-paperclip"
+          className="bi bi-paperclip chat-attach-icon"
           onClick={() => document.getElementById("fileInputmedia").click()}
-          style={{
-            cursor: "pointer",
-            marginLeft: "50px",
-            fontSize: "1.5rem",
-          }}
         />
         <input
           id="fileInputmedia"
-          onChange={handleFileChange}
           type="file"
           accept="image/*,video/*"
-          style={{ display: "none" }}
+          onChange={handleFileChange}
+          hidden
         />
-        <Form.Group controlId="newMessage" className="w-100 ms-5">
+
+        <Form.Group controlId="newMessage" className="w-100 ms-2">
           <Form.Control
             type="text"
             value={newMessage}
             onChange={(e) => setNewMessage(e.target.value)}
             onKeyDown={handleKeyDown}
-            placeholder="Type your message....."
+            placeholder="Type your message..."
           />
         </Form.Group>
-        <i
-          className="bi bi-send mx-2 p-2 bg-danger rounded"
-          style={{ cursor: "pointer" }}
+
+        <Button
+          variant="danger"
+          className="send-btn"
           onClick={handleSendMessage}
           disabled={isSending}
-        ></i>
+        >
+          {isSending ? <Spinner size="sm" animation="border" /> : <i className="bi bi-send"></i>}
+        </Button>
       </Form>
-      <div>
-        <Modal show={showModal} onHide={() => setShowModal(false)} centered>
-          <Modal.Header>
-            <Modal.Body>
-              {file?.type.startsWith("image") ? (
-                <img
-                  src={preview}
-                  alt="Preview"
-                  style={{
-                    width: "100%",
-                    height: "auto",
-                    borderRadius: "10px",
-                  }}
-                />
-              ) : (
-                <video
-                  src={preview}
-                  controls
-                  style={{ width: "100%", borderRadius: "10px" }}
-                />
-              )}
-            </Modal.Body>
-          </Modal.Header>
-          <Modal.Footer>
-            <Button variant="secondary" onClick={() => setShowModal(false)}>
-              Close
-            </Button>
-            <Button
-              variant="primary"
-              onClick={async () => {
-                await handleSendMessage();
-                setShowModal(false); // Ensure modal closes after sending
-              }}
-            >
-              {isSending ? "Sending..." : "Send"}
-            </Button>
-          </Modal.Footer>
-        </Modal>
-      </div>
+
+      {/* File Preview Modal */}
+      <Modal show={showModal} onHide={() => setShowModal(false)} centered>
+        <Modal.Header closeButton>
+          <Modal.Title>Preview</Modal.Title>
+        </Modal.Header>
+        <Modal.Body>
+          {file?.type.startsWith("image") ? (
+            <img src={preview} alt="Preview" className="chat-preview-img" />
+          ) : (
+            <video src={preview} controls className="chat-preview-video" />
+          )}
+        </Modal.Body>
+        <Modal.Footer>
+          <Button variant="secondary" onClick={() => setShowModal(false)}>
+            Close
+          </Button>
+          <Button
+            variant="primary"
+            onClick={async () => {
+              await handleSendMessage();
+              setShowModal(false);
+            }}
+            disabled={isSending}
+          >
+            {isSending ? "Sending..." : "Send"}
+          </Button>
+        </Modal.Footer>
+      </Modal>
     </div>
   );
 };

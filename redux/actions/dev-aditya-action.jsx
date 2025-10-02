@@ -27,17 +27,17 @@ export const LoginUserAction = (obj12) => async (dispatch) => {
     //   password: obj12.password,
     // });
     const res = await axios.post(`https://devsite.digitalpractice.net/devsite/wp-json/custom-jwt/v1/login`, {
+    // const res = await axios.post(`https://portal.digitalpractice.net/hrm/wp-json/custom-jwt/v1/login`, {
+
       username: obj12.login,
       password: obj12.password,
     });
 
     if (res.status === 200) {
       const user = res.data;
-      // console.log(user);
-      
       const userRole = user.roles && user.roles[0] ? user.roles[0] : null;
-
       if (userRole) {
+        localStorage.setItem("firstname", user.first_name);
         localStorage.setItem("authtoken", user.access_token);
         localStorage.setItem("refreshtoken", user.refresh_token);
         localStorage.setItem("user_email", user.user_email);

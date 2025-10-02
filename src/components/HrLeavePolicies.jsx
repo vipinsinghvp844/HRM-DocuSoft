@@ -6,6 +6,15 @@ import { format, parseISO } from 'date-fns';
 import { toast } from 'react-toastify';
 import LoaderSpiner from "./LoaderSpiner";
 import api from './api';
+import DataGrid, {
+  Column,
+  Paging,
+  FilterRow,
+  HeaderFilter,
+  SearchPanel,
+} from "devextreme-react/data-grid";
+import { FaArrowLeft, FaCheckCircle, FaEdit, FaTimesCircle, FaTrash } from 'react-icons/fa';
+import { ArrowLeftCircle } from 'lucide-react';
 
 const LeavePolicies = () => {
   const [leavePolicies, setLeavePolicies] = useState([]);
@@ -107,118 +116,126 @@ const LeavePolicies = () => {
   };
 
   return (
-    <Container className="leave-policies-container">
-      <Row className="mb-4 d-flex">
-        <Col md={1}>
-          <i
-            className="bi bi-arrow-left-circle"
-            onClick={() => window.history.back()}
-            style={{
-              cursor: 'pointer',
-              fontSize: '32px',
-              color: '#343a40',
-            }}
-          ></i>
-        </Col>
-        <Col md={9}>
-          <h3 className="mt-2">Add Leave Policy</h3>
-        </Col>
-      </Row>
+    <div className="pt-4 px-2">
+      <div className="flex md:flex-row items-center justify-between gap-2 mb-6">
+        <button
+          onClick={() => window.history.back()}
+          className="flex items-center text-gray-700 hover:text-gray-900 transition-colors"
+        >
+          <ArrowLeftCircle size={32} className="mr-2" />
+          <span className="hidden md:inline text-lg font-semibold">Back</span>
+        </button>
+        <h3 className="text-xl md:text-2xl font-semibold text-center flex-1">
+          Add Leave Policy
+        </h3>
+      </div>
 
-      <Row>
-        <Form className="leave-policies-form" onSubmit={handleSubmit}>
-          <Form.Group controlId="leaveType">
-            <Form.Label>Leave Type:</Form.Label>
-            <Form.Control
-              type="text"
-              name="leave_type"
-              value={form.leave_type}
-              onChange={handleChange}
-              required
-            />
-          </Form.Group>
+      <form
+        onSubmit={handleSubmit}
+        className="space-y-6"
+      >
+        <div>
+          <label className="block text-sm font-medium mb-2">
+            Leave Type:
+          </label>
+          <input
+            type="text"
+            name="leave_type"
+            value={form.leave_type}
+            onChange={handleChange}
+            required
+            className="w-full border border-gray-300 rounded-lg px-3 py-2 focus:ring-2 focus:ring-blue-500"
+          />
+        </div>
 
-          <Form.Group controlId="leaveDays">
-            <Form.Label>Leave Days:</Form.Label>
-            <Form.Control
-              type="number"
-              name="leave_days"
-              value={form.leave_days}
-              onChange={handleChange}
-              min="1" // Ensure positive numbers
-              required
-            />
-          </Form.Group>
+        <div>
+          <label className="block text-sm font-medium mb-2">
+            Leave Days:
+          </label>
+          <input
+            type="number"
+            name="leave_days"
+            value={form.leave_days}
+            onChange={handleChange}
+            min="1"
+            required
+            className="w-full border border-gray-300 rounded-lg px-3 py-2 focus:ring-2 focus:ring-blue-500"
+          />
+        </div>
 
-          <Form.Group controlId="leaveYear">
-            <Form.Label>Leave Year:</Form.Label>
-            <Form.Control
-              type="date"
-              name="leave_year"
-              value={form.leave_year}
-              onChange={handleChange}
-              required
-            />
-          </Form.Group>
+        <div>
+          <label className="block text-sm font-medium mb-2">
+            Leave Year:
+          </label>
+          <input
+            type="date"
+            name="leave_year"
+            value={form.leave_year}
+            onChange={handleChange}
+            required
+            className="w-full border border-gray-300 rounded-lg px-3 py-2 focus:ring-2 focus:ring-blue-500"
+          />
+        </div>
 
-          <Button variant="primary" type="submit">
-            {editMode ? 'Update' : 'Add'} Leave Policy
-          </Button>
-        </Form>
-      </Row>
+        <button
+          type="submit"
+          className="w-full md:w-auto px-6 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition"
+        >
+          {editMode ? "Update" : "Add"} Leave Policy
+        </button>
+      </form>
 
-      <Row>
-        <h3>Existing Leave Policies</h3>
-        <Table className="leave-policies-table" striped bordered hover>
-          <thead>
-            <tr>
-              <th>ID</th>
-              <th>Leave Type</th>
-              <th>Leave Days</th>
-              <th>Leave Year</th>
-              <th>Actions</th>
-            </tr>
-          </thead>
-          <tbody>
-             {isLoading ? (
-              <tr>
-                <td colSpan="5" className="text-center">
-                  <div
-                    className="d-flex justify-content-center align-items-center"
-                    style={{ height: "100px" }}
-                  >
-                    <LoaderSpiner />
-                  </div>
-                </td>
-              </tr>
-            ) : leavePolicies.length === 0 ? (
-              <tr>
-                <td colSpan="5" className="text-center">
-                  <h4>No Leave Policy </h4>
-                </td>
-              </tr>
-            ) : (
-            leavePolicies.map((policy) => (
-              <tr key={policy.id}>
-                <td>{policy.id}</td>
-                <td>{policy.leave_type}</td>
-                <td>{policy.leave_days}</td>
-                <td>{policy.leave_year}</td>
-                <td>
-                  <Button variant="warning" onClick={() => handleEdit(policy)}>
-                    Edit
-                  </Button>{' '}
-                  <Button variant="danger" onClick={() => handleDelete(policy.id)}>
-                    Delete
-                  </Button>
-                </td>
-              </tr>
-            ))
-          )}
-          </tbody>
-        </Table>
-      </Row>
-    </Container>
+      <h3 className="text-xl md:text-2xl font-semibold text-center flex-1">
+        Existing Leave Policies
+      </h3>
+      <div className="overflow-x-auto bg-white rounded-xl shadow-md p-3">
+        <DataGrid
+          dataSource={leavePolicies}
+          keyExpr="id"
+          showBorders={true}
+          rowAlternationEnabled={true}
+          columnAutoWidth={true}
+          wordWrapEnabled={true}
+          columnHidingEnabled={true}
+        >
+          <SearchPanel visible={true} placeholder="Search..." />
+          <FilterRow visible={true} />
+          <HeaderFilter visible={true} />
+          <Paging defaultPageSize={20} />
+
+          <Column
+            caption="#"
+            width={50}
+            cellRender={({ rowIndex }) => rowIndex + 1}
+          />
+          <Column dataField="leave_type" caption="Leave Type" />
+          <Column dataField="leave_days" caption="Total Leave Days" />
+          <Column dataField="leave_year" caption="Leave Year" />
+
+          <Column
+            caption="Actions"
+            cellRender={({ data }) => (
+              <div className="flex justify-center gap-4">
+                <button
+                  onClick={() => handleEdit(data)}
+                  className="text-yellow-500 hover:text-yellow-600"
+                  title="Edit"
+                >
+                  <FaEdit size={18} />
+                </button>
+                <button
+                  onClick={() => handleDelete(data.id)}
+                  className="text-red-600 hover:text-red-700"
+                  title="Delete"
+                >
+                  <FaTrash size={18} />
+                </button>
+              </div>
+            )}
+          />
+        </DataGrid>
+      </div>
+    </div>
   );
 };
 

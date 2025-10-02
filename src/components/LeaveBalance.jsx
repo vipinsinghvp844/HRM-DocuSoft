@@ -14,6 +14,7 @@ import DataGrid, {
   HeaderFilter,
   SearchPanel,
 } from "devextreme-react/data-grid";
+import { ArrowLeftCircle } from "lucide-react";
 
 const LeaveBalance = () => {
   const dispatch = useDispatch();
@@ -108,58 +109,59 @@ const calculateLeaveBalances = () => {
 
 
   return (
-    <div className="leave-balance-container">
-      <Row className="mb-4 d-flex">
-        <Col md={1}>
-          <i
-            className="bi bi-arrow-left-circle"
-            onClick={() => window.history.back()}
-            style={{ cursor: "pointer", fontSize: "32px", color: "#343a40" }}
-          ></i>
-        </Col>
-        <Col md={9}>
-          <h3 className="mt-2">Employee Leave Balance</h3>
-        </Col>
-      </Row>
-{loading ? (
-      <div className="d-flex justify-content-center align-items-center" style={{ minHeight: "200px" }}>
-        <LoaderSpiner />
+    <div className="pt-4 px-2">
+      <div className="flex md:flex-row items-center justify-between gap-2 mb-6">
+        <button
+          onClick={() => window.history.back()}
+          className="flex items-center text-gray-700 hover:text-gray-900 transition-colors"
+        >
+          <ArrowLeftCircle size={32} className="mr-2" />
+          <span className="hidden md:inline text-lg font-semibold">Back</span>
+        </button>
+        <h3 className="text-xl md:text-2xl font-semibold text-center flex-1">
+          Employee Leave Balance
+        </h3>
       </div>
-    ) : error ? (
-      <p className="text-danger text-center">{error}</p>
-    ) : (
-     
-      <DataGrid
-        dataSource={leaveBalances}
-        keyExpr="user_id"
-        showBorders={true}
-        rowAlternationEnabled={true}
-        className="shadow-sm rounded"
-        height="auto"
-        columnAutoWidth={true}
-        wordWrapEnabled={true}
-        columnHidingEnabled={true}
-      >
-        <SearchPanel visible={true} placeholder="Search..." />
-        <FilterRow visible={true} />
-        <HeaderFilter visible={true} />
-        <Paging defaultPageSize={20} />
-        <Column
-          caption="#"
-          width={50}
-          cellRender={({ rowIndex }) => rowIndex + 1}
-        />
-        <Column dataField="user_id" caption="User Id" />
-        <Column dataField="user_name" caption="User Name" />
-        <Column dataField="year" caption="Year" />
-        <Column dataField="total_leave" caption="Total Paid Leave" />
-        <Column dataField="paid_leave_count" caption="Paid Count" />
-        <Column dataField="unpaid_leave_count" caption="Unpaid Count" />
-        <Column dataField="taken_leave" caption="Taken Leave" />
-        <Column dataField="balance_leave" caption="Balance Leave" />
-      </DataGrid>
-    )}
 
+      {loading ? (
+        <div className="flex justify-center items-center min-h-[200px]">
+          <LoaderSpiner />
+        </div>
+      ) : error ? (
+        <p className="text-red-600 text-center">{error}</p>
+      ) : (
+        <div className="overflow-x-auto bg-white rounded-xl shadow-md p-3">
+          <DataGrid
+            dataSource={leaveBalances}
+            keyExpr="user_id"
+            showBorders={true}
+            rowAlternationEnabled={true}
+            columnAutoWidth={true}
+            wordWrapEnabled={true}
+            columnHidingEnabled={true}
+            className="rounded"
+          >
+            <SearchPanel visible={true} placeholder="Search..." />
+            <FilterRow visible={true} />
+            <HeaderFilter visible={true} />
+            <Paging defaultPageSize={20} />
+
+            <Column
+              caption="#"
+              width={50}
+              cellRender={({ rowIndex }) => rowIndex + 1}
+            />
+            <Column dataField="user_id" caption="User ID" />
+            <Column dataField="user_name" caption="User Name" />
+            <Column dataField="year" caption="Year" />
+            <Column dataField="total_leave" caption="Total Paid Leave" />
+            <Column dataField="paid_leave_count" caption="Paid Count" />
+            <Column dataField="unpaid_leave_count" caption="Unpaid Count" />
+            <Column dataField="taken_leave" caption="Taken Leave" />
+            <Column dataField="balance_leave" caption="Balance Leave" />
+          </DataGrid>
+        </div>
+      )}
     </div>
   );
 };

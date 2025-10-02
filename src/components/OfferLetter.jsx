@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { Container, Row, Col, Form, Button, Card } from 'react-bootstrap';
 import axios from 'axios';
 import jsPDF from 'jspdf';
+import api from './api';
 
 const OfferLetter = () => {
   const [letterContent, setLetterContent] = useState({

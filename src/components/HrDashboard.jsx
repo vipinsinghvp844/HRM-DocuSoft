@@ -1,13 +1,10 @@
 import React, { useState, useEffect } from "react";
 import { Row, Col, Container, Card, Alert } from "react-bootstrap";
-import { Link } from "react-router-dom";
-import axios from "axios";
 import TodayPresent from "./TodayPresent";
 import TodayAbsent from "./TodayAbsent";
 import TodayOnLeave from "./TodayOnLeave";
 import TotalUsers from "./TotalUsers";
 import MarkAttendance from "./MarkAttendance";
-import { IoIosNotifications } from "react-icons/io";
 import "./HrDashboard.css"; // Import custom CSS for styling
 import { useDispatch } from "react-redux";
 import {
@@ -26,6 +23,7 @@ const HrDashboard = () => {
   const [userName, setUserName] = useState("");
   const [birthdayMessages, setBirthdayMessages] = useState([]);
   const dispatch = useDispatch();
+  const firstName = localStorage.getItem("firstname") || "";
   useEffect(() => {
     const user_name = localStorage.getItem("user_name");
 
@@ -62,24 +60,19 @@ const HrDashboard = () => {
   }, []);
 
   return (
-    <Container fluid className="p-3 hr-dashboard-container">
-      <div className="topbar">
-        <Row className="align-items-center justify-content-between">
-          <Col>
-            <h3 className="text-center">Welcome to Dashboard</h3>
-          </Col>
-        </Row>
+    <Container fluid className="p-2 bg-gray-50 min-h-screen">
+      <div className="mb-6">
+        <h1 className="text-3xl md:text-4xl font-bold text-gray-800">
+          👋 Welcome Back,{" "}
+          <span className="text-blue-600 underline decoration-wavy">
+            {firstName}
+          </span>
+          !
+        </h1>
+        <p className="text-gray-600 mt-2">
+          Have a great day ahead 😊
+        </p>
       </div>
-
-      {birthdayMessages.length > 0 && (
-        <Card className="text-center shadow-sm border-0 rounded p-3 mt-3">
-          {birthdayMessages.map((message, index) => (
-            <Alert key={index} variant="success">
-              {message}
-            </Alert>
-          ))}
-        </Card>
-      )}
 
       <Row className="g-3 p-3">
         <Col xs={12} md={6} lg={3}>

@@ -252,7 +252,6 @@ const Header = ({ onLogout, userRole, pendingCount }) => {
   }, [TotalNotifications]);
 
 
-  //unseen user and messages count 
   useEffect(() => {
     const fetchUnseenUserandMessegesCount = async () => {
       try {
@@ -331,106 +330,121 @@ const Header = ({ onLogout, userRole, pendingCount }) => {
 
   return (
     <>
-      <Container fluid className="sticky-top bg-white pb-0 pt-0">
-        <Row className="align-items-center header-row">
-          <Col>
-            <Button
-              variant="danger"
-              onClick={toggleMenu}
-              className="d-md-none togglemobile"
-            >
-              <i className="bi bi-list"></i>
-            </Button>
+      <header className="sticky top-0 z-40 bg-white shadow-sm">
+        <div className="flex items-center justify-between py-2">
+          <button
+            onClick={toggleMenu}
+            className="lg:hidden p-2 rounded-md text-red-600 hover:bg-red-50"
+          >
+            <i className="bi bi-list text-2xl"></i>
+          </button>
 
-            {/* Mobile Sidebar */}
-            <Offcanvas
-              show={show}
-              onHide={toggleMenu}
-              className="sidenav sidenavmobile"
-            >
-              <Offcanvas.Header closeButton>
-                <Offcanvas.Title className="sidebar-logo">
-                  <img
-                    src="/assets/Docusoft-logo-red.svg"
-                    alt="HRM"
-                    className="img-fluid"
-                  />
-                </Offcanvas.Title>
-              </Offcanvas.Header>
-              <Offcanvas.Body>
-                <Nav className="flex-column sidebar">{renderNavItems()}</Nav>
-              </Offcanvas.Body>
-            </Offcanvas>
-          </Col>
-          <Col className="d-flex justify-content-end">
-            <div className=" d-flex align-items-center me-4 ">
-              <Link className="position-relative" to="/notification">
-                <i className="bi bi-bell"></i>
-                {unreadCount > 0 && (
-                  <span className="notification-badge">{unreadCount}</span>
+          <div className="flex items-center gap-6 ml-auto">
+            <Link to="/notification" className="relative">
+              <i className="bi bi-bell text-xl text-gray-700 hover:text-red-600"></i>
+              {unreadCount > 0 && (
+                <span className="absolute -top-3 -right-4 bg-red-500 text-white text-xs px-1.5 py-0.5 rounded-full">
+                  {unreadCount}
+                </span>
+              )}
+            </Link>
+
+            {/* Chat */}
+            <Link to="/chat" className="relative">
+              <i className="bi bi-chat text-xl text-gray-700 hover:text-red-600"></i>
+              {AllUnseenUserAndMessages?.length > 0 &&
+                AllUnseenUserAndMessages[0]?.unread_senders_count > 0 && (
+                  <span className="absolute -top-3 -right-4 bg-blue-500 text-white text-xs px-1.5 py-0.5 rounded-full">
+                    {AllUnseenUserAndMessages[0].unread_senders_count}
+                  </span>
                 )}
-              </Link>
-            </div>
-            <div className="d-flex align-items-center me-4">
-              <Link to="/chat" className="position-relative">
-                <i className="bi bi-chat"></i>
-                {AllUnseenUserAndMessages?.length > 0 &&
-                  AllUnseenUserAndMessages[0]?.unread_senders_count > 0 && (
-                    <span className="chat-badge">
-                      {AllUnseenUserAndMessages[0].unread_senders_count}
-                    </span>
-                  )}
-              </Link>
-            </div>
+            </Link>
 
-            <div className="profile-container">
+            <div className="relative">
               <div
-                className="profile-image-container d-flex"
                 onClick={() => setShowPopup(!showPopup)}
+                className="flex items-center gap-2 cursor-pointer p-1 rounded-lg hover:bg-gray-100"
               >
                 <img
                   src={loginUserProfile || placeholderImage}
-                  alt="Logged in user"
-                  className="profile-image"
+                  alt="User"
+                  className="w-10 h-10 rounded-full border border-gray-300 shadow-sm"
                 />
-                <h5 className="mt-1 USERNAMEHEAD">
-                  {loginUserData?.user_display_name}{" "}
-                  <i className="bi bi-chevron-down"></i>
-                </h5>
+                <span className="text-gray-800 font-medium flex items-center gap-1">
+                  {loginUserData?.user_display_name}
+                  <i
+                    className={`bi ${showPopup ? "bi-chevron-up" : "bi-chevron-down"
+                      } text-gray-500 text-sm`}
+                  ></i>
+                </span>
               </div>
+
               {showPopup && (
-                <div className="popup-dropdown" ref={popupRef}>
-                  <FaTimes
-                    className="popup-close"
+                <div
+                  ref={popupRef}
+                  className="absolute right-0 mt-1 w-64 bg-white rounded-xl shadow-lg border border-gray-200 p-2 z-50 animate-fade-in"
+                >
+                  <button
+                    className="absolute top-2 right-2 text-gray-400 hover:text-gray-600"
                     onClick={() => setShowPopup(false)}
-                  />
-                  <img
-                    src={loginUserProfile || placeholderImage}
-                    alt="Profile"
-                    className="popup-profile-image"
-                  />
-                  <h5>{loginUserData?.user_display_name}</h5>
-                  <p>{loginUserData?.user_email}</p>
-                  <Link
-                    to="/manage-your-account"
-                    className="manage-account-link"
-                    onClick={handleManageAccountClick}
                   >
-                    Manage Your Account
-                  </Link>
-                  <Button
-                    variant="danger"
-                    onClick={handleLogout}
-                    className="popup-logout-button"
-                  >
-                    Logout
-                  </Button>
+                    ✕
+                  </button>
+
+                  <div className="flex flex-col items-center mt-2">
+                    <img
+                      src={loginUserProfile || placeholderImage}
+                      alt="Profile"
+                      className="w-20 h-20 rounded-full border border-gray-300 shadow-md"
+                    />
+                    <h5 className="mt-3 text-lg font-semibold text-gray-800">
+                      {loginUserData?.user_display_name}
+                    </h5>
+                    <p className="text-sm text-gray-500">
+                      {loginUserData?.user_email}
+                    </p>
+                  </div>
+
+                  <div className="mt-0 space-y-2">
+                    <Link
+                      to="/manage-your-account"
+                      onClick={handleManageAccountClick}
+                      className="block text-center py-2 rounded-lg text-blue-600 hover:bg-blue-50 font-medium"
+                    >
+                      Manage Your Account
+                    </Link>
+                    <button
+                      onClick={handleLogout}
+                      className="w-full py-2 rounded-lg bg-red-500 text-white font-semibold hover:bg-red-600 transition"
+                    >
+                      Logout
+                    </button>
+                  </div>
                 </div>
               )}
             </div>
-          </Col>
-        </Row>
-      </Container>
+          </div>
+        </div>
+
+        {show && (
+          <div className="fixed inset-0 bg-transparant bg-opacity-40 z-50 lg:hidden">
+            <div className="absolute left-0 top-0 w-65 h-full bg-white shadow-xl p-4">
+              <div className="flex items-center justify-between mb-4">
+                <img
+                  src="/assets/Docusoft-logo-red.svg"
+                  alt="HRM"
+                  className="h-10"
+                />
+                <button onClick={toggleMenu} className="text-gray-600 text-xl">
+                  ✕
+                </button>
+              </div>
+              <nav className="flex flex-col space-y-2 sidebar">{renderNavItems()}</nav>
+            </div>
+          </div>
+        )}
+      </header>
+
     </>
   );
 };

@@ -7,6 +7,7 @@ import {
   AddNewEmployeeAction,
   GetTotalUserAction,
 } from "../../redux/actions/EmployeeDetailsAction";
+import { ArrowLeftCircle } from "lucide-react";
 
 const initialState = {
   firstName: "",
@@ -80,89 +81,83 @@ const AddNewEmployee = () => {
   );
 
   return (
-    <Container className="add-new-employee">
-      <Row className="mb-4">
-        <Col md={1}>
-          <i
-            className="bi bi-arrow-left-circle"
-            onClick={() => window.history.back()}
-            style={{ cursor: "pointer", fontSize: "32px", color: "#343a40" }}
-          ></i>
-        </Col>
-        <Col md={10}>
-          <h3 className="mt-2">Add New Employee</h3>
-        </Col>
-      </Row>
+    <div className="pt-4 px-2">
+      <div className="flex md:flex-row items-center justify-between gap-2 mb-6">
+        <button
+          onClick={() => window.history.back()}
+          className="flex items-center text-gray-700 hover:text-gray-900 transition-colors"
+        >
+          <ArrowLeftCircle size={32} className="mr-2" />
+          <span className="hidden md:inline text-lg font-semibold">Back</span>
+        </button>
 
-      <Row className="mt-4">
-        <Col>
-          <Form onSubmit={handleAddUser}>
-            <Row>
-              <Col md={6}>{renderInput("First Name", "firstName")}</Col>
-              <Col md={6}>{renderInput("Last Name", "lastName")}</Col>
-            </Row>
+        <h3 className="text-xl md:text-2xl font-semibold text-center flex-1">Add New Employee</h3>
+      </div>
 
-            <Row>
-              <Col md={6}>{renderInput("Username", "username")}</Col>
-              <Col md={6}>{renderInput("Email", "email", "email")}</Col>
-            </Row>
+      <form onSubmit={handleAddUser} className="space-y-6">
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+          {renderInput("First Name", "firstName")}
+          {renderInput("Last Name", "lastName")}
+        </div>
 
-            <Row>
-              <Col md={6}>{renderInput("Address", "address")}</Col>
-              <Col md={6}>
-                <Form.Group controlId="formUserRole" className="mb-3">
-                  <Form.Label>User Role</Form.Label>
-                  <Form.Select
-                    name="role"
-                    value={formData.role}
-                    onChange={handleChange}
-                    required
-                  >
-                    <option value="">Select role...</option>
-                    {userRoleOptions.map((role, index) => (
-                      <option key={index} value={role}>
-                        {role}
-                      </option>
-                    ))}
-                  </Form.Select>
-                </Form.Group>
-              </Col>
-            </Row>
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+          {renderInput("Username", "username")}
+          {renderInput("Email", "email", "email")}
+        </div>
 
-            <Row>
-              <Col md={6}>
-                {renderInput("Mobile Number", "mobile", "tel")}
-              </Col>
-              <Col md={6}>{renderInput("Date of Birth", "dob", "date")}</Col>
-            </Row>
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+          {renderInput("Address", "address")}
 
-            <Row>
-              <Col md={6}>
-                <Form.Group controlId="formUserState" className="mb-3">
-                  <Form.Label>User State</Form.Label>
-                  <Form.Select
-                    name="userState"
-                    value={formData.userState}
-                    onChange={handleChange}
-                    required
-                  >
-                    <option value="active">Active</option>
-                    <option value="inactive">Inactive</option>
-                  </Form.Select>
-                </Form.Group>
-              </Col>
-              <Col md={6}>
-                {renderInput("Password", "password", "password")}
-              </Col>
-            </Row>
+          <div>
+            <label className="block text-sm font-medium mb-2">User Role</label>
+            <select
+              name="role"
+              value={formData.role}
+              onChange={handleChange}
+              required
+              className="w-full rounded-lg border border-gray-300 px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
+            >
+              <option value="">Select role...</option>
+              {userRoleOptions.map((role, index) => (
+                <option key={index} value={role}>
+                  {role}
+                </option>
+              ))}
+            </select>
+          </div>
+        </div>
 
-            <Button variant="primary" type="submit" className="submit-button">
-              Add User
-            </Button>
-          </Form>
-        </Col>
-      </Row>
-    </Container>
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+          {renderInput("Mobile Number", "mobile", "tel")}
+          {renderInput("Date of Birth", "dob", "date")}
+        </div>
+
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+          <div>
+            <label className="block text-sm font-medium mb-2">User State</label>
+            <select
+              name="userState"
+              value={formData.userState}
+              onChange={handleChange}
+              required
+              className="w-full rounded-lg border border-gray-300 px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
+            >
+              <option value="active">Active</option>
+              <option value="inactive">Inactive</option>
+            </select>
+          </div>
+
+          {renderInput("Password", "password", "password")}
+        </div>
+
+        <button
+          type="submit"
+          className="px-6 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition"
+        >
+          Add User
+        </button>
+      </form>
+    </div>
   );
 };
 
