@@ -1,15 +1,11 @@
 import React, { useState, useEffect } from "react";
 import {
-  Table,
-  Spinner,
-  Alert,
   Container,
   Row,
   Col,
   Button,
   Offcanvas,
 } from "react-bootstrap";
-import LoaderSpiner from "./LoaderSpiner";
 import { useDispatch, useSelector } from "react-redux";
 import { GetAttendanceDataActionByDate } from "../../redux/actions/EmployeeDetailsAction";
 import EditEmployeeAttendance from "./EditEmployeeAttendance";
@@ -20,13 +16,12 @@ import DataGrid, {
   HeaderFilter,
   SearchPanel,
 } from "devextreme-react/data-grid";
-import { Link } from "react-router-dom";
+import { ArrowLeftCircle } from "lucide-react";
 
 function OverviewAttendance() {
   const [attendanceRecords, setAttendanceRecords] = useState([]);
   
 
-  const currentDate = new Date().toISOString().split("T")[0]; // Format to YYYY-MM-DD
   const [isLoading, setIsLoading] = useState("false");
   const [show, setShow] = useState(false);
   const handleClose = () => setShow(false);
@@ -45,12 +40,6 @@ function OverviewAttendance() {
   const fetchAttendanceRecords = async () => {
     setIsLoading(true);
     try {
-      // const data = getAttendanceByDate;
-      // console.log(data);
-      
-
-      // const todayRecord = data.filter((record) => record.date === currentDate);
-
       const combinedData = getAttendanceByDate.reduce((acc, record) => {
         let userRecord = acc.find(
           (item) => item.user_id === record.user_id && item.date === record.date
@@ -117,41 +106,35 @@ function OverviewAttendance() {
   }
 
   return (
-    <Container className="my-4">
-      <Row className="mb-4 d-flex">
-        <Col md={1}>
-          <i
-            className="bi bi-arrow-left-circle"
-            onClick={() => window.history.back()}
-            style={{
-              cursor: "pointer",
-              fontSize: "32px",
-              color: "#343a40",
-            }}
-          ></i>
-        </Col>
-        <Col md={9}>
-          <h3 className="mt-2">Today Attendance</h3>
-        </Col>
-        <Col md={2}>
-          <Button onClick={handleShow}>Edit Ateendance</Button>
-        </Col>
-        <Offcanvas show={show} onHide={handleClose} placement="end">
-          <Offcanvas.Header closeButton>
-            <Offcanvas.Title>Edit Attendance</Offcanvas.Title>
-          </Offcanvas.Header>
-          <Offcanvas.Body>
-            <EditEmployeeAttendance />
-          </Offcanvas.Body>
-        </Offcanvas>
-      </Row>
-      <div style={{ overflowX: "auto" }}>
+    <div className="pt-4 px-2">
+      <div className="flex  md:flex-row items-center justify-between gap-2 mb-6">
+        <button
+          onClick={() => window.history.back()}
+          className="flex items-center text-gray-700 hover:text-gray-900 transition-colors"
+        >
+          <ArrowLeftCircle size={32} className="mr-2" />
+          <span className="hidden md:inline text-lg font-semibold">Back</span>
+        </button>
+
+        <h3 className="text-xl md:text-2xl font-semibold text-center flex-1">
+          Today Attendance
+        </h3>
+
+        <button
+          onClick={handleShow}
+          className="bg-blue-600 text-white px-4 py-2 rounded-lg shadow hover:bg-blue-700 transition"
+        >
+          Edit Attendance
+        </button>
+      </div>
+
+      <div className="overflow-x-auto bg-white rounded-xl shadow-md p-3">
         <DataGrid
           dataSource={attendanceRecords}
           keyExpr="user_id"
           showBorders={true}
           rowAlternationEnabled={true}
-          className="shadow-sm rounded"
+          className="w-full"
           height="auto"
           columnAutoWidth={true}
           wordWrapEnabled={true}
@@ -161,11 +144,7 @@ function OverviewAttendance() {
           <FilterRow visible={true} />
           <HeaderFilter visible={true} />
           <Paging defaultPageSize={20} />
-          <Column
-            caption="#"
-            width={50}
-            cellRender={({ rowIndex }) => rowIndex + 1}
-          />
+          <Column caption="#" width={50} cellRender={({ rowIndex }) => rowIndex + 1} />
           <Column dataField="user_id" caption="ID" />
           <Column dataField="user_name" caption="User Name" />
           <Column dataField="date" caption="Date" dataType="date" />
@@ -177,7 +156,26 @@ function OverviewAttendance() {
           <Column dataField="total_work" caption="Total Work" />
         </DataGrid>
       </div>
-    </Container>
+
+      {show && (
+        <div className="fixed inset-0 bg-black bg-opacity-50 z-40">
+          <div className="fixed top-0 right-0 h-full w-25 bg-white shadow-lg z-50 transform transition-transform duration-300">
+            <div className="flex justify-between items-center p-4 border-b">
+              <h2 className="text-lg font-semibold">Edit Attendance</h2>
+              <button
+                onClick={handleClose}
+                className="text-gray-500 hover:text-gray-700"
+              >
+                ✕
+              </button>
+            </div>
+            <div className="p-4">
+              <EditEmployeeAttendance />
+            </div>
+          </div>
+        </div>
+      )}
+    </div>
   );
 }
 

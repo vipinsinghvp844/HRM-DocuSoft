@@ -4,6 +4,15 @@ import { useDispatch } from "react-redux";
 import { GetAttendanceDataActionById } from "../../redux/actions/EmployeeDetailsAction";
 import LoaderSpiner from "./LoaderSpiner";
 import { Select, MenuItem, FormControl, InputLabel } from '@mui/material';
+import DataGrid, {
+  Column,
+  Paging,
+  FilterRow,
+  HeaderFilter,
+  SearchPanel,
+  MasterDetail,
+} from "devextreme-react/data-grid";
+import { ArrowLeftCircle } from "lucide-react";
 
 
 // Utility function to format time in HH:MM format
@@ -65,6 +74,19 @@ const AttendanceRecord = () => {
     hours = hours % 12 || 12;
     return `${padZero(hours)}:${padZero(minutes)} ${period}`;
   };
+  // ✅ Utility: minutes → hours:minutes
+  const formatHoursMinutes = (value) => {
+    if (!value) return "--:--";
+    if (typeof value === "object" && value.hours !== undefined && value.minutes !== undefined) {
+      return `${value.hours}h ${value.minutes}m`;
+    }
+    const minutes = Number(value);
+    if (isNaN(minutes)) return "--:--";
+    const hours = Math.floor(minutes / 60);
+    const mins = minutes % 60;
+    return `${hours}h ${mins}m`;
+  };
+
 
   useEffect(() => {
     setIsLoading(true);
@@ -73,7 +95,6 @@ const AttendanceRecord = () => {
         const data = await dispatch(
           GetAttendanceDataActionById(selectedMonth, selectedYear)
         );
-console.log(data,"+++++++++");
 
         const sortedData = data.sort(
           (a, b) => new Date(b.date) - new Date(a.date)
@@ -87,6 +108,7 @@ console.log(data,"+++++++++");
 
           if (!userRecord) {
             userRecord = {
+              id: record.id,
               user_id: record.user_id,
               user_name: record.user_name,
               date: record.date,
@@ -179,147 +201,126 @@ console.log(data,"+++++++++");
   const years = Array.from({ length: 5 }, (_, i) => selectedYear - 2 + i);
 
   return (
-    <Container-fluid className="border rounded shadow-sm p-3">
-      <Row className="mb-4 d-flex">
-        <Col md={1}>
-          <i
-            className="bi bi-arrow-left-circle"
-            onClick={() => window.history.back()}
-            style={{ cursor: "pointer", fontSize: "32px", color: "#343a40" }}
-          ></i>
-        </Col>
-        <Col md={9}>
-          <h3 className="mt-2">
-            Attendance Records for {selectedMonth}/{selectedYear}
-          </h3>
-        </Col>
-      </Row>
+   <div className="pt-4 px-2">
+  <div className="flex md:flex-row items-center justify-between gap-2 mb-6">
+    <button
+      onClick={() => window.history.back()}
+      className="flex items-center text-gray-700 hover:text-gray-900 transition-colors"
+    >
+      <ArrowLeftCircle size={32} className="mr-2" />
+      <span className="hidden md:inline text-lg font-semibold">Back</span>
+    </button>
 
-      {/* ✅ Monthly Summary UI */}
-      <Row className="mb-3">
-        <Col md={6}>
-          <Card className="p-3 shadow-sm border-success">
-            <h5 className="text-success">Total Work This Month</h5>
-            <p className="mb-0">
-              {padZero(workDuration.hours)} hrs {padZero(workDuration.minutes)}{" "}
-              mins
-            </p>
-          </Card>
-        </Col>
-        <Col md={6}>
-          <Card className="p-3 shadow-sm border-danger">
-            <h5 className="text-danger">Total Break This Month</h5>
-            <p className="mb-0">
-              {padZero(breakDuration.hours)} hrs{" "}
-              {padZero(breakDuration.minutes)} mins
-            </p>
-          </Card>
-        </Col>
-      </Row>
+    <h3 className="text-xl md:text-2xl font-semibold text-center flex-1">
+      Attendance Records for {selectedMonth}/{selectedYear}
+    </h3>
+  </div>
 
-      {/* Month & Year Selector */}
-      <Row className="mb-3">
-        <Col className="d-flex justify-content-end">
-          <FormControl variant="outlined" size="small" sx={{ minWidth: 150, mr: 2 }}>
-            <InputLabel>Select Month</InputLabel>
-            <Select
-              value={selectedMonth}
-              onChange={(e) => handleMonthChange(e.target.value)}
-              label="Select Month"
-            >
-              {months.map((month) => (
-                <MenuItem key={month} value={month}>
-                  {month}
-                </MenuItem>
-              ))}
-            </Select>
-          </FormControl>
-          
-          <FormControl variant="outlined" size="small" sx={{ minWidth: 150, mr: 2 }}>
-            <InputLabel>Select Year</InputLabel>
-            <Select
-              value={selectedYear}
-              onChange={(e) => handleYearChange(e.target.value)}
-              label="Select Year"
-            >
-              {years.map((year) => (
-                <MenuItem key={year} value={year}>
-                  {year}
-                </MenuItem>
-              ))}
-            </Select>
-          </FormControl>    
-              </Col>
-      </Row>
+  <div className="flex flex-wrap gap-4 items-end mb-1">
+    {/* Month & Year Selector */}
+    <div className="flex flex-wrap gap-4">
+      <div className="flex flex-col">
+        <label className="font-medium">Select Month:</label>
+        <select
+          className="border rounded px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-400"
+          value={selectedMonth}
+          onChange={(e) => handleMonthChange(e.target.value)}
+        >
+          {months.map((month) => (
+            <option key={month} value={month}>
+              {month}
+            </option>
+          ))}
+        </select>
+      </div>
+
+      <div className="flex flex-col">
+        <label className="font-medium">Select Year:</label>
+        <select
+          className="border rounded px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-400"
+          value={selectedYear}
+          onChange={(e) => handleYearChange(e.target.value)}
+        >
+          {years.map((year) => (
+            <option key={year} value={year}>
+              {year}
+            </option>
+          ))}
+        </select>
+      </div>
+    </div>
+
+    <div className="flex gap-4 justify-end ml-auto">
+      <div className="flex gap-4 p-1 border border-green-300 rounded shadow-sm justify-center align-items-center h-10">
+        <h5 className="text-green-600 font-semibold text-sm m-0">Total Work</h5>
+        <p className="text-base font-medium m-0">
+          {padZero(workDuration.hours)} hrs {padZero(workDuration.minutes)} mins
+        </p>
+      </div>
+
+      <div className="flex gap-4 p-1 border border-green-300 rounded shadow-sm justify-center align-items-center h-10">
+        <h5 className="text-red-600 font-semibold text-sm m-0">Total Break</h5>
+        <p className="text-base font-medium m-0">
+          {padZero(breakDuration.hours)} hrs {padZero(breakDuration.minutes)} mins
+        </p>
+      </div>
+    </div>
+  </div>
+
+  <div className="overflow-x-auto bg-white rounded-xl shadow-md p-3 relative">
+    <DataGrid
+      dataSource={isLoading ? [] : attendanceData}
+      keyExpr="id"
+      showBorders={true}
+      rowAlternationEnabled={true}
+      className="shadow-sm rounded"
+      // height="500px"
+      columnAutoWidth={true}
+      wordWrapEnabled={true}
+      columnHidingEnabled={true}
+    >
+      <SearchPanel visible={true} placeholder="Search..." />
+      <FilterRow visible={true} />
+      <HeaderFilter visible={true} />
+      <Paging defaultPageSize={20} />
+
+      <Column caption="#" width={30} cellRender={({ rowIndex }) => rowIndex + 1} />
+      <Column dataField="date" caption="Date" dataType="date" />
+      <Column dataField="user_name" caption="User Name" />
+      <Column dataField="clock_in" caption="Check In" />
+      <Column dataField="clock_out" caption="Check Out" />
+      <Column
+        dataField="total_work"
+        caption="Total Work"
+        cellRender={({ value }) => formatHoursMinutes(value)}
+      />
+
+      <MasterDetail
+        enabled={true}
+        component={({ data }) => (
+          <DataGrid
+            dataSource={data.data.breaks}
+            showBorders={true}
+            columnAutoWidth={true}
+            className="rounded"
+          >
+            <Column dataField="break_in" caption="Break In" />
+            <Column dataField="break_out" caption="Break Out" />
+            <Column dataField="total_break" caption="Total Break" />
+          </DataGrid>
+        )}
+      />
+    </DataGrid>
+
+    {/* {isLoading && (
+      <div className="absolute inset-0 flex items-center justify-center bg-white bg-opacity-60 z-10">
+        <LoaderSpiner />
+      </div>
+    )} */}
+  </div>
+</div>
 
 
-      {/* Attendance Table */}
-      <Row>
-        <Table striped bordered hover>
-          <thead>
-            <tr>
-              <th>Date</th>
-              <th>User Name</th>
-              <th>Clock In</th>
-              <th>Clock Out</th>
-              <th>Total Work</th>
-              <th>Breaks</th>
-            </tr>
-          </thead>
-          <tbody>
-            {isLoading ? (
-              <tr>
-                <td colSpan="9" className="text-center">
-                  <div
-                    className="d-flex justify-content-center align-items-center"
-                    style={{ height: "200px" }}
-                  >
-                    <LoaderSpiner />
-                  </div>
-                </td>
-              </tr>
-            ) : attendanceData.length > 0 ? (
-              attendanceData.map((record, index) => (
-                <React.Fragment key={index}>
-                  <tr>
-                    <td>{record.date}</td>
-                    <td>{record.user_name}</td>
-                    <td>{record.clock_in}</td>
-                    <td>{record.clock_out}</td>
-                    <td>{formatDuration(record.total_work || 0)}</td>
-                    <td>
-                      {record.breaks.length === 0 ? (
-                        "No Breaks"
-                      ) : (
-                        <Table bordered size="sm">
-                          <tbody>
-                            {record.breaks.map((breakItem, breakIndex) => (
-                              <tr key={breakIndex}>
-                                <td>{breakItem.break_in}</td>
-                                <td>{breakItem.break_out}</td>
-                                <td>
-                                  {formatDuration(breakItem.total_break || 0)}
-                                </td>
-                              </tr>
-                            ))}
-                          </tbody>
-                        </Table>
-                      )}
-                    </td>
-                  </tr>
-                </React.Fragment>
-              ))
-            ) : (
-              <tr>
-                <td colSpan="9" className="text-center">
-                  No data available for the selected month and year.
-                </td>
-              </tr>
-            )}
-          </tbody>
-        </Table>
-      </Row>
-    </Container-fluid>
   );
 };
 

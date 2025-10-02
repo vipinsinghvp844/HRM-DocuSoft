@@ -12,6 +12,7 @@ import {
   readMessageOnSelectUser,
   unseenUserandMessagecount,
 } from "../../redux/actions/EmployeeDetailsAction";
+import api from "./api";
 
 const ChatBox = () => {
   const placeholderImage = import.meta.env.VITE_PLACEHOLDER_IMAGE;
@@ -119,11 +120,11 @@ const ChatBox = () => {
         prevMessages.map((msg) =>
           msg.id === messageId
             ? {
-                ...msg,
-                message: "This message was deleted",
-                base64_image_data: "This message was deleted",
-                is_deleted: true,
-              }
+              ...msg,
+              message: "This message was deleted",
+              base64_image_data: "This message was deleted",
+              is_deleted: true,
+            }
             : msg
         )
       );
@@ -142,11 +143,11 @@ const ChatBox = () => {
               prevMessages.map((msg) =>
                 msg.id === data.messageId
                   ? {
-                      ...msg,
-                      message: "This message was deleted",
-                      base64_image_data: "This message was deleted",
-                      is_deleted: true,
-                    }
+                    ...msg,
+                    message: "This message was deleted",
+                    base64_image_data: "This message was deleted",
+                    is_deleted: true,
+                  }
                   : msg
               )
             );
@@ -183,7 +184,7 @@ const ChatBox = () => {
     try {
       const selecteduserid = selectedUser?.id;
       const response = await dispatch(
-        GetSpecificUserCahts(selecteduserid, pageNum, (data) => {})
+        GetSpecificUserCahts(selecteduserid, pageNum, (data) => { })
       );
 
       if (response.length > 0) {
@@ -281,7 +282,7 @@ const ChatBox = () => {
           try {
             await dispatch(
               readMessageOnSelectUser(messageIds, async () => {
-                await dispatch(unseenUserandMessagecount((res) => {}));
+                await dispatch(unseenUserandMessagecount((res) => { }));
               })
             );
 
@@ -391,7 +392,7 @@ const ChatBox = () => {
 
     await dispatch(
       messageSentSpecificUser(payload, async () => {
-        await dispatch(GetSpecificUserCahts(selecteduserid, page, (res) => {}));
+        await dispatch(GetSpecificUserCahts(selecteduserid, page, (res) => { }));
       })
     )
       .catch((error) => console.error(error))
@@ -405,7 +406,7 @@ const ChatBox = () => {
     }
   };
 
- 
+
   // emoji add hear button for user messages
   const onEmojiClick = (event, emojiObject) => {
     setNewMessage((prevInput) => prevInput + emojiObject.emoji);
@@ -415,68 +416,88 @@ const ChatBox = () => {
 
   const filteredImage = selectedUser
     ? AllProfilesImage.find(
-        (profile) => String(profile.user_id) === String(selectedUser.id)
-      )
+      (profile) => String(profile.user_id) === String(selectedUser.id)
+    )
     : null;
   const profileImage = filteredImage?.profile_image || placeholderImage;
 
   return (
-    <Container>
-      <Row>
-        <Col md={3} className="mobilechatsidebar">
-          <ChatSidebar
-            selectUser={setSelectedUser}
-            placeholderImage={placeholderImage}
-            AllProfilesImage={AllProfilesImage}
-            TotalUsers={TotalUsers}
-            filteredUsers={filteredUsers}
-            searchItem={searchItem}
-            handleInputChange={handleInputChange}
-            getProfileImage={getProfileImage}
-            // getLastMessageForUser={getLastMessageForUser}
-            userId={userId}
-            hasMore={hasMore}
-          />
-        </Col>
-        <Col md={9} className="mobilschatwindow">
-          <ChatWindow
-            selectedUser={selectedUser}
-            placeholderImage={placeholderImage}
-            AllProfilesImage={AllProfilesImage}
-            userId={userId}
-            socket={socket}
-            messages={messages}
-            isLoading={isLoading}
-            handleSendMessage={handleSendMessage}
-            newMessage={newMessage}
-            isSending={isSending}
-            chatBoxRef={chatBoxRef}
-            setNewMessage={setNewMessage}
-            profileImage={profileImage}
-            filteredImage={filteredImage}
-            editingMessageId={editingMessageId}
-            contextMenu={contextMenu}
-            setContextMenu={setContextMenu}
-            setEditedMessage={setEditedMessage}
-            setEditingMessageId={setEditingMessageId}
-            editedMessage={editedMessage}
-            handleEditMessage={handleEditMessage}
-            handleDeleteMessage={handleDeleteMessage}
-            onEmojiClick={onEmojiClick}
-            EmojiPicker={EmojiPicker}
-            showEmojiPicker={showEmojiPicker}
-            setShowEmojiPicker={setShowEmojiPicker}
-            setFile={setFile}
-            handleFileChange={handleFileChange}
-            showModal={showModal}
-            file={file}
-            setShowModal={setShowModal}
-            preview={preview}
-            handleKeyDown={handleKeyDown}
-          />
-        </Col>
-      </Row>
-    </Container>
+    <Container fluid>
+  <Row>
+    {/* Sidebar */}
+    <Col
+      md={3}
+      className={`mobilechatsidebar ${
+        selectedUser ? "d-none d-md-block" : "d-block"
+      }`}
+    >
+      <ChatSidebar
+        selectUser={setSelectedUser}
+        placeholderImage={placeholderImage}
+        AllProfilesImage={AllProfilesImage}
+        TotalUsers={TotalUsers}
+        filteredUsers={filteredUsers}
+        searchItem={searchItem}
+        handleInputChange={handleInputChange}
+        getProfileImage={getProfileImage}
+        userId={userId}
+        hasMore={hasMore}
+      />
+    </Col>
+
+    {/* Chat Window */}
+    <Col
+      md={9}
+      className={`mobilschatwindow ${
+        selectedUser ? "d-block" : "d-none d-md-block"
+      }`}
+    >
+      {selectedUser ? (
+        <ChatWindow
+          selectedUser={selectedUser}
+          placeholderImage={placeholderImage}
+          AllProfilesImage={AllProfilesImage}
+          userId={userId}
+          socket={socket}
+          messages={messages}
+          isLoading={isLoading}
+          handleSendMessage={handleSendMessage}
+          newMessage={newMessage}
+          isSending={isSending}
+          chatBoxRef={chatBoxRef}
+          setNewMessage={setNewMessage}
+          profileImage={profileImage}
+          filteredImage={filteredImage}
+          editingMessageId={editingMessageId}
+          contextMenu={contextMenu}
+          setContextMenu={setContextMenu}
+          setEditedMessage={setEditedMessage}
+          setEditingMessageId={setEditingMessageId}
+          editedMessage={editedMessage}
+          handleEditMessage={handleEditMessage}
+          handleDeleteMessage={handleDeleteMessage}
+          onEmojiClick={onEmojiClick}
+          EmojiPicker={EmojiPicker}
+          showEmojiPicker={showEmojiPicker}
+          setShowEmojiPicker={setShowEmojiPicker}
+          setFile={setFile}
+          handleFileChange={handleFileChange}
+          showModal={showModal}
+          file={file}
+          setShowModal={setShowModal}
+          preview={preview}
+          handleKeyDown={handleKeyDown}
+          // 👇 back button pass karenge
+          onBack={() => setSelectedUser(null)}
+        />
+      ) : (
+        <div className="h-100 d-flex align-items-center justify-content-center text-muted">
+          Select a chat to start messaging
+        </div>
+      )}
+    </Col>
+  </Row>
+</Container>
   );
 };
 

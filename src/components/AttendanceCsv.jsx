@@ -1,6 +1,5 @@
 import React, { useState, useEffect } from "react";
 import { Table, Form, Container, Row, Col, Button } from "react-bootstrap";
-import axios from "axios";
 import {
   format,
   eachDayOfInterval,
@@ -14,17 +13,18 @@ import { useSelector } from "react-redux";
 import * as XLSX from "xlsx";
 import { saveAs } from "file-saver";
 import ExcelJS from "exceljs";
-  import DataGrid, {
-    Column,
-    Paging,
-    FilterRow,
-    HeaderFilter,
-    SearchPanel,
-    Export,
-  } from "devextreme-react/data-grid";
-  import jsPDF from "jspdf";
+import DataGrid, {
+  Column,
+  Paging,
+  FilterRow,
+  HeaderFilter,
+  SearchPanel,
+  Export,
+} from "devextreme-react/data-grid";
+import jsPDF from "jspdf";
 import { exportDataGrid as exportDataGridToPdf } from "devextreme/pdf_exporter";
 import api from "./api";
+import { ArrowLeftCircle } from "lucide-react";
 
 const AttendanceCsv = () => {
   const [employees, setEmployees] = useState([]);
@@ -38,7 +38,7 @@ const AttendanceCsv = () => {
   const { TotalUsers } = useSelector(
     ({ EmployeeDetailReducers }) => EmployeeDetailReducers
   );
-   const onExporting = (e) => {
+  const onExporting = (e) => {
     const doc = new jsPDF();
 
     exportDataGridToPdf({
@@ -72,8 +72,7 @@ const AttendanceCsv = () => {
     const fetchAttendanceData = async () => {
       try {
         const response = await api.get(
-          `${import.meta.env.VITE_API_GET_ATTENDANCE}?month=${
-            month + 1
+          `${import.meta.env.VITE_API_GET_ATTENDANCE}?month=${month + 1
           }&year=${year}`,
           {
             headers: {
@@ -170,7 +169,7 @@ const AttendanceCsv = () => {
       (entry) =>
         entry.user_id.toString() === employeeId.toString() &&
         entry.status === "Accept" &&
-        entry.leave_type === "Paid Leave" &&
+        entry.paid_leave_count > 0 &&
         entry.start_date &&
         entry.end_date &&
         isWithinInterval(new Date(formattedDate), {
@@ -184,7 +183,7 @@ const AttendanceCsv = () => {
       (entry) =>
         entry.user_id.toString() === employeeId.toString() &&
         entry.status === "Accept" &&
-        entry.leave_type === "Unpaid Leave" &&
+        entry.unpaid_leave_count > 0 &&
         entry.start_date &&
         entry.end_date &&
         isWithinInterval(new Date(formattedDate), {
@@ -423,93 +422,86 @@ const AttendanceCsv = () => {
 
 
   return (
-    <Container fluid className={isFullScreen ? "fullscreen" : ""}>
-      <Row className="mb-4 d-flex">
-        <Col md={1}>
-          <i
-            className="bi bi-arrow-left-circle"
-            onClick={() => window.history.back()}
-            style={{
-              cursor: "pointer",
-              fontSize: "32px",
-              color: "#343a40",
-            }}
-          ></i>
-        </Col>
-        <Col md={9}>
-          <h3 className="mt-2">Total Attendance Overview </h3>
-        </Col>
-      </Row>
+    <div className={`${isFullScreen ? "fixed inset-0 bg-white z-50 p-4 overflow-auto" : "pt-4 px-2"} space-y-6`}>
 
-      {/* Month & Year Selector */}
-      <Row className="my-3">
-        <Col xs={12} md={3}>
-          <Form.Group controlId="selectMonth">
-            <Form.Label>Select Month:</Form.Label>
-            <Form.Control
-              as="select"
-              value={month}
-              onChange={(e) => setMonth(parseInt(e.target.value, 10))}
-            >
-              {Array.from({ length: 12 }, (_, i) => (
-                <option key={i} value={i}>
-                  {format(new Date(0, i), "MMMM")}
-                </option>
-              ))}
-            </Form.Control>
-          </Form.Group>
-        </Col>
-        <Col xs={12} md={3}>
-          <Form.Group controlId="selectYear">
-            <Form.Label>Select Year:</Form.Label>
-            <Form.Control
-              as="select"
-              value={year}
-              onChange={(e) => setYear(parseInt(e.target.value, 10))}
-            >
-              {Array.from({ length: 10 }, (_, i) => (
-                <option key={i} value={year - 5 + i}>
-                  {year - 5 + i}
-                </option>
-              ))}
-            </Form.Control>
-          </Form.Group>
-        </Col>
-        <Col
-          xs={12}
-          md={6}
-          className="d-flex align-items-end justify-content-end"
+      {/* Header */}
+      <div className="flex md:flex-row items-center justify-between gap-2 mb-6">
+        <button
+          onClick={() => window.history.back()}
+          className="flex items-center text-gray-700 hover:text-gray-900 transition-colors"
         >
-          <div className="text-end">
-            <Button variant="primary" onClick={handleToggleFullScreen}>
-              {isFullScreen ? (
-                <i className="bi bi-fullscreen-exit"></i>
-              ) : (
-                <i className="bi bi-fullscreen"></i>
-              )}
-            </Button>
-            <Button
-              variant="success"
-              className="ms-2"
-              onClick={exportToCSV}
-              disabled={!attendance.length}
-            >
-              <i className="bi bi-download"></i> Export CSV
-            </Button>
+          <ArrowLeftCircle size={32} className="mr-2" />
+          <span className="hidden md:inline text-lg font-semibold">Back</span>
+        </button>
+        <h3 className="text-xl md:text-2xl font-semibold text-center flex-1">Total Attendance Overview</h3>
+        <button
+            onClick={handleToggleFullScreen}
+            className="px-4 py-1 bg-gray-200 hover:bg-gray-300 rounded-lg flex items-center gap-2"
+            // className="bg-blue-500 text-white px-4 py-2 rounded-lg shadow hover:bg-blue-700 transition"
+          >
+            {isFullScreen ? (
+              <i className="bi bi-fullscreen-exit"></i>
+            ) : (
+              <i className="bi bi-fullscreen"></i>
+            )}
+            {isFullScreen ? "Exit Fullscreen" : "Fullscreen"}
+          </button>
+      </div>
 
-            <Button
-              variant="warning"
-              className="ms-2"
-              onClick={exportToExcelWithColors}
-            >
-              <i className="bi bi-file-earmark-excel"></i> Export Excel
-            </Button>
-          </div>
-        </Col>
-      </Row>
+      {/* Month & Year Selectors */}
+      <div className="grid grid-cols-1 md:grid-cols-3 gap-4 items-end">
+        <div>
+          <label className="block text-sm font-medium mb-1">Select Month:</label>
+          <select
+            value={month}
+            onChange={(e) => setMonth(parseInt(e.target.value, 10))}
+            className="w-full border border-gray-300 rounded-lg px-3 py-2 focus:ring-2 focus:ring-blue-500"
+          >
+            {Array.from({ length: 12 }, (_, i) => (
+              <option key={i} value={i}>
+                {format(new Date(0, i), "MMMM")}
+              </option>
+            ))}
+          </select>
+        </div>
+
+        <div>
+          <label className="block text-sm font-medium mb-1">Select Year:</label>
+          <select
+            value={year}
+            onChange={(e) => setYear(parseInt(e.target.value, 10))}
+            className="w-full border border-gray-300 rounded-lg px-3 py-2 focus:ring-2 focus:ring-blue-500"
+          >
+            {Array.from({ length: 10 }, (_, i) => (
+              <option key={i} value={year - 5 + i}>
+                {year - 5 + i}
+              </option>
+            ))}
+          </select>
+        </div>
+
+        <div className="flex gap-2 justify-end">
+          <button
+            onClick={exportToCSV}
+            disabled={!attendance.length}
+            className="px-4 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 flex items-center gap-2 disabled:opacity-50"
+          >
+            <i className="bi bi-download"></i>
+            Export CSV
+          </button>
+
+          <button
+            onClick={exportToExcelWithColors}
+            className="px-4 py-2 bg-yellow-500 text-white rounded-lg hover:bg-yellow-600 flex items-center gap-2"
+          >
+            <i className="bi bi-file-earmark-excel"></i>
+            Export Excel
+          </button>
+        </div>
+      </div>
 
       {/* Attendance Table */}
-      <Row>
+      <div className="overflow-x-auto bg-white rounded-xl shadow-md p-3">
         <DataGrid
           dataSource={employeeList}
           keyExpr="id"
@@ -528,11 +520,7 @@ const AttendanceCsv = () => {
           <Paging defaultPageSize={20} />
 
           {/* Serial Number */}
-          <Column
-            caption="SR No."
-            width={30}
-            cellRender={({ rowIndex }) => rowIndex + 1}
-          />
+          <Column caption="SR No." width={30} cellRender={({ rowIndex }) => rowIndex + 1} />
 
           <Column dataField="username" caption="Emp-Name" />
 
@@ -540,30 +528,30 @@ const AttendanceCsv = () => {
           {datesInMonth.map((date) => {
             const formattedDate = format(date, "yyyy-MM-dd");
             const dayNumber = format(date, "d");
-            const dayName = format(date, "EEE"); 
+            const dayName = format(date, "EEE");
 
             return (
               <Column
                 key={formattedDate}
-                caption={`${dayNumber}\n${dayName}`} // shows day + short day name
+                caption={`${dayNumber}\n${dayName}`}
                 alignment="center"
                 cellRender={({ data }) => {
                   const status = getAttendanceStatus(data.id, formattedDate);
 
                   const className =
                     status === "P"
-                      ? "bg-success text-white coustomclass"
+                      ? "bg-green-500 text-white px-2 rounded"
                       : status === "A"
-                      ? "bg-danger text-white coustomclass"
-                      : status === "PL"
-                      ? "bg-warning text-dark coustomclass"
-                      : status === "UL"
-                      ? "bg-info text-dark coustomclass"
-                      : status === "H"
-                      ? "bg-info text-white coustomclass"
-                      : status === "WO"
-                      ? "bg-secondary text-white coustomclass"
-                      : "ram";
+                        ? "bg-red-500 text-white px-2 rounded"
+                        : status === "PL"
+                          ? "bg-yellow-400 text-black px-2 rounded"
+                          : status === "UL"
+                            ? "bg-blue-300 text-black px-2 rounded"
+                            : status === "H"
+                              ? "bg-indigo-500 text-white px-2 rounded"
+                              : status === "WO"
+                                ? "bg-gray-500 text-white px-2 rounded"
+                                : "bg-gray-100 text-black px-2 rounded";
 
                   return <div className={className}>{status}</div>;
                 }}
@@ -573,42 +561,17 @@ const AttendanceCsv = () => {
 
           {/* Summary Columns */}
           <Column caption="Total Days" cellRender={() => datesInMonth.length} />
-          <Column
-            caption="Absent"
-            cellRender={({ data }) => calculateTotals(data.id).absentCount}
-          />
-          <Column
-            caption="Leave"
-            cellRender={({ data }) => calculateTotals(data.id).leaveCount}
-          />
-          <Column
-            caption="Present"
-            cellRender={({ data }) => calculateTotals(data.id).presentCount}
-          />
-          <Column
-            caption="Holidays"
-            cellRender={({ data }) => calculateTotals(data.id).holidayCount}
-          />
-          <Column
-            caption="Wk-Offs"
-            cellRender={({ data }) => calculateTotals(data.id).weekOffCount}
-          />
-          <Column
-            caption="Total Work"
-            cellRender={({ data }) =>
-              convertMinutes(calculateTotals(data.id).totalWorkMinutes)
-            }
-          />
-          <Column
-            caption="Total Break"
-            cellRender={({ data }) =>
-              convertMinutes(calculateTotals(data.id).totalBreakMinutes)
-            }
-          />
-           <Export enabled={true} />
+          <Column caption="Absent" cellRender={({ data }) => calculateTotals(data.id).absentCount} />
+          <Column caption="Leave" cellRender={({ data }) => calculateTotals(data.id).leaveCount} />
+          <Column caption="Present" cellRender={({ data }) => calculateTotals(data.id).presentCount} />
+          <Column caption="Holidays" cellRender={({ data }) => calculateTotals(data.id).holidayCount} />
+          <Column caption="Wk-Offs" cellRender={({ data }) => calculateTotals(data.id).weekOffCount} />
+          <Column caption="Total Work" cellRender={({ data }) => convertMinutes(calculateTotals(data.id).totalWorkMinutes)} />
+          <Column caption="Total Break" cellRender={({ data }) => convertMinutes(calculateTotals(data.id).totalBreakMinutes)} />
+          <Export enabled={true} />
         </DataGrid>
-      </Row>
-    </Container>
+      </div>
+    </div>
   );
 };
 

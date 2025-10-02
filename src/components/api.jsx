@@ -2,6 +2,8 @@ import axios from "axios";
 
 const api = axios.create({
   baseURL: "https://devsite.digitalpractice.net/devsite/wp-json",
+  // baseURL: "https://portal.digitalpractice.net/hrm/wp-json",
+
 });
 
 let isRefreshing = false;
@@ -57,6 +59,8 @@ api.interceptors.response.use(
 
         const res = await axios.post(
           "https://devsite.digitalpractice.net/devsite/wp-json/custom-jwt/v1/refresh",
+          // "https://portal.digitalpractice.net/hrm/wp-json/custom-jwt/v1/refresh",
+
           { refresh_token: refreshToken }
         );
 

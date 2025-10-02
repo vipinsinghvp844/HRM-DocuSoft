@@ -45,18 +45,21 @@
   display: block;
   width: 100%;
 }
+
 .USERNAMEHEAD {
   font-size: 14px;
   align-self: center;
   padding: 0px 10px;
+  display: flex;
+  font-weight: 600;
 }
 
 /*notification bell*/
 
 .notification-badge {
   position: absolute;
-  top: 2px;
-  right: 285px;
+  top: -12px;
+  right: -12px;
   background: red;
   color: white;
   font-size: 12px;
@@ -68,6 +71,7 @@
   align-items: center;
   justify-content: center;
 }
+
 .chat-badge {
   position: absolute;
   top: -12px;
@@ -82,4 +86,8 @@
   display: flex;
   align-items: center;
   justify-content: center;
+}
+
+.sidenavmobile {
+  width: 360px !important;
 }

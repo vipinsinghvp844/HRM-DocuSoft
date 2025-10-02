@@ -111,16 +111,14 @@ color: #495057;
   }
 }
 
-.togglemobile{
+/* .togglemobile{
   position: fixed !important;
   z-index: 1045;
   top: 15 !important;
   left: 150;
   margin-top: 10px;
-}
-.sidenavmobile{
-  width: 360px !important;
-}
+} */
+
 span .badge .bg-danger{
   background-color: #9e2950 !important;
   font-weight: bold !important;
