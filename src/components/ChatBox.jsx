@@ -19,7 +19,7 @@ const ChatBox = () => {
   const [selectedUser, setSelectedUser] = useState(null);
   const [searchItem, setSearchItem] = useState("");
   const { AllProfilesImage } = useSelector(({ AllReducers }) => AllReducers);
-  const { TotalUsers, UserSpecificChats, AllUnseenUserAndMessages } =
+  const { TotalUsers } =
     useSelector(({ EmployeeDetailReducers }) => EmployeeDetailReducers);
   const userId = localStorage.getItem("user_id");
   const [socket, setSocket] = useState(null);
@@ -187,11 +187,11 @@ const ChatBox = () => {
         GetSpecificUserCahts(selecteduserid, pageNum, (data) => { })
       );
 
-      if (response.length > 0) {
+      if (response?.length > 0) {
         setAllMessages((prevMessages) => [...response, ...prevMessages]);
         setPage(pageNum + 1);
       }
-      if (response.length < 20) {
+      if (response?.length < 20) {
         setHasMore(false);
       }
     } catch (error) {
@@ -423,81 +423,79 @@ const ChatBox = () => {
 
   return (
     <Container fluid>
-  <Row>
-    {/* Sidebar */}
-    <Col
-      md={3}
-      className={`mobilechatsidebar ${
-        selectedUser ? "d-none d-md-block" : "d-block"
-      }`}
-    >
-      <ChatSidebar
-        selectUser={setSelectedUser}
-        placeholderImage={placeholderImage}
-        AllProfilesImage={AllProfilesImage}
-        TotalUsers={TotalUsers}
-        filteredUsers={filteredUsers}
-        searchItem={searchItem}
-        handleInputChange={handleInputChange}
-        getProfileImage={getProfileImage}
-        userId={userId}
-        hasMore={hasMore}
-      />
-    </Col>
+      <Row>
+        {/* Sidebar */}
+        <Col
+          md={3}
+          className={`mobilechatsidebar ${selectedUser ? "d-none d-md-block" : "d-block"
+            }`}
+        >
+          <ChatSidebar
+            selectUser={setSelectedUser}
+            placeholderImage={placeholderImage}
+            AllProfilesImage={AllProfilesImage}
+            TotalUsers={TotalUsers}
+            filteredUsers={filteredUsers}
+            searchItem={searchItem}
+            handleInputChange={handleInputChange}
+            getProfileImage={getProfileImage}
+            userId={userId}
+            hasMore={hasMore}
+          />
+        </Col>
 
-    {/* Chat Window */}
-    <Col
-      md={9}
-      className={`mobilschatwindow ${
-        selectedUser ? "d-block" : "d-none d-md-block"
-      }`}
-    >
-      {selectedUser ? (
-        <ChatWindow
-          selectedUser={selectedUser}
-          placeholderImage={placeholderImage}
-          AllProfilesImage={AllProfilesImage}
-          userId={userId}
-          socket={socket}
-          messages={messages}
-          isLoading={isLoading}
-          handleSendMessage={handleSendMessage}
-          newMessage={newMessage}
-          isSending={isSending}
-          chatBoxRef={chatBoxRef}
-          setNewMessage={setNewMessage}
-          profileImage={profileImage}
-          filteredImage={filteredImage}
-          editingMessageId={editingMessageId}
-          contextMenu={contextMenu}
-          setContextMenu={setContextMenu}
-          setEditedMessage={setEditedMessage}
-          setEditingMessageId={setEditingMessageId}
-          editedMessage={editedMessage}
-          handleEditMessage={handleEditMessage}
-          handleDeleteMessage={handleDeleteMessage}
-          onEmojiClick={onEmojiClick}
-          EmojiPicker={EmojiPicker}
-          showEmojiPicker={showEmojiPicker}
-          setShowEmojiPicker={setShowEmojiPicker}
-          setFile={setFile}
-          handleFileChange={handleFileChange}
-          showModal={showModal}
-          file={file}
-          setShowModal={setShowModal}
-          preview={preview}
-          handleKeyDown={handleKeyDown}
-          // 👇 back button pass karenge
-          onBack={() => setSelectedUser(null)}
-        />
-      ) : (
-        <div className="h-100 d-flex align-items-center justify-content-center text-muted">
-          Select a chat to start messaging
-        </div>
-      )}
-    </Col>
-  </Row>
-</Container>
+        {/* Chat Window */}
+        <Col
+          md={9}
+          className={`mobilschatwindow ${selectedUser ? "d-block" : "d-none d-md-block"
+            }`}
+        >
+          {selectedUser ? (
+            <ChatWindow
+              selectedUser={selectedUser}
+              placeholderImage={placeholderImage}
+              AllProfilesImage={AllProfilesImage}
+              userId={userId}
+              socket={socket}
+              messages={messages}
+              isLoading={isLoading}
+              handleSendMessage={handleSendMessage}
+              newMessage={newMessage}
+              isSending={isSending}
+              chatBoxRef={chatBoxRef}
+              setNewMessage={setNewMessage}
+              profileImage={profileImage}
+              filteredImage={filteredImage}
+              editingMessageId={editingMessageId}
+              contextMenu={contextMenu}
+              setContextMenu={setContextMenu}
+              setEditedMessage={setEditedMessage}
+              setEditingMessageId={setEditingMessageId}
+              editedMessage={editedMessage}
+              handleEditMessage={handleEditMessage}
+              handleDeleteMessage={handleDeleteMessage}
+              onEmojiClick={onEmojiClick}
+              EmojiPicker={EmojiPicker}
+              showEmojiPicker={showEmojiPicker}
+              setShowEmojiPicker={setShowEmojiPicker}
+              setFile={setFile}
+              handleFileChange={handleFileChange}
+              showModal={showModal}
+              file={file}
+              setShowModal={setShowModal}
+              preview={preview}
+              handleKeyDown={handleKeyDown}
+              // 👇 back button pass karenge
+              onBack={() => setSelectedUser(null)}
+            />
+          ) : (
+            <div className="h-100 d-flex align-items-center justify-content-center text-muted">
+              Select a chat to start messaging
+            </div>
+          )}
+        </Col>
+      </Row>
+    </Container>
   );
 };
 

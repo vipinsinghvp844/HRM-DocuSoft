@@ -1,7 +1,6 @@
 import React, { useEffect, useState } from "react";
-import { Nav, Container, Offcanvas, Button } from "react-bootstrap";
+import { Nav, Container } from "react-bootstrap";
 import { NavLink } from "react-router-dom";
-import axios from "axios";
 import "./Sidebar.css"; 
 import api from "./api";
 
@@ -26,11 +25,6 @@ const Sidebar = ({ userRole, pendingCount }) => {
     fetchUserStatus();
   }, [userId]);
 
-  const toggleMenu = () => {
-    if (window.innerWidth < 992) {
-      setShow((prev) => !prev);
-    }
-  };
    const handleNavClick = () => {
      if (window.innerWidth < 992) {
        setShow(false);
@@ -42,7 +36,7 @@ const Sidebar = ({ userRole, pendingCount }) => {
       {
         to: "/admin-dashboard",
         icon: "bi-house-door",
-        label: "Admin Dashboard",
+        label: "Dashboard",
       },
       {
         to: "/today-attendance",
@@ -82,7 +76,7 @@ const Sidebar = ({ userRole, pendingCount }) => {
       {
         to: "/attendance-csv",
         icon: "bi-filetype-csv",
-        label: "Attendance CSV",
+        label: "Attendance Overview",
       },
       {
         to: "/manage-documents",
@@ -91,7 +85,7 @@ const Sidebar = ({ userRole, pendingCount }) => {
       },
     ],
     hr: [
-      { to: "/hr-dashboard", icon: "bi-house-door", label: "HR Dashboard" },
+      { to: "/hr-dashboard", icon: "bi-house-door", label: "Dashboard" },
       ...(userStatus === "active"
         ? [
             {
@@ -145,7 +139,7 @@ const Sidebar = ({ userRole, pendingCount }) => {
             {
               to: "/attendance-csv",
               icon: "bi-calendar-check",
-              label: "Attendance Csv",
+              label: "Attendance Overview",
             },
           ]
         : []),
@@ -155,7 +149,7 @@ const Sidebar = ({ userRole, pendingCount }) => {
       {
         to: "/employee-dashboard",
         icon: "bi-house-door",
-        label: "Employee Dashboard",
+        label: "Dashboard",
       },
       ...(userStatus === "active"
         ? [

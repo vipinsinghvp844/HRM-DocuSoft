@@ -65,7 +65,7 @@ const Header = ({ onLogout, userRole, pendingCount }) => {
       {
         to: "/admin-dashboard",
         icon: "bi-house-door",
-        label: "Admin Dashboard",
+        label: "Dashboard",
       },
       {
         to: "/today-attendance",
@@ -105,7 +105,7 @@ const Header = ({ onLogout, userRole, pendingCount }) => {
       {
         to: "/attendance-csv",
         icon: "bi-filetype-csv",
-        label: "Attendance CSV",
+        label: "Attendance Overview",
       },
       {
         to: "/manage-documents",
@@ -114,7 +114,7 @@ const Header = ({ onLogout, userRole, pendingCount }) => {
       },
     ],
     hr: [
-      { to: "/hr-dashboard", icon: "bi-house-door", label: "HR Dashboard" },
+      { to: "/hr-dashboard", icon: "bi-house-door", label: "Dashboard" },
       ...(userStatus === "active"
         ? [
           {
@@ -168,7 +168,7 @@ const Header = ({ onLogout, userRole, pendingCount }) => {
           {
             to: "/attendance-csv",
             icon: "bi-calendar-check",
-            label: "Attendance Csv",
+            label: "Attendance Overview",
           },
         ]
         : []),
@@ -178,24 +178,24 @@ const Header = ({ onLogout, userRole, pendingCount }) => {
       {
         to: "/employee-dashboard",
         icon: "bi-house-door",
-        label: "Employee Dashboard",
+        label: "Dashboard",
       },
       ...(userStatus === "active"
         ? [
           {
             to: "/my-Attendance",
             icon: "bi-person-add",
-            label: "My Attendance",
+            label: "Attendance",
           },
           {
             to: "/my-leaves",
             icon: "bi-person-exclamation",
-            label: "My Leaves",
+            label: "Leaves",
           },
           {
             to: "/leave-entitlements",
             icon: "bi-person-exclamation",
-            label: "My Balance Leave",
+            label: "Balance Leave",
           },
           {
             to: "/holidays",
