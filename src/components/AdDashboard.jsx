@@ -1,10 +1,8 @@
 import { useState } from 'react';
-import { Col, Container, Row, Card, Alert } from 'react-bootstrap';
 import TotalUsers from './TotalUsers';
 import TodayPresent from './TodayPresent';
 import TodayOnLeave from './TodayOnLeave';
 import TodayAbsent from './TodayAbsent';
-import './AdDashboard.css';
 import CalendarComponent from './CalendarComponent ';
 
 const AdDashboard = () => {
@@ -18,7 +16,7 @@ const AdDashboard = () => {
         <div className="mb-6">
           <h1 className="text-3xl md:text-4xl font-bold text-gray-800">
             👋 Welcome Back,{" "}
-            <span className="text-blue-600 underline decoration-wavy">
+            <span className="text-blue-600">
               {firstName}
             </span>
             !

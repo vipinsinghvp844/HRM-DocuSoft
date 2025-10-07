@@ -1,11 +1,7 @@
 import React, { useEffect, useState } from 'react';
-import axios from 'axios';
-import { Col, Container, Row, Table, Button, Modal, Form } from 'react-bootstrap';
-import './HrShift.css';
 import { useDispatch, useSelector } from 'react-redux';
 import { toast } from 'react-toastify';
 import { GetOfficeShiftsAction } from "../../redux/actions/EmployeeDetailsAction";
-import LoaderSpiner from "./LoaderSpiner"
 import DataGrid, {
   Column,
   Paging,
@@ -25,9 +21,9 @@ function HrShift() {
   const [isUpdating, setIsUpdating] = useState(false);
   const [currentShiftId, setCurrentShiftId] = useState(null);
   const [isLoading, setIsLoading] = useState(false);
-  const { TotalOfficeShifts } = useSelector(
-    ({ EmployeeDetailReducers }) => EmployeeDetailReducers
-  );
+  // const { TotalOfficeShifts } = useSelector(
+  //   ({ EmployeeDetailReducers }) => EmployeeDetailReducers
+  // );
   const dispatch = useDispatch();
 
   function convertTo12Hour(time24) {

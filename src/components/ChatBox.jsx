@@ -15,7 +15,7 @@ import {
 import api from "./api";
 
 const ChatBox = () => {
-  const placeholderImage = import.meta.env.VITE_PLACEHOLDER_IMAGE;
+  const placeholderImage = `${import.meta.env.VITE_API_BASE_URL}/2024/07/placeholder-image-hrm.png`;
   const [selectedUser, setSelectedUser] = useState(null);
   const [searchItem, setSearchItem] = useState("");
   const { AllProfilesImage } = useSelector(({ AllReducers }) => AllReducers);
@@ -234,8 +234,8 @@ const ChatBox = () => {
 
   useEffect(() => {
     if (selectedUser) {
-      const ws = new WebSocket("ws://localhost:8080"); // on local use
-      // const ws = new WebSocket("wss://testing-vipin.onrender.com"); // on production use
+      const ws = new WebSocket(import.meta.env.VITE_API_WEBSOCKET_URL); // on local use
+      // const ws = new WebSocket("ws://localhost:8080"); // on local use
 
       ws.onopen = () => {
         console.log("WebSocket Connected!");
@@ -338,9 +338,9 @@ const ChatBox = () => {
     const selectedFile = event.target.files[0];
     if (!selectedFile) return;
 
+    setFile(selectedFile);
     const fileURl = URL.createObjectURL(selectedFile);
     setPreview(fileURl);
-    setFile(selectedFile);
     setShowModal(true);
   };
 
@@ -356,17 +356,31 @@ const ChatBox = () => {
     // setIsLoading(true);
     setIsSending(true);
 
-    let base64_image_data = "";
-    let media_type = "";
+    let fileName = "";
 
     if (file) {
-      // File ko Base64 me convert karna
-      const reader = new FileReader();
-      reader.readAsDataURL(file);
-      base64_image_data = await new Promise((resolve) => {
-        reader.onload = () => resolve(reader.result.split(",")[1]);
+      console.log(file, "file")
+      const formData = new FormData();
+      formData.append("file", file);
+      console.log(formData, "file")
+
+
+      const uploadRes = await api.post(`${import.meta.env.VITE_API_FILE_UPLOAD}`, formData, {
+        headers: {
+          "Content-Type": "multipart/form-data",
+          Authorization: `Bearer ${localStorage.getItem("authtoken")}`,
+        },
       });
-      media_type = file.type.startsWith("image") ? "image" : "video";
+
+      console.log(uploadRes, "uploadRes");
+      
+
+      const uploadData = await uploadRes.data;
+
+      if (uploadData.success) {
+        fileName = uploadData.fileName;
+      }
+
     }
 
     const payload = {
@@ -374,16 +388,12 @@ const ChatBox = () => {
       sender_id: String(userId),
       receiver_id: selectedUser.id,
       message: newMessage,
-      base64_image_data,
-      media_type,
+      file_name: fileName,
+      media_type: file ? file.type.startsWith("image") ? "image" : "video" : "",
       timestamp: new Date().toISOString(),
       read_status: "0",
     };
-    console.log("Sending WebSocket Message:", payload);
-    // Send message via WebSocket
     socket.send(JSON.stringify(payload));
-
-    // Update UI instantly
     setAllMessages((prev) => [...prev, payload]);
     setNewMessage("");
     setFile(null);

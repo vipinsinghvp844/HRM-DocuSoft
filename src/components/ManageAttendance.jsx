@@ -1,15 +1,6 @@
 import React, { useState, useEffect } from "react";
-import {
-  Button,
-  Container,
-  Row,
-  Col,
-  Offcanvas,
-} from "react-bootstrap";
 import { useNavigate } from "react-router-dom";
-import { FaEye } from "react-icons/fa";
 import AddAttendance from "./AddAttendance";
-import "./ManageAttendance.css"; // Import the custom CSS file
 import { useSelector } from "react-redux";
 import DataGrid, {
   Column,
@@ -144,7 +135,7 @@ const ManageAttendance = () => {
 
       {show && (
         <div className="fixed inset-0 bg-black bg-opacity-50 z-40">
-          <div className="fixed top-0 right-0 h-full w-25 bg-white shadow-lg z-50 transform transition-transform duration-300">
+          <div className="fixed top-0 right-0 h-full w-3/4 sm:w-1/3 lg:w-1/4 bg-white shadow-lg z-50 transform transition-transform duration-300">
             <div className="flex justify-between items-center p-4 border-b">
               <h2 className="text-lg font-semibold">Add Attendance</h2>
               <button
@@ -154,7 +145,7 @@ const ManageAttendance = () => {
                 ✕
               </button>
             </div>
-            <div className="p-4">
+            <div className="overflow-y-auto h-[calc(100vh-64px)]">
               <AddAttendance />
             </div>
           </div>

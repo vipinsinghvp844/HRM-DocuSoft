@@ -1,9 +1,6 @@
 import React, { useEffect, useState, useRef } from "react";
-import { Container, Row, Col, Button, Offcanvas, Nav } from "react-bootstrap";
-import axios from "axios";
+import { Nav } from "react-bootstrap";
 import { Link, useNavigate, NavLink } from "react-router-dom";
-import { FaTimes } from "react-icons/fa";
-import "./Header.css";
 import { useDispatch, useSelector } from "react-redux";
 import {
   FetchAllUserProfileAction,
@@ -23,7 +20,7 @@ const Header = ({ onLogout, userRole, pendingCount }) => {
   const [showPopup, setShowPopup] = useState(false);
   const navigate = useNavigate();
   const dispatch = useDispatch();
-  const placeholderImage = import.meta.env.VITE_PLACEHOLDER_IMAGE;
+  const placeholderImage = `${import.meta.env.VITE_API_BASE_URL}/2024/07/placeholder-image-hrm.png`;
   const popupRef = useRef(null);
   const { loginUserProfile, loginUserData } = useSelector(
     ({ AllReducers }) => AllReducers
@@ -309,7 +306,7 @@ const Header = ({ onLogout, userRole, pendingCount }) => {
     if (authtoken && userId) {
       try {
         await api.post(
-          `${import.meta.env.VITE_API_ON_OFF_USER_STATUS}`,
+          `${import.meta.env.VITE_API_BASE_API_URL}/jwt-auth/v1/user-status`,
           { user_id: userId, status: "offline" },
           { headers: { Authorization: `Bearer ${authtoken}` } }
         );

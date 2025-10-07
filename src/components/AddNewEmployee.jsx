@@ -1,6 +1,5 @@
 import React, { useState, useEffect } from "react";
-import { Col, Container, Row, Form, Button } from "react-bootstrap";
-import "./AddNewEmployee.css";
+import {  Form } from "react-bootstrap";
 import { toast } from "react-toastify";
 import { useDispatch } from "react-redux";
 import {
@@ -24,7 +23,6 @@ const initialState = {
 
 const AddNewEmployee = () => {
   const [formData, setFormData] = useState(initialState);
-  // const [userState, setUserState] = useState("active");
   const [userRoleOptions, setUserRoleOptions] = useState([]);
   const currentUserRole = localStorage.getItem("role");
   const dispatch = useDispatch();

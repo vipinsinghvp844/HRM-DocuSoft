@@ -8,6 +8,7 @@ import {
 import { useDispatch, useSelector } from "react-redux";
 import "./Notification.css";
 import LoaderSpiner from "./LoaderSpiner";
+import { ArrowLeftCircle } from "lucide-react";
 
 const Notification = () => {
   const [notification, setNotification] = useState([]);
@@ -99,24 +100,21 @@ const Notification = () => {
           <LoaderSpiner />
         </div>
       )}
-      <Container className="leave-policies-container">
-        <Row className="mb-4 d-flex">
-          <Col md={1}>
-            <i
-              className="bi bi-arrow-left-circle"
-              onClick={() => window.history.back()}
-              style={{ cursor: "pointer", fontSize: "32px", color: "#343a40" }}
-            ></i>
-          </Col>
-          <Col md={9}>
-            <h3 className="mt-2">Notification</h3>
-          </Col>
-        </Row>
+      <div className="pt-4 px-2">
+        <div className="flex md:flex-row items-center justify-between gap-2 mb-6">
+          <button
+          onClick={() => window.history.back()}
+          className="flex items-center text-gray-700 hover:text-gray-900 transition-colors"
+        >
+          <ArrowLeftCircle size={32} className="mr-2" />
+          <span className="hidden md:inline text-lg font-semibold">Back</span>
+        </button>
+        <h3 className="text-xl md:text-2xl font-semibold text-center flex-1">Notifications</h3>
+        </div>
 
         <Row>
           {TotalNotifications.length > 0 ? (
             TotalNotifications.map((item) => {
-              // Extract date directly inside map()
               const match = item.message.match(/\d{4}-\d{2}-\d{2}/g);
               const startDate = match ? match[0] : null;
 
@@ -165,7 +163,7 @@ const Notification = () => {
             </Col>
           </Row>
         )}
-      </Container>
+      </div>
     </>
   );
 };

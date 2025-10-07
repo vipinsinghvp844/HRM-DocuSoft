@@ -153,26 +153,27 @@ const ChatWindow = ({
                 >
                   <div
                     className={`relative inline-block max-w-[70%] break-words  py-2 pr-20 ps-2 rounded-lg ${isSender
-                        ? "bg-blue-500 text-white"
-                        : "bg-gray-200 text-gray-800"
+                      ? "bg-blue-500 text-white"
+                      : "bg-gray-200 text-gray-800"
                       }`}
                   >
                     {/* Image / Video */}
                     {msg.base64_image_data &&
                       (msg.media_type === "image" ? (
                         <img
-                          src={`data:image/jpeg;base64,${msg.base64_image_data}`}
+                          src={`${import.meta.env.VITE_API_BASE_URL}/${msg.base64_image_data}`}
                           alt="Media"
                           className="rounded-lg max-w-full mb-2"
                         />
                       ) : (
                         <video controls className="rounded-lg max-w-full mb-2">
                           <source
-                            src={`data:video/mp4;base64,${msg.base64_image_data}`}
+                            src={`${import.meta.env.VITE_API_BASE_URL}/${msg.base64_image_data}`}
                             type="video/mp4"
                           />
                         </video>
                       ))}
+
 
                     {/* Editable message */}
                     {editingMessageId === msg.id && isSender ? (

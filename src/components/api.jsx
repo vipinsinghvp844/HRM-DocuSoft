@@ -1,9 +1,7 @@
 import axios from "axios";
 
 const api = axios.create({
-  baseURL: "https://devsite.digitalpractice.net/devsite/wp-json",
-  // baseURL: "https://portal.digitalpractice.net/hrm/wp-json",
-
+  baseURL: import.meta.env.VITE_API_BASE_API_URL,
 });
 
 let isRefreshing = false;
@@ -58,9 +56,7 @@ api.interceptors.response.use(
         if (!refreshToken) throw new Error("No refresh token found");
 
         const res = await axios.post(
-          "https://devsite.digitalpractice.net/devsite/wp-json/custom-jwt/v1/refresh",
-          // "https://portal.digitalpractice.net/hrm/wp-json/custom-jwt/v1/refresh",
-
+          `${import.meta.env.VITE_API_BASE_API_URL}/custom-jwt/v1/refresh`,
           { refresh_token: refreshToken }
         );
 

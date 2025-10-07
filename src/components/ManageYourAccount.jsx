@@ -16,7 +16,7 @@ const ManageYourAccount = () => {
     ({ AllReducers }) => AllReducers
   );
   const dispatch = useDispatch();
- const placeholderImage = import.meta.env.VITE_PLACEHOLDER_IMAGE;
+  const placeholderImage = `${import.meta.env.VITE_API_BASE_URL}/2024/07/placeholder-image-hrm.png`;
   const [activeTab, setActiveTab] = useState("Personal Info");
   const user_name = localStorage.getItem("user_name");
 
@@ -25,11 +25,11 @@ const ManageYourAccount = () => {
   const [selectedImage, setSelectedImage] = useState(null);
   const [crop, setCrop] = useState({ x: 0, y: 0 });
   const [zoom, setZoom] = useState(1);
-   const [croppedAreaPixels, setCroppedAreaPixels] = useState(null);
+  const [croppedAreaPixels, setCroppedAreaPixels] = useState(null);
 
-   const onCropComplete = useCallback((croppedArea, croppedAreaPixels) => {
-     setCroppedAreaPixels(croppedAreaPixels);
-   }, []);
+  const onCropComplete = useCallback((croppedArea, croppedAreaPixels) => {
+    setCroppedAreaPixels(croppedAreaPixels);
+  }, []);
 
   const handleFileChange = async (event) => {
     const file = event.target.files[0];
@@ -41,46 +41,46 @@ const ManageYourAccount = () => {
         setSelectedImage(reader.result);
         setShowCropModal(true);
       }
-     
+
     }
   };
-const handleCropConfirm = async () => {
-  setLoading(true);
-  try {
-    const croppedDataUrl = await getCroppedImg(
-      selectedImage,
-      croppedAreaPixels
-    );
-
-    const blob = await fetch(croppedDataUrl).then((res) => res.blob());
-    let file = new File([blob], "profile.jpg", { type: "image/jpeg" });
-
+  const handleCropConfirm = async () => {
+    setLoading(true);
     try {
-      file = await compressImage(file, { maxWidth: 1024, quality: 0.72 });
-      
-    } catch (e) {
-      console.warn(
-        "Canva compression failed, using image-compression fallback:",
-        e
+      const croppedDataUrl = await getCroppedImg(
+        selectedImage,
+        croppedAreaPixels
       );
-      file = await imageCompression(file, {
-        maxSizeMB: 1, 
-        maxWidthOrHeight: 1024,
-        useWebWorker: false, 
-        initialQuality: 0.72,
-      });
+
+      const blob = await fetch(croppedDataUrl).then((res) => res.blob());
+      let file = new File([blob], "profile.jpg", { type: "image/jpeg" });
+
+      try {
+        file = await compressImage(file, { maxWidth: 1024, quality: 0.72 });
+
+      } catch (e) {
+        console.warn(
+          "Canva compression failed, using image-compression fallback:",
+          e
+        );
+        file = await imageCompression(file, {
+          maxSizeMB: 1,
+          maxWidthOrHeight: 1024,
+          useWebWorker: false,
+          initialQuality: 0.72,
+        });
+      }
+
+
+      const res = await dispatch(ProfilePicUpdateAction(file));
+
+    } catch (err) {
+      console.error("Crop/Compress/Upload error:", err);
+    } finally {
+      setLoading(false);
+      setShowCropModal(false);
     }
-
-
-    const res = await dispatch(ProfilePicUpdateAction(file));
-  
-  } catch (err) {
-    console.error("Crop/Compress/Upload error:", err);
-  } finally {
-    setLoading(false);
-    setShowCropModal(false);
-  }
-};
+  };
 
   const renderTabContent = () => {
     switch (activeTab) {

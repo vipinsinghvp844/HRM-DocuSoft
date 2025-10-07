@@ -1,11 +1,9 @@
 import React, { useState, useEffect } from "react";
-import { Row, Col, Container, Card, Alert } from "react-bootstrap";
 import TodayPresent from "./TodayPresent";
 import TodayAbsent from "./TodayAbsent";
 import TodayOnLeave from "./TodayOnLeave";
 import TotalUsers from "./TotalUsers";
 import MarkAttendance from "./MarkAttendance";
-import "./HrDashboard.css"; // Import custom CSS for styling
 import { useDispatch } from "react-redux";
 import {
   GetAttendanceDataAction,
@@ -64,7 +62,7 @@ const HrDashboard = () => {
       <div className="mb-6">
         <h1 className="text-3xl md:text-4xl font-bold text-gray-800">
           👋 Welcome Back,{" "}
-          <span className="text-blue-600 underline decoration-wavy">
+          <span className="text-blue-600">
             {firstName}
           </span>
           !
@@ -79,8 +77,8 @@ const HrDashboard = () => {
         <TodayAbsent />
       </div>
       <div className="bg-white p-6 rounded-lg shadow-lg">
-              <MarkAttendance userName={userName} />
-            </div>
+        <MarkAttendance userName={userName} />
+      </div>
 
       <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
         <div className="bg-white rounded-xl shadow-md p-4">

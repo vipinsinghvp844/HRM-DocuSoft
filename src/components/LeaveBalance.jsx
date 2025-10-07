@@ -1,12 +1,10 @@
 import { useState, useEffect } from "react";
 import { useDispatch, useSelector } from "react-redux";
-import { Row, Col } from "react-bootstrap";
 import LoaderSpiner from "./LoaderSpiner";
 import {
   GetLeavePolicyAction,
   GetEmployeeLeaveDetailAction,
 } from "../../redux/actions/EmployeeDetailsAction";
-import "./LeaveBalance.css";
 import DataGrid, {
   Column,
   Paging,

@@ -1,11 +1,5 @@
 import React, { useState, useEffect } from "react";
-import {
-  Container,
-  Row,
-  Col,
-  Button,
-  Offcanvas,
-} from "react-bootstrap";
+
 import { useDispatch, useSelector } from "react-redux";
 import { GetAttendanceDataActionByDate } from "../../redux/actions/EmployeeDetailsAction";
 import EditEmployeeAttendance from "./EditEmployeeAttendance";
