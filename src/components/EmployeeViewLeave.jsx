@@ -177,7 +177,7 @@ const EmployeeViewLeave = () => {
         </h3>
 
           <Link to={"/apply-leave"}>
-            <button className="bg-blue-600 text-white px-4 py-2 rounded-lg shadow hover:bg-blue-700 transition">
+            <button className="bg-blue-600 btn-blue text-white p-5 rounded-lg shadow hover:bg-blue-700 transition">
               Apply Leave
             </button>
           </Link>
@@ -191,7 +191,7 @@ const EmployeeViewLeave = () => {
             keyExpr="id"
             showBorders={true}
             rowAlternationEnabled={true}
-            className="shadow-sm rounded"
+            className="shadow-sm rounded table table-grid table-grid-2 w-100"
             height="auto"
             columnAutoWidth={true}
             wordWrapEnabled={true}

@@ -4,6 +4,7 @@ import 'react-calendar/dist/Calendar.css';
 import CalendarComponent from './CalendarComponent ';
 import api from './api';
 import { ArrowLeftCircle } from 'lucide-react';
+import { FormControl, MenuItem, Select } from '@mui/material';
 
 
 const EmHolidays = () => {
@@ -97,29 +98,43 @@ const EmHolidays = () => {
         <form>
           <div className="grid grid-cols-1 md:grid-cols-3 gap-4 items-end">
             <div className="flex flex-col">
-              <label className="font-medium mb-1">Date</label>
+              <label className="font-medium mb-2 text-gray-700">Date</label>
               <input
                 type="date"
                 name="date"
                 value={filters.date}
                 onChange={handleFilterChange}
-                className="border rounded px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-400"
+                className="border border-gray-300 rounded-md px-4 py-2.5 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 shadow-sm transition duration-150 ease-in-out hover:border-blue-400 text-gray-700 bg-white w-full"
               />
             </div>
 
             <div className="flex flex-col">
               <label className="font-medium mb-1">Type</label>
-              <select
-                name="type"
+              <FormControl fullWidth size="small">
+                <Select
+              
+                 name="type"
                 value={filters.type}
                 onChange={handleFilterChange}
-                className="border rounded px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-400"
+                 className="min-w-[120px]"
+            sx={{
+              '& .MuiOutlinedInput-root': {
+                '&:hover fieldset': {
+                  borderColor: '#60a5fa',
+                },
+              },
+              '& .MuiSelect-select': {
+                padding: '8px 14px',
+              }
+            }}
               >
-                <option value="">Select Type</option>
-                <option value="Public Holiday">Public Holiday</option>
-                <option value="Company Holiday">Company Holiday</option>
-                <option value="Other">Other</option>
-              </select>
+                <MenuItem value="">Select Type</MenuItem>
+                <MenuItem value="Public Holiday">Public Holiday</MenuItem>
+                <MenuItem value="Company Holiday">Company Holiday</MenuItem>
+                <MenuItem value="Other">Other</MenuItem>
+              </Select>
+              </FormControl>
+              
             </div>
 
             {/* Buttons */}
@@ -127,14 +142,14 @@ const EmHolidays = () => {
               <button
                 type="button"
                 onClick={applyFilters}
-                className="bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-600"
+                className="bg-blue-500 btn-blue text-white px-4 py-2 rounded hover:bg-blue-600"
               >
                 Apply Filters
               </button>
               <button
                 type="button"
                 onClick={resetFilters}
-                className="bg-gray-300 text-gray-800 px-4 py-2 rounded hover:bg-gray-400"
+                className="btn-outline-danger btn"
               >
                 Reset Filters
               </button>
