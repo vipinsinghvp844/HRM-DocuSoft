@@ -1,10 +1,6 @@
 import React, { useState, useEffect } from 'react';
-import axios from 'axios';
-import { Form, Table, Button, Container, Row, Col } from 'react-bootstrap';
-import './HrLeavePolicies.css';
 import { format, parseISO } from 'date-fns';
 import { toast } from 'react-toastify';
-import LoaderSpiner from "./LoaderSpiner";
 import api from './api';
 import DataGrid, {
   Column,
@@ -13,7 +9,7 @@ import DataGrid, {
   HeaderFilter,
   SearchPanel,
 } from "devextreme-react/data-grid";
-import { FaArrowLeft, FaCheckCircle, FaEdit, FaTimesCircle, FaTrash } from 'react-icons/fa';
+import { FaEdit, FaTrash } from 'react-icons/fa';
 import { ArrowLeftCircle } from 'lucide-react';
 
 const LeavePolicies = () => {

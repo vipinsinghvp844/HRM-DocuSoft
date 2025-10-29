@@ -139,8 +139,9 @@ const LeaveEntitlements = () => {
           dataSource={leaveBalances}
           keyExpr="id"
           showBorders={true}
+          height="auto"
           rowAlternationEnabled={true}
-          className="shadow-sm rounded"
+          className="shadow-sm rounded table-grid-2 table-grid w-100"
           columnAutoWidth={true}
           wordWrapEnabled={true}
         >

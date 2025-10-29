@@ -1,18 +1,6 @@
 import React, { useState, useEffect } from "react";
-import axios from "axios";
-import {
-  Container,
-  Row,
-  Col,
-  Form,
-  Button,
-  Modal,
-  Table,
-} from "react-bootstrap";
-import "./HrManageHolidays.css";
 import { GetHolidayAction } from "../../redux/actions/EmployeeDetailsAction";
 import { useDispatch, useSelector } from "react-redux";
-import LoaderSpiner from "./LoaderSpiner";
 import api from "./api";
 import { ArrowLeftCircle } from "lucide-react";
 import { FaEdit, FaTrash } from "react-icons/fa";
@@ -39,9 +27,9 @@ const ManageHolidays = () => {
   const [selectedHoliday, setSelectedHoliday] = useState(null);
   const userRole = localStorage.getItem("role");
   const dispatch = useDispatch();
-  const { TotalHolidays } = useSelector(
-    ({ EmployeeDetailReducers }) => EmployeeDetailReducers
-  );
+  // const { TotalHolidays } = useSelector(
+  //   ({ EmployeeDetailReducers }) => EmployeeDetailReducers
+  // );
 
 
   useEffect(() => {

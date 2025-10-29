@@ -1,9 +1,6 @@
 import React, { useEffect, useState, useRef } from "react";
-import { Container, Row, Col, Button, Offcanvas, Nav } from "react-bootstrap";
-import axios from "axios";
+import { Nav } from "react-bootstrap";
 import { Link, useNavigate, NavLink } from "react-router-dom";
-import { FaTimes } from "react-icons/fa";
-import "./Header.css";
 import { useDispatch, useSelector } from "react-redux";
 import {
   FetchAllUserProfileAction,
@@ -23,7 +20,7 @@ const Header = ({ onLogout, userRole, pendingCount }) => {
   const [showPopup, setShowPopup] = useState(false);
   const navigate = useNavigate();
   const dispatch = useDispatch();
-  const placeholderImage = import.meta.env.VITE_PLACEHOLDER_IMAGE;
+  const placeholderImage = `${import.meta.env.VITE_API_BASE_URL}/2024/07/placeholder-image-hrm.png`;
   const popupRef = useRef(null);
   const { loginUserProfile, loginUserData } = useSelector(
     ({ AllReducers }) => AllReducers
@@ -65,7 +62,7 @@ const Header = ({ onLogout, userRole, pendingCount }) => {
       {
         to: "/admin-dashboard",
         icon: "bi-house-door",
-        label: "Admin Dashboard",
+        label: "Dashboard",
       },
       {
         to: "/today-attendance",
@@ -105,7 +102,7 @@ const Header = ({ onLogout, userRole, pendingCount }) => {
       {
         to: "/attendance-csv",
         icon: "bi-filetype-csv",
-        label: "Attendance CSV",
+        label: "Attendance Overview",
       },
       {
         to: "/manage-documents",
@@ -114,7 +111,7 @@ const Header = ({ onLogout, userRole, pendingCount }) => {
       },
     ],
     hr: [
-      { to: "/hr-dashboard", icon: "bi-house-door", label: "HR Dashboard" },
+      { to: "/hr-dashboard", icon: "bi-house-door", label: "Dashboard" },
       ...(userStatus === "active"
         ? [
           {
@@ -168,7 +165,7 @@ const Header = ({ onLogout, userRole, pendingCount }) => {
           {
             to: "/attendance-csv",
             icon: "bi-calendar-check",
-            label: "Attendance Csv",
+            label: "Attendance Overview",
           },
         ]
         : []),
@@ -178,24 +175,24 @@ const Header = ({ onLogout, userRole, pendingCount }) => {
       {
         to: "/employee-dashboard",
         icon: "bi-house-door",
-        label: "Employee Dashboard",
+        label: "Dashboard",
       },
       ...(userStatus === "active"
         ? [
           {
             to: "/my-Attendance",
             icon: "bi-person-add",
-            label: "My Attendance",
+            label: "Attendance",
           },
           {
             to: "/my-leaves",
             icon: "bi-person-exclamation",
-            label: "My Leaves",
+            label: "Leaves",
           },
           {
             to: "/leave-entitlements",
             icon: "bi-person-exclamation",
-            label: "My Balance Leave",
+            label: "Balance Leave",
           },
           {
             to: "/holidays",
@@ -309,7 +306,7 @@ const Header = ({ onLogout, userRole, pendingCount }) => {
     if (authtoken && userId) {
       try {
         await api.post(
-          `${import.meta.env.VITE_API_ON_OFF_USER_STATUS}`,
+          `${import.meta.env.VITE_API_BASE_API_URL}/jwt-auth/v1/user-status`,
           { user_id: userId, status: "offline" },
           { headers: { Authorization: `Bearer ${authtoken}` } }
         );
@@ -382,46 +379,51 @@ const Header = ({ onLogout, userRole, pendingCount }) => {
               {showPopup && (
                 <div
                   ref={popupRef}
-                  className="absolute right-0 mt-1 w-64 bg-white rounded-xl shadow-lg border border-gray-200 p-2 z-50 animate-fade-in"
+                  className="absolute right-0 mt-2 w-80 bg-white rounded-2xl shadow-2xl border border-gray-100 p-4 z-50 transform transition-all duration-200 ease-out"
                 >
                   <button
-                    className="absolute top-2 right-2 text-gray-400 hover:text-gray-600"
+                    className="absolute top-3 right-3 text-gray-400 hover:text-gray-600 transition-colors"
                     onClick={() => setShowPopup(false)}
                   >
-                    ✕
+                    <i className="bi bi-x-lg text-lg"></i>
                   </button>
 
-                  <div className="flex flex-col items-center mt-2">
-                    <img
-                      src={loginUserProfile || placeholderImage}
-                      alt="Profile"
-                      className="w-20 h-20 rounded-full border border-gray-300 shadow-md"
-                    />
-                    <h5 className="mt-3 text-lg font-semibold text-gray-800">
+                  <div className="flex flex-col items-center pt-2">
+                    <div className="relative">
+                      <img
+                        src={loginUserProfile || placeholderImage}
+                        alt="Profile"
+                        className="w-24 h-24 rounded-full border-4 border-white shadow-lg object-cover"
+                      />
+                      <div className="absolute bottom-1 right-1 w-4 h-4 bg-green-500 rounded-full border-2 border-white"></div>
+                    </div>
+
+                    <h5 className="mt-4 text-xl font-bold text-gray-800">
                       {loginUserData?.user_display_name}
                     </h5>
-                    <p className="text-sm text-gray-500">
+                    <p className="text-sm text-gray-500 font-medium">
                       {loginUserData?.user_email}
                     </p>
                   </div>
 
-                  <div className="mt-0 space-y-2">
+                  <div className="mt-6 space-y-3">
                     <Link
                       to="/manage-your-account"
                       onClick={handleManageAccountClick}
-                      className="block text-center py-2 rounded-lg text-blue-600 hover:bg-blue-50 font-medium"
+                      className="flex btn-blue items-center justify-center gap-2 w-full py-2.5 px-4 rounded-xl text-blue-600 hover:bg-blue-50 font-semibold transition-colors"
                     >
+                      <i className="bi bi-gear-fill"></i>
                       Manage Your Account
                     </Link>
                     <button
                       onClick={handleLogout}
-                      className="w-full py-2 rounded-lg bg-red-500 text-white font-semibold hover:bg-red-600 transition"
+                      className="btn-red btn w-100 gap-2"
                     >
+                      <i className="bi bi-box-arrow-right me-2"></i>
                       Logout
                     </button>
                   </div>
-                </div>
-              )}
+                </div>)}
             </div>
           </div>
         </div>

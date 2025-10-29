@@ -14,91 +14,65 @@ function ChatSidebar({
 }) {
  
   const { userStatus } = useContext(WebSocketContext);
-  const [active, setActive] = useState(false);
     const { TotalNotifications, AllUnseenUserAndMessages } = useSelector(
     ({ EmployeeDetailReducers }) => EmployeeDetailReducers
   );
 
   return (
-    <div className="sidebare">
-      <div>
-        <input
-          type="text"
-          className="p-2 mb-2"
-          value={searchItem}
-          onChange={handleInputChange}
-          placeholder="Type to Search User"
-          style={{ width: "100%", borderRadius: "15px" }}
-        />
-      </div>
-      <ListGroup style={{ height: "500px", overflowY: "auto", overflowX:"hidden" }}>
-        {filteredUsers.map((user) => {
-          const unseenMessages =
-            AllUnseenUserAndMessages?.[0]?.unread_messages?.find(
-              (msg) => String(msg.sender_id) === String(user.id) 
-            )?.unread_count || 0;
-          const isOnline = userStatus[String(user.id)]?.status === "online";
-          // console.log(isOnline,"jhckjsdkjdhfkhds");
-          
+   <div className="flex flex-col h-screen">
+  <div className="sticky top-30 z-10 bg-white p-3 border-b border-gray-200">
+    <input
+      type="text"
+      value={searchItem}
+      onChange={handleInputChange}
+      placeholder="🔍 Search user..."
+      className="w-full p-2 text-sm border rounded-full focus:outline-none focus:ring-2 focus:ring-blue-400"
+    />
+  </div>
 
-          return (
-            <ListGroup.Item
-              key={user.id}
-              onClick={() => selectUser(user)}
-              style={{
-                cursor: "pointer",
-                display: "flex",
-                alignItems: "center",
-              }}
-            >
-              <div style={{ position: "relative" }}>
-                <img
-                  src={getProfileImage(user.id)}
-                  alt="Profile"
-                  className="popup-profile-image"
-                  style={{
-                    width: "40px",
-                    height: "40px",
-                    marginRight: "10px",
-                    objectFit: "cover",
-                    borderRadius: "50%",
-                  }}
-                />
-                {/* Online/Offline Status Dot */}
-                <div
-                  style={{
-                    position: "absolute",
-                    bottom: "0",
-                    right: "0",
-                    width: "20px",
-                    height: "20px",
-                    borderRadius: "50%",
-                    backgroundColor: isOnline ? "green" : "gray",
-                    border: "2px solid white",
-                  }}
-                />
-              </div>
-              <div>
-                <div style={{ fontWeight: "bold" }}>{user.username}</div>
-              </div>
-              {unseenMessages > 0 && (
-                <span
-                  style={{
-                    backgroundColor: "red",
-                    color: "white",
-                    fontSize: "0.8em",
-                    padding: "4px 7px",
-                    borderRadius: "50%",
-                   }}
-                >
-                  {unseenMessages}
-                </span>
-              )}
-            </ListGroup.Item>
-          );
-        })}
-      </ListGroup>
-    </div>
+  <div className="flex-1 overflow-y-auto">
+    {filteredUsers.map((user) => {
+      const unseenMessages =
+        AllUnseenUserAndMessages?.[0]?.unread_messages?.find(
+          (msg) => String(msg.sender_id) === String(user.id)
+        )?.unread_count || 0;
+
+      const isOnline = userStatus[String(user.id)]?.status === "online";
+
+      return (
+        <div
+          key={user.id}
+          onClick={() => selectUser(user)}
+          className="flex items-center px-3 py-2 hover:bg-gray-100 cursor-pointer transition"
+        >
+          <div className="relative mr-3">
+            <img
+              src={getProfileImage(user.id)}
+              alt="Profile"
+              className="w-10 h-10 rounded-full object-cover"
+            />
+            <span
+              className={`absolute bottom-0 right-0 w-3.5 h-3.5 rounded-full border-2 border-white ${
+                isOnline ? "bg-green-500" : "bg-gray-400"
+              }`}
+            />
+          </div>
+
+          <div className="flex-1">
+            <p className="font-medium text-gray-800">{user.username}</p>
+          </div>
+
+          {unseenMessages > 0 && (
+            <span className="bg-red-500 text-white text-xs font-semibold px-2 py-1 rounded-full">
+              {unseenMessages}
+            </span>
+          )}
+        </div>
+      );
+    })}
+  </div>
+</div>
+
   );
 }
 

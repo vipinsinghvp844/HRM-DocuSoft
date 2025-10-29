@@ -96,7 +96,7 @@ function transformDocuments(documents) {
       keyExpr="id"
       showBorders={true}
       rowAlternationEnabled={true}
-      className="shadow-sm rounded"
+      className="shadow-sm rounded table-grid-2 table-grid w-100"
       height="auto"
       columnAutoWidth={true}
       wordWrapEnabled={true}

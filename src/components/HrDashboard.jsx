@@ -1,11 +1,9 @@
 import React, { useState, useEffect } from "react";
-import { Row, Col, Container, Card, Alert } from "react-bootstrap";
 import TodayPresent from "./TodayPresent";
 import TodayAbsent from "./TodayAbsent";
 import TodayOnLeave from "./TodayOnLeave";
 import TotalUsers from "./TotalUsers";
 import MarkAttendance from "./MarkAttendance";
-import "./HrDashboard.css"; // Import custom CSS for styling
 import { useDispatch } from "react-redux";
 import {
   GetAttendanceDataAction,
@@ -60,45 +58,39 @@ const HrDashboard = () => {
   }, []);
 
   return (
-    <Container fluid className="p-2 bg-gray-50 min-h-screen">
+    <div className="p-4 bg-gray-50 min-h-screen">
       <div className="mb-6">
         <h1 className="text-3xl md:text-4xl font-bold text-gray-800">
           👋 Welcome Back,{" "}
-          <span className="text-blue-600 underline decoration-wavy">
+          <span className="text-blue-600">
             {firstName}
           </span>
           !
         </h1>
-        <p className="text-gray-600 mt-2">
-          Have a great day ahead 😊
-        </p>
+        <p className="text-gray-600 mt-2">Have a great day ahead 😊</p>
       </div>
 
-      <Row className="g-3 p-3">
-        <Col xs={12} md={6} lg={3}>
-          <Card className="dashboard-card">
-            <TotalUsers setBirthdayMessages={setBirthdayMessages} />
-          </Card>
-        </Col>
-        <Col xs={12} md={6} lg={3}>
-          <Card className="dashboard-card">
-            <TodayPresent />
-          </Card>
-        </Col>
-        <Col xs={12} md={6} lg={3}>
-          <Card className="dashboard-card">
-            <TodayOnLeave />
-          </Card>
-        </Col>
-        <Col xs={12} md={6} lg={3}>
-          <Card className="dashboard-card">
-            <TodayAbsent />
-          </Card>
-        </Col>
-      </Row>
-      <MarkAttendance />
-      <CalendarComponent />
-    </Container>
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 mb-6">
+        <TotalUsers setBirthdayMessages={setBirthdayMessages} />
+        <TodayPresent />
+        <TodayOnLeave />
+        <TodayAbsent />
+      </div>
+      <div className="bg-white p-6 rounded-lg shadow-lg">
+        <MarkAttendance userName={userName} />
+      </div>
+
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+        <div className="bg-white rounded-xl shadow-md p-4">
+          <CalendarComponent />
+        </div>
+        <div className="bg-white rounded-xl shadow-md p-4">
+          <h2 className="text-xl font-semibold text-gray-800 mb-2">📢 Announcements</h2>
+          <p className="text-gray-600">Upcoming......</p>
+        </div>
+      </div>
+    </div>
+
   );
 };
 

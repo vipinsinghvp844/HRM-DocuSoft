@@ -1,7 +1,6 @@
 import { useState, useEffect } from "react";
 import { Container } from "react-bootstrap";
 import MarkAttendance from "./MarkAttendance";
-import "./EmDashboard.css"; // Import custom CSS
 import {
   GetEmployeeLeaveDetailActionById
 } from "../../redux/actions/EmployeeDetailsAction";
@@ -23,11 +22,11 @@ function EmployeeDashboard() {
 
 
   return (
-    <Container fluid className="p-2 bg-gray-50 min-h-screen">
+    <div className="p-4 bg-gray-50 min-h-screen">
       <div className="mb-6">
         <h1 className="text-3xl md:text-4xl font-bold text-gray-800">
           👋 Welcome Back,{" "}
-          <span className="text-blue-600 underline decoration-wavy">
+          <span className="text-blue-600">
             {firstName}
           </span>
           !
@@ -40,7 +39,7 @@ function EmployeeDashboard() {
       <div className="bg-white p-6 rounded-lg shadow-lg">
         <MarkAttendance userName={userName} />
       </div>
-    </Container>
+    </div>
 
   );
 }

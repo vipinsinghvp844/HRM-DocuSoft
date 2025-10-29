@@ -1,22 +1,3 @@
-.bg-success {
-  background-color: #28a745 !important;
-}
-
-.bg-danger {
-  background-color: #dc3545 !important;
-}
-
-.bg-warning {
-  background-color: #ffc107 !important;
-}
-
-.text-white {
-  color: #fff !important;
-}
-
-.text-dark {
-  color: #343a40 !important;
-}
 .fullscreen {
   position: fixed;
   top: 0;

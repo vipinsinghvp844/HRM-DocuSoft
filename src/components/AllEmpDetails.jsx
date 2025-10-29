@@ -1,14 +1,9 @@
 import React, { useState, useEffect } from "react";
-import { Table, Button, Container, Alert, Row, Col } from "react-bootstrap";
 import { Link } from "react-router-dom";
 import { useNavigate } from "react-router-dom";
-import axios from "axios";
 import EditEmployee from "./EditEmployee";
 import ToggleButton from "./ToggleButton";
-import LoaderSpiner from "./LoaderSpiner";
-import "./AllEmpDetails.css";
 import { useDispatch, useSelector } from "react-redux";
-import { FetchAllUserProfileAction } from "../../redux/actions/dev-aditya-action";
 import { toast } from "react-toastify";
 import { GetTotalUserAction } from "../../redux/actions/EmployeeDetailsAction";
 import DataGrid, {
@@ -30,7 +25,7 @@ const AllEmpDetails = () => {
   const navigate = useNavigate();
 
 
-  const placeholderImage = import.meta.env.VITE_PLACEHOLDER_IMAGE;
+  const placeholderImage = `${import.meta.env.VITE_API_BASE_URL}/2024/07/placeholder-image-hrm.png`;
   const dispatch = useDispatch();
 
   const { AllProfilesImage } = useSelector(({ AllReducers }) => AllReducers);
@@ -164,6 +159,7 @@ const AllEmpDetails = () => {
                 src={getProfileImage(data.id)}
                 alt="Profile"
                 className="w-10 h-10 rounded-full object-cover cursor-pointer border"
+                onClick={() => handleFullDetail(data.id)}
               />
             )}
           />
