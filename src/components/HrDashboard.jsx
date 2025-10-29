@@ -15,7 +15,7 @@ import {
 import { FetchAllUserProfileAction } from "../../redux/actions/dev-aditya-action";
 import CalendarComponent from "./CalendarComponent .jsx";
 
-const HrDashboard = () => {
+const HrDashboard = ({greeting}) => {
   const [currentDate, setCurrentDate] = useState("");
   const [userId, setUserId] = useState("");
   const [userName, setUserName] = useState("");
@@ -61,7 +61,7 @@ const HrDashboard = () => {
     <div className="p-4 bg-gray-50 min-h-screen">
       <div className="mb-6">
         <h1 className="text-3xl md:text-4xl font-bold text-gray-800">
-          👋 Welcome Back,{" "}
+          {greeting},{" "}
           <span className="text-blue-600">
             {firstName}
           </span>

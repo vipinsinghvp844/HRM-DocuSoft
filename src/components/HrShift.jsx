@@ -11,6 +11,7 @@ import DataGrid, {
 } from "devextreme-react/data-grid";
 import { FaEdit, FaTrash } from 'react-icons/fa';
 import { ArrowLeftCircle } from 'lucide-react';
+import api from "./api";
 
 function HrShift() {
   const [shifts, setShifts] = useState([]);

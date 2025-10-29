@@ -1,9 +1,8 @@
 import React, { useState, useEffect, useRef } from "react";
-import { Button, Table, Container, Row, Col, Modal } from "react-bootstrap";
+import { Button, Modal } from "react-bootstrap";
 import { toast } from "react-toastify";
-import "react-toastify/dist/ReactToastify.css"; // Import the toastify CSS
+import "react-toastify/dist/ReactToastify.css";
 import LoaderSpiner from "./LoaderSpiner";
-import "./MarkAttendance.css";
 import {
   GetAttendanceDataActionByIdAndDate,
   submitAttendanceAction,
@@ -215,13 +214,14 @@ const MarkAttendance = () => {
 
   return (
     <>
+      <div className="min-h-screen bg-gray-50 p-sm-2 relative">
+
       {isLoading && (
-        <div className="loader-overlay">
+        <div className="absolute inset-0 flex items-start justify-center bg-white/60 z-10">
           <LoaderSpiner />
         </div>
       )}
 
-      <div className="min-h-screen bg-gray-50 p-sm-2">
 
         <div className="grid grid-cols-2 md:grid-cols-2 gap-6 mb-8">
           <button

@@ -6,7 +6,7 @@ import {
 } from "../../redux/actions/EmployeeDetailsAction";
 import { useDispatch } from "react-redux";
 
-function EmployeeDashboard() {
+function EmployeeDashboard({greeting}) {
   const [userName, setUserName] = useState("");
   const dispatch = useDispatch();
   const firstName = localStorage.getItem("firstname") || "";
@@ -25,7 +25,7 @@ function EmployeeDashboard() {
     <div className="p-4 bg-gray-50 min-h-screen">
       <div className="mb-6">
         <h1 className="text-3xl md:text-4xl font-bold text-gray-800">
-          👋 Welcome Back,{" "}
+          {greeting},{" "}
           <span className="text-blue-600">
             {firstName}
           </span>

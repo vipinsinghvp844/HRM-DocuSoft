@@ -36,9 +36,9 @@ const EmployeeViewLeave = () => {
   const calculateEndDate = (startDate, paid, unpaid) => {
     if (!startDate) return "";
     const totalDays = (parseInt(paid) || 0) + (parseInt(unpaid) || 0);
-    if (totalDays <= 0) return startDate;
+    const validDays = totalDays < 1 ? 1 : totalDays;
     const endDate = new Date(startDate);
-    endDate.setDate(endDate.getDate() + totalDays - 1);
+    endDate.setDate(endDate.getDate() + validDays - 1);
     return endDate.toISOString().split("T")[0];
   };
 
@@ -138,6 +138,10 @@ const EmployeeViewLeave = () => {
   };
 
   const confirmEdit = async () => {
+    if (parseInt(formData.paid_leave_count || 0) + parseInt(formData.unpaid_leave_count || 0) < 1) {
+      toast.error("Leave must be at least 1 day.");
+      return;
+    }
     const userId = localStorage.getItem("user_id");
     setEditing(true);
     try {
@@ -165,77 +169,77 @@ const EmployeeViewLeave = () => {
     <div className="pt-4 px-2">
       <div className="flex md:flex-row items-center justify-between gap-2 mb-6">
         <button
-      onClick={() => window.history.back()}
-      className="flex items-center text-gray-700 hover:text-gray-900 transition-colors"
-    >
-      <ArrowLeftCircle size={32} className="mr-2" />
-      <span className="hidden md:inline text-lg font-semibold">Back</span>
-    </button>
+          onClick={() => window.history.back()}
+          className="flex items-center text-gray-700 hover:text-gray-900 transition-colors"
+        >
+          <ArrowLeftCircle size={32} className="mr-2" />
+          <span className="hidden md:inline text-lg font-semibold">Back</span>
+        </button>
 
         <h3 className="text-xl md:text-2xl font-semibold text-center flex-1">
           My Leave Requests
         </h3>
 
-          <Link to={"/apply-leave"}>
-            <button className="bg-blue-600 text-white px-4 py-2 rounded-lg shadow hover:bg-blue-700 transition">
-              Apply Leave
-            </button>
-          </Link>
+        <Link to={"/apply-leave"}>
+          <button className="bg-blue-600 text-white px-4 py-2 rounded-lg shadow hover:bg-blue-700 transition">
+            Apply Leave
+          </button>
+        </Link>
       </div>
 
-     
-        <div className="overflow-x-auto bg-white rounded-xl shadow-md p-3 relative">
-          <DataGrid
-            ref={gridRef}
-            dataSource={requests}
-            keyExpr="id"
-            showBorders={true}
-            rowAlternationEnabled={true}
-            className="shadow-sm rounded"
-            height="auto"
-            columnAutoWidth={true}
-            wordWrapEnabled={true}
-            columnHidingEnabled={true}
-          >
-            <SearchPanel visible={true} placeholder="Search..." />
-            <FilterRow visible={true} />
-            <HeaderFilter visible={true} />
-            <Paging defaultPageSize={5} />
 
-            <Column dataField="apply_date" caption="Apply Date" dataType="date" />
-            <Column dataField="paid_leave_count" caption="Paid Count" />
-            <Column dataField="unpaid_leave_count" caption="Unpaid Count" />
-            <Column dataField="start_date" caption="Start Date" dataType="date" />
-            <Column dataField="end_date" caption="End Date" dataType="date" />
-            <Column dataField="reason_for_leave" caption="Reason" />
-            <Column dataField="total_leave_days" caption="Total Days" width={70} />
-            <Column dataField="status" caption="Status" />
-            <Column dataField="hr_note" caption="HR Note" />
+      <div className="overflow-x-auto bg-white rounded-xl shadow-md p-3 relative">
+        <DataGrid
+          ref={gridRef}
+          dataSource={requests}
+          keyExpr="id"
+          showBorders={true}
+          rowAlternationEnabled={true}
+          className="shadow-sm rounded"
+          height="auto"
+          columnAutoWidth={true}
+          wordWrapEnabled={true}
+          columnHidingEnabled={true}
+        >
+          <SearchPanel visible={true} placeholder="Search..." />
+          <FilterRow visible={true} />
+          <HeaderFilter visible={true} />
+          <Paging defaultPageSize={5} />
 
-            <Column
-              caption="Actions"
-              width={120}
-              cellRender={({ data }) => (
-                <div className="flex gap-2">
-                  <button
-                    onClick={() => handleDeleteClick(data.id)}
-                    disabled={deleting}
-                    className="bg-red-500 text-white px-2 py-1 rounded text-sm hover:bg-red-600 transition disabled:opacity-50"
-                  >
-                    Delete
-                  </button>
-                  <button
-                    onClick={() => handleEditClick(data.id)}
-                    disabled={editing}
-                    className="bg-yellow-500 text-white px-2 py-1 rounded text-sm hover:bg-yellow-600 transition disabled:opacity-50"
-                  >
-                    Edit
-                  </button>
-                </div>
-              )}
-            />
-          </DataGrid>
-        </div>
+          <Column dataField="apply_date" caption="Apply Date" dataType="date" />
+          <Column dataField="paid_leave_count" caption="Paid Count" />
+          <Column dataField="unpaid_leave_count" caption="Unpaid Count" />
+          <Column dataField="start_date" caption="Start Date" dataType="date" />
+          <Column dataField="end_date" caption="End Date" dataType="date" />
+          <Column dataField="reason_for_leave" caption="Reason" />
+          <Column dataField="total_leave_days" caption="Total Days" width={70} />
+          <Column dataField="status" caption="Status" />
+          <Column dataField="hr_note" caption="HR Note" />
+
+          <Column
+            caption="Actions"
+            width={120}
+            cellRender={({ data }) => (
+              <div className={`flex gap-2 ${data.status !== "Pending" ? "opacity-50 pointer-events-none" : ""}`}>
+                <button
+                  onClick={() => handleDeleteClick(data.id)}
+                  disabled={deleting}
+                  className="bg-red-500 text-white px-2 py-1 rounded text-sm hover:bg-red-600 transition disabled:opacity-50"
+                >
+                  Delete
+                </button>
+                <button
+                  onClick={() => handleEditClick(data.id)}
+                  disabled={editing}
+                  className="bg-yellow-500 text-white px-2 py-1 rounded text-sm hover:bg-yellow-600 transition disabled:opacity-50"
+                >
+                  Edit
+                </button>
+              </div>
+            )}
+          />
+        </DataGrid>
+      </div>
       {showConfirm && (
         <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
           <div className="bg-white rounded-lg shadow-lg w-full max-w-2xl p-6">

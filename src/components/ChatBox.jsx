@@ -451,6 +451,7 @@ const ChatBox = () => {
             getProfileImage={getProfileImage}
             userId={userId}
             hasMore={hasMore}
+            allMessages={allMessages}
           />
         </Col>
 

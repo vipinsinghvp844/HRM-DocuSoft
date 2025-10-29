@@ -26,7 +26,7 @@ export const LoginUserAction = (obj12) => async (dispatch) => {
     //   username: obj12.email,
     //   password: obj12.password,
     // });
-    const res = await axios.post(`https://devsite.digitalpractice.net/devsite/wp-json/custom-jwt/v1/login`, {
+    const res = await axios.post(`${import.meta.env.VITE_API_LOGIN}`, {
     // const res = await axios.post(`https://portal.digitalpractice.net/hrm/wp-json/custom-jwt/v1/login`, {
 
       username: obj12.login,

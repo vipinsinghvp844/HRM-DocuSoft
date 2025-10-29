@@ -1,5 +1,4 @@
 import React, { useState, useEffect } from "react";
-
 import { useDispatch, useSelector } from "react-redux";
 import { GetAttendanceDataActionByDate } from "../../redux/actions/EmployeeDetailsAction";
 import EditEmployeeAttendance from "./EditEmployeeAttendance";
@@ -14,8 +13,6 @@ import { ArrowLeftCircle } from "lucide-react";
 
 function OverviewAttendance() {
   const [attendanceRecords, setAttendanceRecords] = useState([]);
-  
-
   const [isLoading, setIsLoading] = useState("false");
   const [show, setShow] = useState(false);
   const handleClose = () => setShow(false);
@@ -52,7 +49,6 @@ function OverviewAttendance() {
           };
           acc.push(userRecord);
         }
-
         switch (record.type) {
           case "clock_in":
             userRecord.clock_in = convertTo12HourFormat(record.time);
@@ -69,36 +65,29 @@ function OverviewAttendance() {
           default:
             break;
         }
-
         if (record.type === "break_out" && userRecord.break_in !== "N/A") {
           const breakDuration =
             (new Date(`1970-01-01T${record.time}Z`) -
               new Date(`1970-01-01T${userRecord.break_in}Z`)) /
             1000 /
-            60; // duration in minutes
+            60; 
           userRecord.total_break_time += breakDuration;
         }
-
         return acc;
       }, []);
-
       setAttendanceRecords(combinedData);
-      // setLoading(false);
     } finally {
-      setIsLoading(false); // Set loading to false after fetching
+      setIsLoading(false); 
     }
   };
   function convertTo12HourFormat(time24) {
-    if (!time24) return "--:--"; // Handle null/undefined input gracefully
-    let [hours, minutes, seconds] = time24.split(":"); // Split the time string
+    if (!time24) return "--:--"; 
+    let [hours, minutes, seconds] = time24.split(":");
     hours = parseInt(hours, 10);
-
-    const period = hours >= 12 ? "PM" : "AM"; // Determine AM or PM
-    hours = hours % 12 || 12; // Convert 0 to 12 for midnight
-
+    const period = hours >= 12 ? "PM" : "AM"; 
+    hours = hours % 12 || 12;
     return `${hours}:${minutes} ${period}`;
   }
-
   return (
     <div className="pt-4 px-2">
       <div className="flex  md:flex-row items-center justify-between gap-2 mb-6">
@@ -109,11 +98,9 @@ function OverviewAttendance() {
           <ArrowLeftCircle size={32} className="mr-2" />
           <span className="hidden md:inline text-lg font-semibold">Back</span>
         </button>
-
         <h3 className="text-xl md:text-2xl font-semibold text-center flex-1">
           Today Attendance
         </h3>
-
         <button
           onClick={handleShow}
           className="bg-blue-600 text-white px-4 py-2 rounded-lg shadow hover:bg-blue-700 transition"
@@ -121,7 +108,6 @@ function OverviewAttendance() {
           Edit Attendance
         </button>
       </div>
-
       <div className="overflow-x-auto bg-white rounded-xl shadow-md p-3">
         <DataGrid
           dataSource={attendanceRecords}
@@ -150,10 +136,9 @@ function OverviewAttendance() {
           <Column dataField="total_work" caption="Total Work" />
         </DataGrid>
       </div>
-
       {show && (
         <div className="fixed inset-0 bg-black bg-opacity-50 z-40">
-          <div className="fixed top-0 right-0 h-full w-25 bg-white shadow-lg z-50 transform transition-transform duration-300">
+          <div className="fixed top-0 right-0 h-full w-3/4 sm:w-1/3 lg:w-1/4 bg-white shadow-lg z-50 transform transition-transform duration-300">
             <div className="flex justify-between items-center p-4 border-b">
               <h2 className="text-lg font-semibold">Edit Attendance</h2>
               <button
@@ -163,7 +148,7 @@ function OverviewAttendance() {
                 ✕
               </button>
             </div>
-            <div className="p-4">
+            <div className="overflow-y-auto h-[calc(100vh-64px)]">
               <EditEmployeeAttendance />
             </div>
           </div>
@@ -172,5 +157,4 @@ function OverviewAttendance() {
     </div>
   );
 }
-
 export default OverviewAttendance;

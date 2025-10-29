@@ -347,9 +347,8 @@ export const GetOfficeShiftsAction = () => async (dispatch) => {
       });
     }
 
-    // console.log(response.data, "Data from API ===========");
 
-    return response.data; // Ensure this returns data correctly
+    return response?.data; 
   } catch (error) {
     console.error("Error performing action", error);
   }
@@ -364,8 +363,9 @@ export const fetchNotificationsAll =
 
       if (response?.data) {
         dispatch(fetchAllNotificationsReduser(response.data));
-
-        callback(response.data);
+        if(typeof callback === "function"){
+        callback(response?.data);
+        }
       }
     } catch (error) {
       console.error("Error fetching notifications:", error);
@@ -377,6 +377,28 @@ export const changeReadUnreadAction =
     try {
       const response = await api.post(
         `${import.meta.env.VITE_API_NOTIFICATION}/${notificationId}`,
+        {},
+        {
+          headers: {
+            Authorization: `Bearer ${localStorage.getItem("authtoken")}`,
+          },
+        }
+      );
+      if (response.data) {
+        callback(response.data);
+      }
+
+      return response.data;
+    } catch (error) {
+      console.error("Error performing action", error);
+    }
+  };
+
+  export const ChangeAllReadUnreadAction =
+  (callback) => async () => {
+    try {
+      const response = await api.post(
+        `${import.meta.env.VITE_API_ALL_NOTIFICATION_READ}`,
         {},
         {
           headers: {
