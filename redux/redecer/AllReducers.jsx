@@ -5,7 +5,6 @@ const initialState = {
   loginUserProfile: "",
   token: null,
   TotalUsers: [],
-  // TotalAttendance: "",
   AllProfilesImage:[],
 };
 
@@ -24,8 +23,6 @@ const AllReducers = createSlice({
       state.loginUserData = payload;
     },
     UserProfilePicReduser: (state, { payload }) => {
-      // console.log(payload,"=====payload");
-
       state.loginUserProfile = payload;
     },
     UserEditReduser: (state, { payload }) => {

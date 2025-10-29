@@ -1,103 +1,113 @@
 import React, { useEffect, useState } from "react";
-import { Alert, Button, Col, Container, Form, Row } from "react-bootstrap";
+import { Button, Col, Container, Form, Row, Spinner } from "react-bootstrap";
 import { useSelector } from "react-redux";
-import axios from "axios";
 import { toast } from "react-toastify";
+import api from "./api";
+
 const AdminAddEmpLeave = () => {
   const [userName, setUserName] = useState("");
   const [userId, setUserId] = useState("");
-  const [date, setDate] = useState("");
-  const [message, setMessage] = useState("");
   const [userRole, setUserRole] = useState("");
   const [employees, setEmployees] = useState([]);
   const [showDropdown, setShowDropdown] = useState(false);
   const [startDate, setStartDate] = useState("");
   const [endDate, setEndDate] = useState("");
-  const [leaveDays, setLevaDays] = useState({
-    unpaidLeave: 0,
-    paidLeave: 0,
-  });
+  const [leaveDays, setLeaveDays] = useState({ unpaidLeave: 0, paidLeave: 0 });
   const [reasonForLeave, setReasonForLeave] = useState("");
+  const [isLoading, setIsLoading] = useState(false);
+
   const { TotalUsers } = useSelector(
     ({ EmployeeDetailReducers }) => EmployeeDetailReducers
   );
-  const formatEndDate = (value, paidLeave, unpaidLeave) => {
-  let selectedDate = new Date(value);
-  let totalLeaveDays = (Number(paidLeave) || 0) + (Number(unpaidLeave) || 0) - 1;
-  selectedDate.setDate(selectedDate.getDate() + totalLeaveDays);
-  return selectedDate.toISOString().split("T")[0];
-};
+
   const currentDate = new Date().toISOString().split("T")[0];
 
-  useEffect(() => {
-    const currentDate = new Date().toISOString().split("T")[0];
-    setDate(currentDate);
+  // Utility: calculate end date based on start date & leave counts
+  const formatEndDate = (value, paidLeave, unpaidLeave) => {
+    let selectedDate = new Date(value);
+    let totalLeaveDays =
+      (Number(paidLeave) || 0) + (Number(unpaidLeave) || 0) - 1;
+    selectedDate.setDate(selectedDate.getDate() + totalLeaveDays);
+    return selectedDate.toISOString().split("T")[0];
+  };
 
+  // Reset form
+  const resetForm = () => {
+    setUserName("");
+    setUserId("");
+    setStartDate("");
+    setEndDate("");
+    setReasonForLeave("");
+    setLeaveDays({ unpaidLeave: 0, paidLeave: 0 });
+    setShowDropdown(false);
+  };
+
+  // Initial load
+  useEffect(() => {
     const storedUserRole = localStorage.getItem("role");
     setUserRole(storedUserRole || "");
 
-    const fetchEmployees =  () => {
-      try {
-        const employeeUsers = TotalUsers?.filter(
-          (user) => user.role === "employee" || user.role === "hr"
-        );
-        setEmployees(employeeUsers || []);
-      } catch (error) {
-        console.error("Error fetching employees:", error);
-      }
-    };
+    try {
+      const employeeUsers = TotalUsers?.filter(
+        (user) => user.role === "employee" || user.role === "hr"
+      );
+      setEmployees(employeeUsers || []);
+    } catch (error) {
+      toast.error("Error loading employees");
+    }
+  }, [TotalUsers]);
 
-    fetchEmployees();
-  }, []);
-
-  const handleUserSelection = async (employee) => {
+  // User select from dropdown
+  const handleUserSelection = (employee) => {
     setUserName(employee.username);
     setUserId(employee.id);
     setShowDropdown(false);
   };
 
+  // Form submit
   const handleSubmit = async (e) => {
-    let employeeId = userId;
-    const currentUserRole = localStorage.getItem("role");
     e.preventDefault();
-   if (userRole !== "employee" && localStorage.getItem("role") === "hr") {
-     toast.info("Admin can only add leaves for employees.");
-     return;
-   }
+
+    if (userRole !== "employee" && localStorage.getItem("role") === "hr") {
+      toast.info("Admin can only add leaves for employees.");
+      return;
+    }
+
+    const totalLeave =
+      (parseInt(leaveDays?.paidLeave) || 0) +
+      (parseInt(leaveDays?.unpaidLeave) || 0);
+
+    if (totalLeave <= 0) {
+      toast.warn("Please enter at least 1 day of leave (paid or unpaid).");
+      return;
+    }
+
     try {
       const payload = {
-        user_id: employeeId,
+        user_id: userId,
         user_name: userName,
         apply_date: currentDate,
         start_date: startDate,
         end_date: endDate,
         reason_for_leave: reasonForLeave,
-        total_leave_days:
-          (parseInt(leaveDays?.paidLeave) || 0) +
-          (parseInt(leaveDays?.unpaidLeave) || 0),
-        paid_leave_days: parseInt(leaveDays?.paidLeave) || 0,
+        total_leave_days: totalLeave,
+        paid_leave_count: parseInt(leaveDays?.paidLeave) || 0,
+        unpaid_leave_count: parseInt(leaveDays?.unpaidLeave) || 0,
         status: "Pending",
-        actions: "Submitted",
+        action: "Submitted",
         hr_note: "",
       };
+      setIsLoading(true);
 
-      await axios.post(`${import.meta.env.VITE_API_LEAVE}`, payload, {
-        headers: {
-          Authorization: `Bearer ${localStorage.getItem("authtoken")}`,
-        },
-      });
-      // setMessage("leave added successfully!");
+      await api.post(`${import.meta.env.VITE_API_LEAVE}`, payload);
       toast.success("Leave added successfully!");
-      // Reset the form
-      setUserName("");
-      setUserId("");
-      setShowDropdown(false);
+      resetForm();
     } catch (error) {
-      setMessage("Error adding leaves. Please try again.");
-      console.error("Error adding leaves:", error);
+      toast.error(error?.response?.data?.message,"Error adding leaves. Please try again." );
+    }finally{
+      setIsLoading(false);
     }
   };
-  
 
   return (
     <Container className="add-attendance-container">
@@ -106,19 +116,16 @@ const AdminAddEmpLeave = () => {
           <i
             className="bi bi-arrow-left-circle"
             onClick={() => window.history.back()}
-            style={{
-              cursor: "pointer",
-              fontSize: "32px",
-              color: "#343a40",
-            }}
+            style={{ cursor: "pointer", fontSize: "32px", color: "#343a40" }}
           ></i>
         </Col>
         <Col md={8}>
           <h3 className="mt-2">Add Leave Request</h3>
         </Col>
       </Row>
-      {message && <Alert variant="info">{message}</Alert>}
-      <Form onSubmit={handleSubmit} style={{ overflow: "hidden" }}>
+
+      <Form onSubmit={handleSubmit}>
+        {/* User Name Dropdown */}
         <Form.Group controlId="formUserName">
           <Form.Label>User Name</Form.Label>
           <div className="dropdown-wrapper">
@@ -129,8 +136,6 @@ const AdminAddEmpLeave = () => {
               onFocus={() => setShowDropdown(true)}
               onBlur={() => setTimeout(() => setShowDropdown(false), 200)}
               readOnly
-              // onChange={(e) => setUserName(e.target.value)}
-              // onClick={() => setShowDropdown(!showDropdown)}
               required
             />
             {showDropdown && (
@@ -148,72 +153,51 @@ const AdminAddEmpLeave = () => {
             )}
           </div>
         </Form.Group>
-        <Form.Group controlId="formDate">
-          <Form.Label column sm={4}>
-            Paid Leave
-          </Form.Label>
-          <Col sm={8}>
-            <Form.Control
-              type="number"
-              min="0"
-              value={leaveDays?.paidLeave}
-              onChange={(e) => {
-                e.preventDefault();
-                let value = e.target.value.trim()
-                  ? parseInt(e.target.value, 10)
-                  : 0;
 
-                if (!isNaN(value) && value >= 0) {
-                  setLevaDays((prev) => ({
-                    ...prev,
-                    paidLeave: value,
-                  }));
-                }
-                if (startDate) {
-                  let formattedEndDate = formatEndDate(
-                    startDate,
-                    value,
-                    leaveDays?.unpaidLeave
-                  );
-                  if (formattedEndDate) {
-                    setEndDate(formattedEndDate);
-                  }
-                }
-              }}
-              required
-            />
-          </Col>
-          <Form.Label column sm={4}>
-            Unpaid Leave
-          </Form.Label>
-          <Col sm={8}>
-            <Form.Control
-              type="number"
-              min="0"
-              value={leaveDays?.unpaidLeave}
-              onChange={(e) => {
-                e.preventDefault();
-                const value = parseInt(e.target.value, 10) || 0;
-                if (value >= 0) {
-                  setLevaDays((prev) => ({
-                    ...prev,
-                    unpaidLeave: value,
-                  }));
-                }
+        {/* Paid & Unpaid Leave */}
+        <Form.Group controlId="formLeaveDays">
+          <Form.Label>Paid Leave</Form.Label>
+          <Form.Control
+            type="number"
+            min="0"
+            value={leaveDays?.paidLeave}
+            onChange={(e) => {
+              const value = e.target.value.trim()
+                ? parseInt(e.target.value, 10)
+                : 0;
+              if (value >= 0) {
+                setLeaveDays((prev) => ({ ...prev, paidLeave: value }));
+              }
+              if (startDate) {
+                setEndDate(
+                  formatEndDate(startDate, value, leaveDays?.unpaidLeave)
+                );
+              }
+            }}
+            required
+          />
 
-                if (startDate) {
-                  let formattedEndDate = formatEndDate(
-                    startDate,
-                    leaveDays?.paidLeave,
-                    value
-                  );
-                  setEndDate(formattedEndDate);
-                }
-              }}
-              required
-            />
-          </Col>
+          <Form.Label className="mt-2">Unpaid Leave</Form.Label>
+          <Form.Control
+            type="number"
+            min="0"
+            value={leaveDays?.unpaidLeave}
+            onChange={(e) => {
+              const value = parseInt(e.target.value, 10) || 0;
+              if (value >= 0) {
+                setLeaveDays((prev) => ({ ...prev, unpaidLeave: value }));
+              }
+              if (startDate) {
+                setEndDate(
+                  formatEndDate(startDate, leaveDays?.paidLeave, value)
+                );
+              }
+            }}
+            required
+          />
         </Form.Group>
+
+        {/* Start Date */}
         <Form.Group as={Row} controlId="startDate" className="mb-3">
           <Form.Label column sm={4}>
             Start Date
@@ -223,34 +207,31 @@ const AdminAddEmpLeave = () => {
               type="date"
               value={startDate}
               onChange={(e) => {
-                let formattedEndDate = formatEndDate(
-                  e.target.value,
-                  leaveDays?.paidLeave,
-                  leaveDays?.unpaidLeave
-                );
-                setEndDate(formattedEndDate);
                 setStartDate(e.target.value);
+                setEndDate(
+                  formatEndDate(
+                    e.target.value,
+                    leaveDays?.paidLeave,
+                    leaveDays?.unpaidLeave
+                  )
+                );
               }}
               required
             />
           </Col>
         </Form.Group>
 
+        {/* End Date */}
         <Form.Group as={Row} controlId="endDate" className="mb-3">
           <Form.Label column sm={4}>
             End Date
           </Form.Label>
           <Col sm={8}>
-            <Form.Control
-              type="date"
-              value={endDate}
-              onChange={(e) => setEndDate(e.target.value)}
-              required
-              readOnly
-            />
+            <Form.Control type="date" value={endDate} readOnly required />
           </Col>
         </Form.Group>
 
+        {/* Reason */}
         <Form.Group as={Row} controlId="reasonForLeave" className="mb-3">
           <Form.Label column sm={4}>
             Reason for Leave
@@ -266,10 +247,24 @@ const AdminAddEmpLeave = () => {
           </Col>
         </Form.Group>
 
+        {/* Submit Button */}
         <Form.Group as={Row} className="text-center">
           <Col>
             <Button variant="primary" type="submit">
-              Submit Request
+              {isLoading ? (
+                <>
+                  <Spinner
+                    as="span"
+                    animation="border"
+                    size="sm"
+                    role="status"
+                    aria-hidden="true"
+                  />{" "}
+                  Submitting...
+                </>
+              ) : (
+                "Submit Request"
+              )}
             </Button>
           </Col>
         </Form.Group>

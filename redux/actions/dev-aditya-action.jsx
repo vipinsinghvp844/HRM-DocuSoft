@@ -9,6 +9,8 @@ import {
   // TotalAttendanceReduser,
 } from "../redecer/AllReducers";
 import { toast } from "react-toastify";
+import api from "../../src/components/api"
+
 
 const token = localStorage.getItem("authtoken");
 
@@ -20,20 +22,24 @@ const header = {
 
 export const LoginUserAction = (obj12) => async (dispatch) => {
   try {
-    const res = await axios.post(`${import.meta.env.VITE_API_AUTH}`, {
-      username: obj12.email,
+    // const res = await axios.post(`${import.meta.env.VITE_API_AUTH}`, {
+    //   username: obj12.email,
+    //   password: obj12.password,
+    // });
+    const res = await axios.post(`https://devsite.digitalpractice.net/devsite/wp-json/custom-jwt/v1/login`, {
+    // const res = await axios.post(`https://portal.digitalpractice.net/hrm/wp-json/custom-jwt/v1/login`, {
+
+      username: obj12.login,
       password: obj12.password,
     });
 
     if (res.status === 200) {
       const user = res.data;
-      // console.log(user);
-      
       const userRole = user.roles && user.roles[0] ? user.roles[0] : null;
-
       if (userRole) {
-        localStorage.setItem('password' , obj12.password )
-        localStorage.setItem("authtoken", user.token);
+        localStorage.setItem("firstname", user.first_name);
+        localStorage.setItem("authtoken", user.access_token);
+        localStorage.setItem("refreshtoken", user.refresh_token);
         localStorage.setItem("user_email", user.user_email);
         localStorage.setItem("user_name", user.user_display_name);
         localStorage.setItem("role", userRole);
@@ -55,13 +61,14 @@ export const LoginUserAction = (obj12) => async (dispatch) => {
 export const FetchUserProfileAction = (body) => async (dispatch) => {
   try {
     const token = localStorage.getItem("authtoken");
-    const profileResponse = await axios.get(
-      `${import.meta.env.VITE_API_PROFILE_GET}`,
-      {
-        headers: {
-          Authorization: `Bearer ${token}`,
-        },
-      }
+    const profileResponse = await api.get(
+      `${import.meta.env.VITE_API_PROFILE_GET}`
+      // ,
+      // {
+      //   headers: {
+      //     Authorization: `Bearer ${token}`,
+      //   },
+      // }
     );
     // console.log(profileResponse.data, "============================jsut check");
 
@@ -77,11 +84,13 @@ export const FetchUserProfileAction = (body) => async (dispatch) => {
 export const FetchAllUserProfileAction = () => async (dispatch) => {
   try {
     const token = localStorage.getItem("authtoken");
-    const profileResponse = await axios.get(`${import.meta.env.VITE_API_PROFILE_GET_ALL}`, {
-      headers: {
-        Authorization: `Bearer ${token}`,
-      },
-    });
+    const profileResponse = await api.get(`${import.meta.env.VITE_API_PROFILE_GET_ALL}`,
+    //    {
+    //   headers: {
+    //     Authorization: `Bearer ${token}`,
+    //   },
+    // }
+  );
 
     // console.log(profileResponse, "Full API response"); // Log the response
     if (profileResponse.status == 200) {
@@ -96,10 +105,10 @@ export const FetchAllUserProfileAction = () => async (dispatch) => {
 export const EditUserProfileAction =
   (userInfo, user_id) => async (dispatch) => {
     try {
-      const profileResponse = await axios.put(
+      const profileResponse = await api.put(
         `${import.meta.env.VITE_API_CUSTOM_USERS}/${user_id}`,
         userInfo,
-        header
+        // header
       );
 
       if (profileResponse.status == 200) {
@@ -115,15 +124,15 @@ export const ProfilePicUpdateAction = (file) => async (dispatch) => {
   try {
     const formData = new FormData();
     formData.append("file", file);
-    const response = await axios.post(
+    const response = await api.post(
       `${import.meta.env.VITE_API_PROFILE_UPDATE}`,
       formData,
-      {
-        headers: {
-          "Content-Type": "multipart/form-data",
-          Authorization: `Bearer ${token}`,
-        },
-      }
+      // {
+      //   headers: {
+      //     "Content-Type": "multipart/form-data",
+      //     Authorization: `Bearer ${token}`,
+      //   },
+      // }
     );
     // console.log(response, "=====ProfilePicUpdateAction");
 console.log(response.data,"check");
@@ -140,9 +149,14 @@ console.log(response.data,"check");
 export const ChangePasswordAction = (obj) => async (dispatch) => {
   // console.log(obj, "===========object");
   try {
-    const response = await axios.post(
+    const response = await api.post(
       import.meta.env.VITE_API_CHANGE_PASSWORD,
-      obj
+      obj,
+      // {
+      //   headers: {
+      //     Authorization: `Bearer ${token}`,
+      //   },
+      // }
     );
     // console.log(response?.data?.message);
     toast.success(response?.data?.message);

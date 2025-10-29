@@ -1,8 +1,15 @@
 import React, { useState, useEffect } from 'react';
-import { Container, Row, Col, Button, Table } from 'react-bootstrap';
-import axios from 'axios';
 import { toast } from 'react-toastify';
 import LoaderSpiner from "./LoaderSpiner";
+import api from './api';
+import { ArrowLeftCircle } from 'lucide-react';
+import DataGrid, {
+  Column,
+  Paging,
+  FilterRow,
+  HeaderFilter,
+  SearchPanel,
+} from "devextreme-react/data-grid";
 
 function EmDocuments() {
   const [documents, setDocuments] = useState([]);
@@ -19,7 +26,7 @@ function EmDocuments() {
     setIsLoading(true);
     
   try {
-    const response = await axios.get(
+    const response = await api.get(
       `${import.meta.env.VITE_API_LETTER}/${userId}`,
       {
         headers: {
@@ -32,117 +39,101 @@ function EmDocuments() {
     if (error.response && error.response.status === 403) {
       setStatus("You do not have permission to view these documents.");
     } else {
-      // setStatus("No document Available");
       toast.info(`No document Available`);
     }
   } finally {
     setIsLoading(false);
   }
 };
+function transformDocuments(documents) {
+  let transformed = [];
+  documents.forEach((doc, index) => {
+    if (doc.offer_letter) {
+      transformed.push({
+        id: `${index}-offer`,
+        file_name: "Offer Letter",
+        description: "Offer of Employment for the position.",
+        file_url: doc.offer_letter,
+      });
+    }
+    if (doc.experience_letter) {
+      transformed.push({
+        id: `${index}-experience`,
+        file_name: "Experience Letter",
+        description: "Experience letter details.",
+        file_url: doc.experience_letter,
+      });
+    }
+    if (doc.noc) {
+      transformed.push({
+        id: `${index}-noc`,
+        file_name: "NOC",
+        description: "No Objection Certificate details.",
+        file_url: doc.noc,
+      });
+    }
+  });
+  return transformed;
+}
+
 
   return (
-    <Container>
-      <Row className="mb-4 d-flex">
-        <Col md={1}>
-          <i
-            className="bi bi-arrow-left-circle"
-            onClick={() => window.history.back()}
-            style={{
-              cursor: "pointer",
-              fontSize: "32px",
-              color: "#343a40",
-            }}
-          ></i>
-        </Col>
-        <Col md={9}>
-          <h3 className="mt-2">Employee Documents</h3>
-        </Col>
-      </Row>
-      {/* {status && <p className="text-danger">{status}</p>} */}
-      <Table>
-        <thead>
-          <tr>
-            <th>File Name</th>
-            <th>Description</th>
-            <th>Download</th>
-          </tr>
-        </thead>
-        <tbody>
-          {isLoading ? (
-            <tr>
-              <td colSpan="3" className="text-center">
-                <div
-                  className="d-flex justify-content-center align-items-center"
-                  style={{ height: "200px" }}
-                >
-                  <LoaderSpiner />
-                </div>
-              </td>
-            </tr>
-          ) : documents.length > 0 ? (
-            documents.map((doc, index) => (
-              <React.Fragment key={index}>
-                {doc.offer_letter && (
-                  <tr>
-                    <td>Offer Letter</td>
-                    <td>Offer of Employment for the position of Developer.</td>
-                    <td>
-                      <Button
-                        variant="primary"
-                        onClick={() =>
-                          handleDownload(doc.offer_letter, "Offer_Letter")
-                        }
-                      >
-                        Download
-                      </Button>
-                    </td>
-                  </tr>
-                )}
-                {doc.experience_letter && (
-                  <tr>
-                    <td>Experience Letter</td>
-                    <td>Experience letter details.</td>
-                    <td>
-                      <Button
-                        variant="primary"
-                        onClick={() =>
-                          handleDownload(
-                            doc.experience_letter,
-                            "Experience_Letter"
-                          )
-                        }
-                      >
-                        Download
-                      </Button>
-                    </td>
-                  </tr>
-                )}
-                {doc.noc && (
-                  <tr>
-                    <td>NOC</td>
-                    <td>No Objection Certificate details.</td>
-                    <td>
-                      <Button
-                        variant="primary"
-                        onClick={() => handleDownload(doc.noc, "NOC")}
-                      >
-                        Download
-                      </Button>
-                    </td>
-                  </tr>
-                )}
-              </React.Fragment>
-            ))
-          ) : (
-            <tr>
-              <td colSpan="3" className="text-center">
-                No document available
-              </td>
-            </tr>
-          )}
-        </tbody> 
-      </Table>
-    </Container>
+    <div className="pt-4 px-2">
+  <div className="flex md:flex-row items-center justify-between gap-2 mb-6">
+    <button
+          onClick={() => window.history.back()}
+          className="flex items-center text-gray-700 hover:text-gray-900 transition-colors"
+        >
+          <ArrowLeftCircle size={32} className="mr-2" />
+          <span className="hidden md:inline text-lg font-semibold">Back</span>
+        </button>
+    <h3 className="text-xl md:text-2xl font-semibold text-center flex-1">Employee Documents</h3>
+  </div>
+
+  <div className="overflow-x-auto bg-white rounded-xl shadow-md p-3 relative">
+    <DataGrid
+      dataSource={isLoading ? [] : transformDocuments(documents)}
+      keyExpr="id"
+      showBorders={true}
+      rowAlternationEnabled={true}
+      className="shadow-sm rounded table-grid-2 table-grid w-100"
+      height="auto"
+      columnAutoWidth={true}
+      wordWrapEnabled={true}
+      columnHidingEnabled={true}
+    >
+      <SearchPanel visible={true} placeholder="Search documents..." />
+      <FilterRow visible={true} />
+      <HeaderFilter visible={true} />
+      <Paging defaultPageSize={10} />
+
+      <Column dataField="file_name" caption="File Name" />
+      <Column dataField="description" caption="Description" />
+      <Column
+        caption="Download"
+        cellRender={({ data }) => (
+          <button
+            className="bg-blue-500 text-white px-3 py-1 rounded hover:bg-blue-600 transition"
+            onClick={() => handleDownload(data.file_url, data.file_name)}
+          >
+            Download
+          </button>
+        )}
+      />
+    </DataGrid>
+
+    {isLoading && (
+      <div className="flex justify-center items-center h-48">
+        <LoaderSpiner />
+      </div>
+    )}
+
+    {!isLoading && documents.length === 0 && (
+      <p className="text-center text-gray-500 mt-4">No document available</p>
+    )}
+  </div>
+</div>
+
   );
 
   function handleDownload(content, fileName) {

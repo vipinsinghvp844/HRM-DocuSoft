@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { Container, Form, Button, Card } from 'react-bootstrap';
 import axios from 'axios';
+import api from './api';
 
 const ExperienceLetter = () => {
   const [letterContent, setLetterContent] = useState({
@@ -21,7 +22,7 @@ const ExperienceLetter = () => {
 
   // Fetch usernames on component mount
   useEffect(() => {
-    axios.get(import.meta.env.VITE_API_CUSTOM_USERS, {
+    api.get(import.meta.env.VITE_API_CUSTOM_USERS, {
       headers: {
         Authorization: `Bearer ${localStorage.getItem('authtoken')}`,
       },

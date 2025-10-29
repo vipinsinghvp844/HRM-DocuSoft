@@ -16,42 +16,47 @@ const Login = ({ onLogin }) => {
   const [loading, setLoading] = useState(false);
   const [showPopup, setShowPopup] = useState(false);
   const [errorMessage, setErrorMessage] = useState("");
+  const [showPassword, setShowPassword] = useState(false);
   const navigate = useNavigate();
   const dispatch = useDispatch();
 
   const formik = useFormik({
     initialValues: {
-      email: "",
+      login: "",
       password: "",
     },
     validationSchema: Yup.object({
-      email: Yup.string().required().email(),
-      password: Yup.string().required(),
+      login: Yup.string().required("Username or Email is required"),
+      password: Yup.string().required("Password is required"),
     }),
     onSubmit: async (data, { setSubmitting }) => {
       setLoading(true);
       try {
-        const user = await dispatch(LoginUserAction(data));
+        const payload = {
+          login: data.login,
+          password: data.password,
+        };
+        const user = await dispatch(LoginUserAction(payload));
 
         const userRole = user.roles && user.roles[0] ? user.roles[0] : null;
         if (userRole) {
           await dispatch(FetchUserProfileAction());
-            onLogin(userRole);
+          onLogin(userRole);
 
-            // Redirect based on the role
-            if (userRole === "admin") {
-              navigate("/admin-dashboard");
-            } else if (userRole === "hr") {
-              navigate("/hr-dashboard");
-            } else if (userRole === "employee") {
-              navigate("/employee-dashboard");
-            } else {
-              navigate("/default-dashboard");
-            }
-          
+          // Redirect based on the role
+          if (userRole === "admin") {
+            navigate("/admin-dashboard");
+          } else if (userRole === "hr") {
+            navigate("/hr-dashboard");
+          } else if (userRole === "employee") {
+            navigate("/employee-dashboard");
+          } else {
+            navigate("/default-dashboard");
+          }
+
         }
       } catch (error) {
-        if (error.response.data.code === "[jwt_auth] incorrect_password") {
+        if (error?.response?.data?.code === "invalid_login") {
           setErrorMessage("Invalid password. Please try again.");
           setShowPopup(true);
         } else if (error.response.data.code === "[jwt_auth] invalid_email") {
@@ -63,35 +68,31 @@ const Login = ({ onLogin }) => {
           setErrorMessage("Login failed. Please try again later.");
         }
         setShowPopup(true);
-          
+
       } finally {
         setLoading(false);
-        setSubmitting(false); 
-      }
+        setSubmitting(false);
+      } 
     },
   });
 
   useEffect(() => {
     let authToken = localStorage.getItem("authtoken");
-
     if (authToken) {
       let userRole = localStorage.getItem('role')
 
-       dispatch(setValueForSideBarClick(0))
-    
-        onLogin(userRole)
-        if (userRole === "admin") {
-          navigate("/admin-dashboard");
-        } else if (userRole === "hr") {
-          navigate("/hr-dashboard");
-        } else if (userRole === "employee") {
-          navigate("/employee-dashboard");
-        } else {
-          navigate("/default-dashboard");
-        }
+      dispatch(setValueForSideBarClick(0))
 
-     
-
+      onLogin(userRole)
+      if (userRole === "admin") {
+        navigate("/admin-dashboard");
+      } else if (userRole === "hr") {
+        navigate("/hr-dashboard");
+      } else if (userRole === "employee") {
+        navigate("/employee-dashboard");
+      } else {
+        navigate("/default-dashboard");
+      }
     }
   }, []);
 
@@ -111,14 +112,6 @@ const Login = ({ onLogin }) => {
     };
   }, [showPopup]);
 
-  const showPass = () => {
-    var x = document.getElementById("myInput");
-    if (x.type === "password") {
-      x.type = "text";
-    } else {
-      x.type = "password";
-    }
-  };
   return (
     <Container fluid className="maincontainer">
       <Row className="w-100">
@@ -136,34 +129,37 @@ const Login = ({ onLogin }) => {
             <Form onSubmit={formik.handleSubmit} >
               <Form.Group className="mb-3" controlId="formBasicEmail">
                 <Form.Control
-                  name="email"
-                  type="email"
-                  placeholder="Type your username"
-                  value={formik.values.email}
+                  name="login"
+                  type="text"
+                  placeholder="Enter your username or Email"
+                  value={formik.values.login}
                   onChange={formik.handleChange}
                   required
                 />
               </Form.Group>
-              <Form.Group className="mb-3" controlId="myInput">
+              <Form.Group className="mb-3 position-relative" >
                 <Form.Control
-                  // id="myInput"
                   name="password"
-                  type="password"
+                  type={showPassword ? "text" : "password"}
                   placeholder="Type your password"
                   value={formik.values.password}
                   onChange={formik.handleChange}
                   required
                 />
-                <div className="d-flex align-items-center p-2">
-                 
-                    <input
-                      type="checkbox"
-                      onClick={showPass}
-                      className="me-2"
-                    />
-                    <label className="mb-0 text-white">Show Password</label>
-                  </div>
-         
+                  <i
+                    className={`bi eyecolorhover ${showPassword ? "bi-eye-slash " : "bi-eye"} me-2`}
+                    style={{
+                      cursor: "pointer",
+                      position: "absolute",
+                      right: "1px",  
+                      top: "50%",  
+                      transform: "translateY(-50%)",
+                      fontSize: "18px",
+                      color: "#555"
+                    }}
+                    onClick={() => setShowPassword(!showPassword)}
+                  ></i>
+
               </Form.Group>
               <div className="d-flex justify-content-end mb-3">
                 <Link
@@ -197,14 +193,6 @@ const Login = ({ onLogin }) => {
                     &times;
                   </span>
                   <p>{errorMessage}</p>
-                  {/* <Link
-                    variant="primary"
-                    onClick={() => setShowPopup(false)}
-                    to={"/request-password-reset"}
-                    className="mx-2 "
-                  >
-                    Forget Your Password
-                  </Link> */}
                   <Button onClick={() => setShowPopup(false)}>Try Again</Button>
                 </div>
               </div>

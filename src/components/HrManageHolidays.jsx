@@ -1,18 +1,16 @@
 import React, { useState, useEffect } from "react";
-import axios from "axios";
-import {
-  Container,
-  Row,
-  Col,
-  Form,
-  Button,
-  Modal,
-  Table,
-} from "react-bootstrap";
-import "./HrManageHolidays.css";
 import { GetHolidayAction } from "../../redux/actions/EmployeeDetailsAction";
 import { useDispatch, useSelector } from "react-redux";
-import LoaderSpiner from "./LoaderSpiner";
+import api from "./api";
+import { ArrowLeftCircle } from "lucide-react";
+import { FaEdit, FaTrash } from "react-icons/fa";
+import DataGrid, {
+  Column,
+  Paging,
+  FilterRow,
+  HeaderFilter,
+  SearchPanel,
+} from "devextreme-react/data-grid";
 
 
 const ManageHolidays = () => {
@@ -24,15 +22,15 @@ const ManageHolidays = () => {
     holiday_type: "Public Holiday",
     repeat_annually: false,
   });
-   const [isLoading, setIsLoading] = useState(true); // Loading state
+  const [isLoading, setIsLoading] = useState(true); // Loading state
   const [showModal, setShowModal] = useState(false);
   const [selectedHoliday, setSelectedHoliday] = useState(null);
   const userRole = localStorage.getItem("role");
   const dispatch = useDispatch();
-  const { TotalHolidays } = useSelector(
-    ({ EmployeeDetailReducers }) => EmployeeDetailReducers
-  );
-  
+  // const { TotalHolidays } = useSelector(
+  //   ({ EmployeeDetailReducers }) => EmployeeDetailReducers
+  // );
+
 
   useEffect(() => {
     fetchHolidays();
@@ -67,13 +65,13 @@ const ManageHolidays = () => {
   const handleAddHoliday = async (e) => {
     e.preventDefault();
     try {
-      const response = await axios.post(
+      const response = await api.post(
         `${import.meta.env.VITE_API_HOLIDAYS}`,
         newHoliday, {
-          headers: {
-            Authorization: `Bearer ${localStorage.getItem("authtoken")}`,
-          }
+        headers: {
+          Authorization: `Bearer ${localStorage.getItem("authtoken")}`,
         }
+      }
       );
       // console.log('Holiday added:', response.data);
       fetchHolidays();
@@ -91,12 +89,12 @@ const ManageHolidays = () => {
 
   const handleUpdateHoliday = async (id, updatedHoliday) => {
     try {
-      const response = await axios.put(
+      const response = await api.put(
         `${import.meta.env.VITE_API_HOLIDAYS}/${id}`, {
-          headers: {
-            Authorization: `Bearer ${localStorage.getItem("authtoken")}`,
-          }
-        },
+        headers: {
+          Authorization: `Bearer ${localStorage.getItem("authtoken")}`,
+        }
+      },
         updatedHoliday
       );
       // console.log('Holiday updated:', response.data);
@@ -108,12 +106,12 @@ const ManageHolidays = () => {
 
   const handleDeleteHoliday = async (id) => {
     try {
-      const response = await axios.delete(
+      const response = await api.delete(
         `${import.meta.env.VITE_API_HOLIDAYS}/${id}`, {
-          headers: {
-            Authorization: `Bearer ${localStorage.getItem("authtoken")}`,
-          }
+        headers: {
+          Authorization: `Bearer ${localStorage.getItem("authtoken")}`,
         }
+      }
       );
       // console.log('Holiday deleted:', response.data);
       fetchHolidays();
@@ -148,223 +146,287 @@ const ManageHolidays = () => {
   };
 
   return (
-    <Container className="manage-holidays-container">
-      <Row className="mb-4 d-flex">
-        <Col md={1}>
-          <i
-            className="bi bi-arrow-left-circle"
-            onClick={() => window.history.back()}
-            style={{
-              cursor: "pointer",
-              fontSize: "32px",
-              color: "#343a40",
-            }}
-          ></i>
-        </Col>
-        <Col md={9}>
-          <h3 className="mt-2">Add Holidays</h3>
-        </Col>
-      </Row>
-      <Form className="manage-holidays-form" onSubmit={handleAddHoliday}>
-        <Row>
-          <Col>
-            <Form.Group controlId="holidayName">
-              <Form.Label>Holiday Name</Form.Label>
-              <Form.Control
-                type="text"
-                name="holiday_name"
-                value={newHoliday.holiday_name}
-                onChange={handleChange}
-                required
-              />
-            </Form.Group>
-          </Col>
-          <Col>
-            <Form.Group controlId="holidayDate">
-              <Form.Label>Holiday Date</Form.Label>
-              <Form.Control
-                type="date"
-                name="holiday_date"
-                value={newHoliday.holiday_date}
-                onChange={handleChange}
-                required
-              />
-            </Form.Group>
-          </Col>
-        </Row>
-        <Form.Group controlId="description">
-          <Form.Label>Description</Form.Label>
-          <Form.Control
-            as="textarea"
+    <div className="pt-4 px-2">
+      {/* Header */}
+      <div className="flex md:flex-row items-center justify-between gap-2 mb-6">
+        <button
+          onClick={() => window.history.back()}
+          className="flex items-center text-gray-700 hover:text-gray-900 transition-colors"
+        >
+          <ArrowLeftCircle size={32} className="mr-2" />
+          <span className="hidden md:inline text-lg font-semibold">Back</span>
+        </button>
+        <h3 className="text-xl md:text-2xl font-semibold text-center flex-1">Add Holidays</h3>
+      </div>
+
+      {/* Form */}
+      <form
+        onSubmit={handleAddHoliday}
+        className="space-y-6"
+      >
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+          <div>
+            <label className="block text-sm font-medium mb-2">Holiday Name</label>
+            <input
+              type="text"
+              name="holiday_name"
+              value={newHoliday.holiday_name}
+              onChange={handleChange}
+              required
+              className="w-full border border-gray-300 rounded-lg px-3 py-2 focus:ring-2 focus:ring-blue-500"
+            />
+          </div>
+
+          <div>
+            <label className="block text-sm font-medium mb-2">Holiday Date</label>
+            <input
+              type="date"
+              name="holiday_date"
+              value={newHoliday.holiday_date}
+              onChange={handleChange}
+              required
+              className="w-full border border-gray-300 rounded-lg px-3 py-2 focus:ring-2 focus:ring-blue-500"
+            />
+          </div>
+        </div>
+
+        <div>
+          <label className="block text-sm font-medium mb-2">Description</label>
+          <textarea
             name="description"
             value={newHoliday.description}
             onChange={handleChange}
+            className="w-full border border-gray-300 rounded-lg px-3 py-2 focus:ring-2 focus:ring-blue-500"
           />
-        </Form.Group>
-        <Row>
-          <Col>
-            <Form.Group controlId="holidayType">
-              <Form.Label>Holiday Type</Form.Label>
-              <Form.Control
-                as="select"
-                name="holiday_type"
-                value={newHoliday.holiday_type}
-                onChange={handleChange}
-              >
-                <option value="Public Holiday">Public Holiday</option>
-                <option value="Company Holiday">Company Holiday</option>
-                <option value="Other">Other</option>
-              </Form.Control>
-            </Form.Group>
-          </Col>
-          <Col>
-            <Form.Group controlId="repeatAnnually">
-              <Form.Label>Repeat Annually</Form.Label>
-              <Form.Check
-                type="checkbox"
-                name="repeat_annually"
-                checked={newHoliday.repeat_annually}
-                onChange={handleChange}
-              />
-            </Form.Group>
-          </Col>
-        </Row>
-        <Button variant="primary" type="submit">
-          Add Holiday
-        </Button>
-      </Form>
+        </div>
 
-      <h2>Holiday List</h2>
-      <div className="manage-holidays-table">
-        <Table striped bordered hover responsive>
-          <thead>
-            <tr>
-              <th>No.</th>
-              <th>Date</th>
-              <th>Holiday Name</th>
-              <th>Type</th>
-              <th>Actions</th>
-            </tr>
-          </thead>
-          <tbody>
-            {isLoading ? (
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+          <div>
+            <label className="block text-sm font-medium mb-2">Holiday Type</label>
+            <select
+              name="holiday_type"
+              value={newHoliday.holiday_type}
+              onChange={handleChange}
+              className="w-full border border-gray-300 rounded-lg px-3 py-2 focus:ring-2 focus:ring-blue-500"
+            >
+              <option value="Public Holiday">Public Holiday</option>
+              <option value="Company Holiday">Company Holiday</option>
+              <option value="Other">Other</option>
+            </select>
+          </div>
+
+          <div className="flex items-center space-x-3">
+            <label className="block text-sm font-medium mb-2">Repeat Annually</label>
+            <input
+              type="checkbox"
+              name="repeat_annually"
+              checked={newHoliday.repeat_annually}
+              onChange={handleChange}
+              className="w-full border border-gray-300 rounded-lg px-3 py-2 focus:ring-2 focus:ring-blue-500"
+            />
+          </div>
+        </div>
+
+        <button
+          type="submit"
+          className="w-full md:w-auto px-6 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition"
+        >
+          Add Holiday
+        </button>
+      </form>
+
+      {/* Holiday List Table */}
+      <h3 className="text-xl md:text-2xl font-semibold text-center flex-1">Holiday List</h3>
+      {/* <div className="overflow-x-auto bg-white rounded-lg shadow p-4">
+        {isLoading ? (
+          <div className="flex justify-center items-center min-h-[200px]">
+            <LoaderSpiner />
+          </div>
+        ) : holidays.length === 0 ? (
+          <p className="text-center text-gray-500">No Holidays Available</p>
+        ) : (
+          <table className="min-w-full table-auto border border-gray-200">
+            <thead className="bg-gray-100">
               <tr>
-                <td colSpan="5" className="text-center">
-                  <div
-                    className="d-flex justify-content-center align-items-center"
-                    style={{ height: "100px" }}
-                  >
-                    <LoaderSpiner />
-                  </div>
-                </td>
+                <th className="px-4 py-2 border">No.</th>
+                <th className="px-4 py-2 border">Date</th>
+                <th className="px-4 py-2 border">Holiday Name</th>
+                <th className="px-4 py-2 border">Type</th>
+                <th className="px-4 py-2 border">Actions</th>
               </tr>
-            ) : holidays.length === 0 ? (
-              <tr>
-                <td colSpan="5" className="text-center">
-                  <h4>No Holidays Available</h4>
-                </td>
-              </tr>
-            ) : (
-              holidays.map((holiday, index) => (
-                <tr key={holiday.id}>
-                  <td>{index + 1}</td>
-                  <td>{holiday.holiday_date}</td>
-                  <td>{holiday.holiday_name}</td>
-                  <td>{holiday.holiday_type}</td>
-                  <td>
-                    <Button
-                      variant="warning"
+            </thead>
+            <tbody>
+              {holidays.map((holiday, index) => (
+                <tr key={holiday.id} className="hover:bg-gray-50">
+                  <td className="px-4 py-2 border">{index + 1}</td>
+                  <td className="px-4 py-2 border">{holiday.holiday_date}</td>
+                  <td className="px-4 py-2 border">{holiday.holiday_name}</td>
+                  <td className="px-4 py-2 border">{holiday.holiday_type}</td>
+                  <td className="px-4 py-2 border flex gap-2">
+                    <button
                       onClick={() => openModal(holiday)}
+                      className="text-yellow-500 hover:text-yellow-600 flex items-center gap-1"
+                      title="Update"
                     >
-                      Update
-                    </Button>
+                      <FaEdit />
+                      <span className="hidden md:inline">Update</span>
+                    </button>
                     {userRole !== "hr" && (
-                      <Button
-                        variant="danger"
+                      <button
                         onClick={() => handleDeleteHoliday(holiday.id)}
+                        className="text-red-600 hover:text-red-700 flex items-center gap-1"
+                        title="Delete"
                       >
-                        Delete
-                      </Button>
+                        <FaTrash />
+                        <span className="hidden md:inline">Delete</span>
+                      </button>
                     )}
                   </td>
                 </tr>
-              ))
+              ))}
+            </tbody>
+          </table>
+        )}
+      </div> */}
+
+       <div className="overflow-x-auto bg-white rounded-xl shadow-md p-3">
+        <DataGrid
+          dataSource={holidays}
+          keyExpr="id"
+          showBorders={true}
+          rowAlternationEnabled={true}
+          columnAutoWidth={true}
+          wordWrapEnabled={true}
+          columnHidingEnabled={true}
+        >
+          <SearchPanel visible={true} placeholder="Search..." />
+          <FilterRow visible={true} />
+          <HeaderFilter visible={true} />
+          <Paging defaultPageSize={20} />
+
+          <Column
+            caption="#"
+            width={50}
+            cellRender={({ rowIndex }) => rowIndex + 1}
+          />
+          <Column dataField="holiday_date" caption="Holiday Date" />
+          <Column dataField="holiday_name" caption="Holiday Name" />
+          <Column dataField="holiday_type" caption="Holiday Type" />
+          <Column dataField="repeat_annually" caption="Repeat Annually"/>
+
+          <Column
+            caption="Actions"
+            cellRender={({ data }) => (
+              <div className="flex justify-center gap-4">
+                <button
+                  onClick={() => openModal(data)}
+                  className="text-yellow-500 hover:text-yellow-600"
+                  title="Edit"
+                >
+                  <FaEdit size={18} />
+                </button>
+                <button
+                  onClick={() => handleDeleteHoliday(data.id)}
+                  className="text-red-600 hover:text-red-700"
+                  title="Delete"
+                >
+                  <FaTrash size={18} />
+                </button>
+              </div>
             )}
-          </tbody>
-        </Table>
+          />
+        </DataGrid>
       </div>
 
-      <Modal show={showModal} onHide={closeModal}>
-        <Modal.Header closeButton className="modal-header">
-          <Modal.Title>Update Holiday</Modal.Title>
-        </Modal.Header>
-        <Modal.Body>
-          {selectedHoliday && (
-            <Form>
-              <Form.Group controlId="modalHolidayName">
-                <Form.Label>Holiday Name</Form.Label>
-                <Form.Control
-                  type="text"
-                  name="holiday_name"
-                  value={selectedHoliday.holiday_name}
-                  onChange={handleModalChange}
-                  required
-                />
-              </Form.Group>
-              <Form.Group controlId="modalHolidayDate">
-                <Form.Label>Holiday Date</Form.Label>
-                <Form.Control
-                  type="date"
-                  name="holiday_date"
-                  value={selectedHoliday.holiday_date}
-                  onChange={handleModalChange}
-                  required
-                />
-              </Form.Group>
-              <Form.Group controlId="modalDescription">
-                <Form.Label>Description</Form.Label>
-                <Form.Control
-                  as="textarea"
-                  name="description"
-                  value={selectedHoliday.description}
-                  onChange={handleModalChange}
-                />
-              </Form.Group>
-              <Form.Group controlId="modalHolidayType">
-                <Form.Label>Holiday Type</Form.Label>
-                <Form.Control
-                  as="select"
-                  name="holiday_type"
-                  value={selectedHoliday.holiday_type}
-                  onChange={handleModalChange}
-                >
-                  <option value="Public Holiday">Public Holiday</option>
-                  <option value="Company Holiday">Company Holiday</option>
-                  <option value="Other">Other</option>
-                </Form.Control>
-              </Form.Group>
-              <Form.Group controlId="modalRepeatAnnually">
-                <Form.Label>Repeat Annually</Form.Label>
-                <Form.Check
-                  type="checkbox"
-                  name="repeat_annually"
-                  checked={selectedHoliday.repeat_annually}
-                  onChange={handleModalChange}
-                />
-              </Form.Group>
-            </Form>
-          )}
-        </Modal.Body>
-        <Modal.Footer>
-          <Button variant="secondary" onClick={closeModal}>
-            Close
-          </Button>
-          <Button variant="primary" onClick={saveModalChanges}>
-            Save Changes
-          </Button>
-        </Modal.Footer>
-      </Modal>
-    </Container>
+      {/* Modal */}
+      {showModal && (
+        <div className="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50 z-50">
+          <div className="bg-white rounded-lg w-full max-w-lg p-6 space-y-4">
+            <div className="flex justify-between items-center">
+              <h3 className="text-lg font-semibold">Update Holiday</h3>
+              <button onClick={closeModal} className="text-gray-600 hover:text-gray-800">
+                ✕
+              </button>
+            </div>
+            {selectedHoliday && (
+              <form className="space-y-4">
+                <div>
+                  <label className="block text-sm font-medium">Holiday Name</label>
+                  <input
+                    type="text"
+                    name="holiday_name"
+                    value={selectedHoliday.holiday_name}
+                    onChange={handleModalChange}
+                    required
+                    className="w-full border border-gray-300 rounded-lg px-3 py-2 focus:ring-2 focus:ring-blue-500"
+                  />
+                </div>
+                <div>
+                  <label className="block text-sm font-medium">Holiday Date</label>
+                  <input
+                    type="date"
+                    name="holiday_date"
+                    value={selectedHoliday.holiday_date}
+                    onChange={handleModalChange}
+                    required
+                    className="w-full border border-gray-300 rounded-lg px-3 py-2 focus:ring-2 focus:ring-blue-500"
+                  />
+                </div>
+                <div>
+                  <label className="block text-sm font-medium">Description</label>
+                  <textarea
+                    name="description"
+                    value={selectedHoliday.description}
+                    onChange={handleModalChange}
+                    className="w-full border border-gray-300 rounded-lg px-3 py-2 focus:ring-2 focus:ring-blue-500"
+                  />
+                </div>
+                <div>
+                  <label className="block text-sm font-medium">Holiday Type</label>
+                  <select
+                    name="holiday_type"
+                    value={selectedHoliday.holiday_type}
+                    onChange={handleModalChange}
+                    className="w-full border border-gray-300 rounded-lg px-3 py-2 focus:ring-2 focus:ring-blue-500"
+                  >
+                    <option value="Public Holiday">Public Holiday</option>
+                    <option value="Company Holiday">Company Holiday</option>
+                    <option value="Other">Other</option>
+                  </select>
+                </div>
+                <div className="flex items-center gap-2">
+                  <label className="block text-sm font-medium">Repeat Annually</label>
+                  <input
+                    type="checkbox"
+                    name="repeat_annually"
+                    checked={selectedHoliday.repeat_annually}
+                    onChange={handleModalChange}
+                    className="h-5 w-5 text-blue-600 border-gray-300 rounded"
+                  />
+                </div>
+                <div className="flex justify-end gap-2">
+                  <button
+                    type="button"
+                    onClick={closeModal}
+                    className="px-4 py-2 bg-gray-300 rounded hover:bg-gray-400"
+                  >
+                    Close
+                  </button>
+                  <button
+                    type="button"
+                    onClick={saveModalChanges}
+                    className="px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700"
+                  >
+                    Save Changes
+                  </button>
+                </div>
+              </form>
+            )}
+          </div>
+        </div>
+      )}
+    </div>
+
   );
 };
 

@@ -14,7 +14,7 @@ import "react-toastify/dist/ReactToastify.css";
 import Header from "./components/Header";
 import AdDashboard from "./components/AdDashboard";
 import HrDashboard from "./components/HrDashboard";
-import HrShift from "./components/HrShift";
+import HrShift from "./components/HrShift"; 
 import LeaveRequests from "./components/LeaveRequests";
 import LeaveEntitlements from "./components/LeaveEntitlements";
 import AllEmpDetails from "./components/AllEmpDetails";
@@ -56,6 +56,7 @@ import { ToastContainer } from "react-toastify";
 import { WebSocketProvider } from "./components/WebSocketContext.jsx";
 import AdminAddEmpLeave from "./components/AdminAddEmpLeave.jsx";
 import ProtectedRoute from "./components/ProtectedRoute";
+import EmployeeFullDetails from "./components/EmployeeFullDetails.jsx";
 
 function App() {
   const [userRole, setUserRole] = useState(null);
@@ -490,11 +491,21 @@ function App() {
                     }
                   />
                   <Route
-                    path="add-employee-leaves"
+                    path="/add-employee-leaves"
                     element={
                       <ProtectedRoute
                         element={AdminAddEmpLeave}
-                        allowedRoles={["admin", "hr", "employee"]}
+                        allowedRoles={["admin", "hr"]}
+                        userRole={userRole}
+                      />
+                    }
+                  />
+                  <Route
+                    path="/show-full-profile/:userId"
+                    element={
+                      <ProtectedRoute
+                        element={EmployeeFullDetails}
+                        allowedRoles={["admin", "hr"]}
                         userRole={userRole}
                       />
                     }

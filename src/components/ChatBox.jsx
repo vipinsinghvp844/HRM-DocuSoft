@@ -12,13 +12,14 @@ import {
   readMessageOnSelectUser,
   unseenUserandMessagecount,
 } from "../../redux/actions/EmployeeDetailsAction";
+import api from "./api";
 
 const ChatBox = () => {
-  const placeholderImage = import.meta.env.VITE_PLACEHOLDER_IMAGE;
+  const placeholderImage = `${import.meta.env.VITE_API_BASE_URL}/2024/07/placeholder-image-hrm.png`;
   const [selectedUser, setSelectedUser] = useState(null);
   const [searchItem, setSearchItem] = useState("");
   const { AllProfilesImage } = useSelector(({ AllReducers }) => AllReducers);
-  const { TotalUsers, UserSpecificChats, AllUnseenUserAndMessages } =
+  const { TotalUsers } =
     useSelector(({ EmployeeDetailReducers }) => EmployeeDetailReducers);
   const userId = localStorage.getItem("user_id");
   const [socket, setSocket] = useState(null);
@@ -65,7 +66,7 @@ const ChatBox = () => {
 
   const handleEditMessage = async (messageId) => {
     try {
-      const response = await axios.put(
+      const response = await api.put(
         `${import.meta.env.VITE_API_CHATTING}/${messageId}`,
         {
           message: editedMessage,
@@ -94,7 +95,7 @@ const ChatBox = () => {
   //delete message by sender user
   const handleDeleteMessage = async (messageId) => {
     try {
-      await axios.delete(
+      await api.delete(
         `${import.meta.env.VITE_SOFT_DELETED_MESSAGE}/${messageId}`,
         {
           headers: {
@@ -119,11 +120,11 @@ const ChatBox = () => {
         prevMessages.map((msg) =>
           msg.id === messageId
             ? {
-                ...msg,
-                message: "This message was deleted",
-                base64_image_data: "This message was deleted",
-                is_deleted: true,
-              }
+              ...msg,
+              message: "This message was deleted",
+              base64_image_data: "This message was deleted",
+              is_deleted: true,
+            }
             : msg
         )
       );
@@ -142,11 +143,11 @@ const ChatBox = () => {
               prevMessages.map((msg) =>
                 msg.id === data.messageId
                   ? {
-                      ...msg,
-                      message: "This message was deleted",
-                      base64_image_data: "This message was deleted",
-                      is_deleted: true,
-                    }
+                    ...msg,
+                    message: "This message was deleted",
+                    base64_image_data: "This message was deleted",
+                    is_deleted: true,
+                  }
                   : msg
               )
             );
@@ -183,14 +184,14 @@ const ChatBox = () => {
     try {
       const selecteduserid = selectedUser?.id;
       const response = await dispatch(
-        GetSpecificUserCahts(selecteduserid, pageNum, (data) => {})
+        GetSpecificUserCahts(selecteduserid, pageNum, (data) => { })
       );
 
-      if (response.length > 0) {
+      if (response?.length > 0) {
         setAllMessages((prevMessages) => [...response, ...prevMessages]);
         setPage(pageNum + 1);
       }
-      if (response.length < 20) {
+      if (response?.length < 20) {
         setHasMore(false);
       }
     } catch (error) {
@@ -233,8 +234,8 @@ const ChatBox = () => {
 
   useEffect(() => {
     if (selectedUser) {
-      const ws = new WebSocket("ws://localhost:8080"); // on local use
-      // const ws = new WebSocket("wss://testing-vipin.onrender.com"); // on production use
+      const ws = new WebSocket(import.meta.env.VITE_API_WEBSOCKET_URL); // on local use
+      // const ws = new WebSocket("ws://localhost:8080"); // on local use
 
       ws.onopen = () => {
         console.log("WebSocket Connected!");
@@ -281,7 +282,7 @@ const ChatBox = () => {
           try {
             await dispatch(
               readMessageOnSelectUser(messageIds, async () => {
-                await dispatch(unseenUserandMessagecount((res) => {}));
+                await dispatch(unseenUserandMessagecount((res) => { }));
               })
             );
 
@@ -337,9 +338,9 @@ const ChatBox = () => {
     const selectedFile = event.target.files[0];
     if (!selectedFile) return;
 
+    setFile(selectedFile);
     const fileURl = URL.createObjectURL(selectedFile);
     setPreview(fileURl);
-    setFile(selectedFile);
     setShowModal(true);
   };
 
@@ -355,17 +356,31 @@ const ChatBox = () => {
     // setIsLoading(true);
     setIsSending(true);
 
-    let base64_image_data = "";
-    let media_type = "";
+    let fileName = "";
 
     if (file) {
-      // File ko Base64 me convert karna
-      const reader = new FileReader();
-      reader.readAsDataURL(file);
-      base64_image_data = await new Promise((resolve) => {
-        reader.onload = () => resolve(reader.result.split(",")[1]);
+      console.log(file, "file")
+      const formData = new FormData();
+      formData.append("file", file);
+      console.log(formData, "file")
+
+
+      const uploadRes = await api.post(`${import.meta.env.VITE_API_FILE_UPLOAD}`, formData, {
+        headers: {
+          "Content-Type": "multipart/form-data",
+          Authorization: `Bearer ${localStorage.getItem("authtoken")}`,
+        },
       });
-      media_type = file.type.startsWith("image") ? "image" : "video";
+
+      console.log(uploadRes, "uploadRes");
+      
+
+      const uploadData = await uploadRes.data;
+
+      if (uploadData.success) {
+        fileName = uploadData.fileName;
+      }
+
     }
 
     const payload = {
@@ -373,16 +388,12 @@ const ChatBox = () => {
       sender_id: String(userId),
       receiver_id: selectedUser.id,
       message: newMessage,
-      base64_image_data,
-      media_type,
+      file_name: fileName,
+      media_type: file ? file.type.startsWith("image") ? "image" : "video" : "",
       timestamp: new Date().toISOString(),
       read_status: "0",
     };
-    console.log("Sending WebSocket Message:", payload);
-    // Send message via WebSocket
     socket.send(JSON.stringify(payload));
-
-    // Update UI instantly
     setAllMessages((prev) => [...prev, payload]);
     setNewMessage("");
     setFile(null);
@@ -391,7 +402,7 @@ const ChatBox = () => {
 
     await dispatch(
       messageSentSpecificUser(payload, async () => {
-        await dispatch(GetSpecificUserCahts(selecteduserid, page, (res) => {}));
+        await dispatch(GetSpecificUserCahts(selecteduserid, page, (res) => { }));
       })
     )
       .catch((error) => console.error(error))
@@ -405,7 +416,7 @@ const ChatBox = () => {
     }
   };
 
- 
+
   // emoji add hear button for user messages
   const onEmojiClick = (event, emojiObject) => {
     setNewMessage((prevInput) => prevInput + emojiObject.emoji);
@@ -415,15 +426,20 @@ const ChatBox = () => {
 
   const filteredImage = selectedUser
     ? AllProfilesImage.find(
-        (profile) => String(profile.user_id) === String(selectedUser.id)
-      )
+      (profile) => String(profile.user_id) === String(selectedUser.id)
+    )
     : null;
   const profileImage = filteredImage?.profile_image || placeholderImage;
 
   return (
-    <Container>
+    <Container fluid>
       <Row>
-        <Col md={3} className="mobilechatsidebar">
+        {/* Sidebar */}
+        <Col
+          md={3}
+          className={`mobilechatsidebar ${selectedUser ? "d-none d-md-block" : "d-block"
+            }`}
+        >
           <ChatSidebar
             selectUser={setSelectedUser}
             placeholderImage={placeholderImage}
@@ -433,47 +449,60 @@ const ChatBox = () => {
             searchItem={searchItem}
             handleInputChange={handleInputChange}
             getProfileImage={getProfileImage}
-            // getLastMessageForUser={getLastMessageForUser}
             userId={userId}
             hasMore={hasMore}
           />
         </Col>
-        <Col md={9} className="mobilschatwindow">
-          <ChatWindow
-            selectedUser={selectedUser}
-            placeholderImage={placeholderImage}
-            AllProfilesImage={AllProfilesImage}
-            userId={userId}
-            socket={socket}
-            messages={messages}
-            isLoading={isLoading}
-            handleSendMessage={handleSendMessage}
-            newMessage={newMessage}
-            isSending={isSending}
-            chatBoxRef={chatBoxRef}
-            setNewMessage={setNewMessage}
-            profileImage={profileImage}
-            filteredImage={filteredImage}
-            editingMessageId={editingMessageId}
-            contextMenu={contextMenu}
-            setContextMenu={setContextMenu}
-            setEditedMessage={setEditedMessage}
-            setEditingMessageId={setEditingMessageId}
-            editedMessage={editedMessage}
-            handleEditMessage={handleEditMessage}
-            handleDeleteMessage={handleDeleteMessage}
-            onEmojiClick={onEmojiClick}
-            EmojiPicker={EmojiPicker}
-            showEmojiPicker={showEmojiPicker}
-            setShowEmojiPicker={setShowEmojiPicker}
-            setFile={setFile}
-            handleFileChange={handleFileChange}
-            showModal={showModal}
-            file={file}
-            setShowModal={setShowModal}
-            preview={preview}
-            handleKeyDown={handleKeyDown}
-          />
+
+        {/* Chat Window */}
+        <Col
+          md={9}
+          className={`mobilschatwindow ${selectedUser ? "d-block" : "d-none d-md-block"
+            }`}
+        >
+          {selectedUser ? (
+            <ChatWindow
+              selectedUser={selectedUser}
+              placeholderImage={placeholderImage}
+              AllProfilesImage={AllProfilesImage}
+              userId={userId}
+              socket={socket}
+              messages={messages}
+              isLoading={isLoading}
+              handleSendMessage={handleSendMessage}
+              newMessage={newMessage}
+              isSending={isSending}
+              chatBoxRef={chatBoxRef}
+              setNewMessage={setNewMessage}
+              profileImage={profileImage}
+              filteredImage={filteredImage}
+              editingMessageId={editingMessageId}
+              contextMenu={contextMenu}
+              setContextMenu={setContextMenu}
+              setEditedMessage={setEditedMessage}
+              setEditingMessageId={setEditingMessageId}
+              editedMessage={editedMessage}
+              handleEditMessage={handleEditMessage}
+              handleDeleteMessage={handleDeleteMessage}
+              onEmojiClick={onEmojiClick}
+              EmojiPicker={EmojiPicker}
+              showEmojiPicker={showEmojiPicker}
+              setShowEmojiPicker={setShowEmojiPicker}
+              setFile={setFile}
+              handleFileChange={handleFileChange}
+              showModal={showModal}
+              file={file}
+              setShowModal={setShowModal}
+              preview={preview}
+              handleKeyDown={handleKeyDown}
+              // 👇 back button pass karenge
+              onBack={() => setSelectedUser(null)}
+            />
+          ) : (
+            <div className="h-100 d-flex align-items-center justify-content-center text-muted">
+              Select a chat to start messaging
+            </div>
+          )}
         </Col>
       </Row>
     </Container>

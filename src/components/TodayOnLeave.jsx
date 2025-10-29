@@ -1,14 +1,13 @@
 import React, { useState, useEffect } from "react";
-import { Spinner, Alert, Card, OverlayTrigger, Tooltip } from "react-bootstrap";
-import axios from "axios";
 import { FaUserTimes } from "react-icons/fa";
+import api from "./api";
 
 function TodayOnLeave() {
   const [onLeaveCount, setOnLeaveCount] = useState(0);
   const [leaveUserNames, setLeaveUserNames] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
-  const currentDate = new Date().toISOString().split("T")[0]; // Format to YYYY-MM-DD
+  const currentDate = new Date().toISOString().split("T")[0]; // YYYY-MM-DD
 
   useEffect(() => {
     fetchOnLeaveCount();
@@ -16,22 +15,16 @@ function TodayOnLeave() {
 
   const fetchOnLeaveCount = async () => {
     try {
-      const leaveResponse = await axios.get(
-        `${import.meta.env.VITE_API_LEAVE}`, {
+      const leaveResponse = await api.get(
+        `${import.meta.env.VITE_API_LEAVE}`,
+        {
           headers: {
             Authorization: `Bearer ${localStorage.getItem("authtoken")}`,
           },
         }
       );
       const leaveData = leaveResponse.data || [];
-      // console.log(leaveData)
-      // const absentUserIds = nonAdminUserIds.filter(
-      //   (userId) => !presentOrOnLeaveUserIds.has(userId)
-      // );
 
-      // const absentUserNames = nonAdminUsers
-      //   .filter((user) => absentUserIds.includes(user.id.toString()))
-      //   .map((user) => user.username);
       // Filter leaves that are accepted and active for the current date
       const onLeaveUsers = leaveData.filter((leave) => {
         const startDate = new Date(leave.start_date)
@@ -56,29 +49,42 @@ function TodayOnLeave() {
     }
   };
 
+  // if (loading) {
+  //   return (
+  //     <div className="bg-white shadow-md rounded-xl p-6 text-center">
+  //       <p className="text-gray-500">Loading...</p>
+  //     </div>
+  //   );
+  // }
+
+  // if (error) {
+  //   return (
+  //     <div className="bg-white shadow-md rounded-xl p-6 text-center">
+  //       <p className="text-red-500">{error}</p>
+  //     </div>
+  //   );
+  // }
+
   return (
-    <Card className="text-center shadow-sm border-0 rounded p-0">
-      <OverlayTrigger
-        placement="bottom"
-        overlay={
-          <Tooltip id="tooltip">
-                {leaveUserNames.length > 0
-                  ? leaveUserNames.join(", ")
-                  : "No Leaves users"}
-          </Tooltip>
-        }
-      >
-        <Card.Body>
-          <Card.Title>Today Leave</Card.Title>
-          <div className="d-flex flex-column align-items-center">
-            <FaUserTimes size={50} color="#a855f7" />
-            <h3 className="mt-2" style={{ color: "#a855f7", fontSize: "2rem" }}>
-              {onLeaveCount}
-            </h3>
-          </div>
-        </Card.Body>
-      </OverlayTrigger>
-    </Card>
+    <div className="relative group">
+      {/* Card */}
+      <div className="bg-white shadow-md rounded-xl p-6 text-center hover:shadow-lg transition cursor-pointer">
+        <h3 className="text-gray-700 font-medium">Today Leave</h3>
+        <div className="flex flex-col items-center">
+          <FaUserTimes size={50} className="text-purple-500" />
+          <p className="mt-2 text-3xl font-bold text-purple-500">
+            {onLeaveCount}
+          </p>
+        </div>
+      </div>
+
+      {/* Tooltip */}
+      <div className="absolute left-1/2 -translate-x-1/2 mt-2 hidden group-hover:block w-56 p-2 bg-gray-800 text-white text-sm rounded-lg shadow-lg z-50">
+        {leaveUserNames.length > 0
+          ? leaveUserNames.join(", ")
+          : "No leave users"}
+      </div>
+    </div>
   );
 }
 

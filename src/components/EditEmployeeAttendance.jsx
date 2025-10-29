@@ -4,6 +4,7 @@ import axios from "axios";
 import { useDispatch, useSelector } from "react-redux";
 import { EditAttDeatilByAdminHr, GetAttendanceDataActionByDate, GetTotalUserAction } from "../../redux/actions/EmployeeDetailsAction";
 import { toast } from "react-toastify";
+import api from "./api";
 
 const EditEmployeeAttendance = () => {
   const [employees, setEmployees] = useState([]);
@@ -71,7 +72,7 @@ const EditEmployeeAttendance = () => {
 
   const fetchUserAttendance = async (userId, date) => {
     try {
-      const response = await axios.get(
+      const response = await api.get(
         `${import.meta.env.VITE_API_ATTENDANCE}`,
         {
           params: { user_id: userId, date },

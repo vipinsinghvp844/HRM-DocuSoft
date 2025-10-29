@@ -1,21 +1,7 @@
 import React, { useState, useEffect } from "react";
-import {
-  Table,
-  Button,
-  Container,
-  Alert,
-  Spinner,
-  Row,
-  Col,
-  Offcanvas,
-} from "react-bootstrap";
-import axios from "axios";
 import { useNavigate } from "react-router-dom";
-import { FaEye } from "react-icons/fa";
 import AddAttendance from "./AddAttendance";
-import LoaderSpiner from "./LoaderSpiner";
-import "./ManageAttendance.css"; // Import the custom CSS file
-import { useDispatch, useSelector } from "react-redux";
+import { useSelector } from "react-redux";
 import DataGrid, {
   Column,
   Paging,
@@ -23,6 +9,7 @@ import DataGrid, {
   HeaderFilter,
   SearchPanel,
 } from "devextreme-react/data-grid";
+import { ArrowLeftCircle, CalendarCheck, Eye } from "lucide-react";
 
 const ManageAttendance = () => {
   const [employees, setEmployees] = useState([]);
@@ -75,38 +62,35 @@ const ManageAttendance = () => {
 
 
   return (
-    <Container className="manage-attendance-container">
-      <Row className="mb-4 mt-2 d-flex align-items-center">
-        <Col xs={2} md={1}>
-          <i
-            className="bi bi-arrow-left-circle back-icon"
-            onClick={() => window.history.back()}
-          ></i>
-        </Col>
-        <Col xs={8} md={9} className="text-center text-md-left">
-          <h3 className="mt-2">Manage Attendance</h3>
-        </Col>
-        <Col xs={12} md={2} className="text-right text-md-left">
-          <Button variant="primary" onClick={handleShow}>
-            Add Attendance
-          </Button>
-          <Offcanvas show={show} onHide={handleClose} placement="end">
-            <Offcanvas.Header closeButton>
-              <Offcanvas.Title>Add Attendance</Offcanvas.Title>
-            </Offcanvas.Header>
-            <Offcanvas.Body>
-              <AddAttendance />
-            </Offcanvas.Body>
-          </Offcanvas>
-        </Col>
-      </Row>
-      <div style={{ overflowX: "auto" }}>
+    <div className="pt-4 px-2">
+      <div className="flex md:flex-row items-center justify-between gap-2 mb-6">
+        <button
+          onClick={() => window.history.back()}
+          className="flex items-center text-gray-700 hover:text-gray-900 transition-colors"
+        >
+          <ArrowLeftCircle size={32} className="mr-2" />
+          <span className="hidden md:inline text-lg font-semibold">Back</span>
+        </button>
+
+        <h3 className="text-xl md:text-2xl font-semibold text-center flex-1">
+          Manage Attendance
+        </h3>
+
+        <button
+          onClick={handleShow}
+          className="bg-green-600 text-white px-4 py-2 rounded-lg shadow hover:bg-green-700 transition"
+        >
+          Add Attendance
+        </button>
+      </div>
+
+      <div className="overflow-x-auto bg-white rounded-xl shadow-md p-3">
         <DataGrid
           dataSource={employees}
           keyExpr="id"
           showBorders={true}
           rowAlternationEnabled={true}
-          className="shadow-sm rounded"
+          className="w-full"
           height="auto"
           columnAutoWidth={true}
           wordWrapEnabled={true}
@@ -116,43 +100,58 @@ const ManageAttendance = () => {
           <FilterRow visible={true} />
           <HeaderFilter visible={true} />
           <Paging defaultPageSize={10} />
-          <Column
-            caption="#"
-            width={50}
-            cellRender={({ rowIndex }) => rowIndex + 1}
-          />
+
+          <Column caption="#" width={50} cellRender={({ rowIndex }) => rowIndex + 1} />
           <Column dataField="id" caption="ID" />
-          <Column dataField="first_name" caption="User Name" />
+          <Column dataField="first_name" caption="First Name" />
           <Column dataField="last_name" caption="Last Name" />
           <Column dataField="email" caption="E-Mail" dataType="email" />
           <Column dataField="mobile" caption="Mobile" />
           <Column dataField="role" caption="Role" />
+
           <Column
             caption="Actions"
             cellRender={({ data }) => (
-              <>
-                <Button
-                  variant="info"
-                  className="action-button"
+              <div className="flex gap-2 justify-center">
+                <button
                   onClick={() => handlePersonalDetails(data.id)}
+                  className="p-2 bg-blue-500 text-white rounded-lg shadow hover:bg-blue-600 transition"
                   title="View Personal Report"
                 >
-                  <FaEye />
-                </Button>
-                <Button
-                  variant="info"
-                  className="action-button"
+                  <Eye size={18} />
+                </button>
+                <button
                   onClick={() => handleAttendanceDetails(data.id)}
+                  className="p-2 bg-indigo-500 text-white rounded-lg shadow hover:bg-indigo-600 transition"
                   title="View Attendance Report"
                 >
-                  <i className="bi bi-calendar-check"></i>
-                </Button>
-              </>
+                  <CalendarCheck size={18} />
+                </button>
+              </div>
             )}
           />
         </DataGrid>
       </div>
-    </Container>
+
+      {show && (
+        <div className="fixed inset-0 bg-black bg-opacity-50 z-40">
+          <div className="fixed top-0 right-0 h-full w-3/4 sm:w-1/3 lg:w-1/4 bg-white shadow-lg z-50 transform transition-transform duration-300">
+            <div className="flex justify-between items-center p-4 border-b">
+              <h2 className="text-lg font-semibold">Add Attendance</h2>
+              <button
+                onClick={handleClose}
+                className="text-gray-500 hover:text-gray-700"
+              >
+                ✕
+              </button>
+            </div>
+            <div className="overflow-y-auto h-[calc(100vh-64px)]">
+              <AddAttendance />
+            </div>
+          </div>
+        </div>
+      )}
+    </div>
   );
 };
 

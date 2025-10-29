@@ -76,8 +76,10 @@ export const WebSocketProvider = ({ children }) => {
       try {
         const authtoken = localStorage.getItem("authtoken");
         const response = await axios.get(
-          `${import.meta.env.VITE_API_ON_OFF_ALL_USER_STATUS}`,
-          { headers: { Authorization: `Bearer ${authtoken}` } }
+          `${import.meta.env.VITE_API_BASE_API_URL}/jwt-auth/v1/user-status-all`,
+          { 
+            headers: { Authorization: `Bearer ${authtoken}` } 
+          }
         );
 // console.log(response.data);
 
@@ -106,7 +108,7 @@ export const WebSocketProvider = ({ children }) => {
       if (userId) {
         axios
           .post(
-            `${import.meta.env.VITE_API_ON_OFF_USER_STATUS}`,
+            `${import.meta.env.VITE_API_BASE_API_URL}/jwt-auth/v1/user-status`,
             { user_id: userId, status },
             { headers: { Authorization: `Bearer ${authtoken}` } }
           )

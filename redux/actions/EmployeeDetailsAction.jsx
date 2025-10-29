@@ -12,10 +12,11 @@ import {
   GetSpecificUserCahtsReduser,
   GetUnseenUserCountReduser,
 } from "../redecer/EmployeeDetailReducers";
+import api from "../../src/components/api";
 
 export const AddNewEmployeeAction = (userData, callback) => async () => {
   try {
-    const response = await axios.post(
+    const response = await api.post(
       `${import.meta.env.VITE_API_REGISTER}`,
       userData,
       {
@@ -35,7 +36,7 @@ export const AddNewEmployeeAction = (userData, callback) => async () => {
 };
 export const GetTotalUserAction = () => async (dispatch) => {
   try {
-    const response = await axios.get(
+    const response = await api.get(
       `${import.meta.env.VITE_API_CUSTOM_USERS}`
     );
     const users = response.data;
@@ -49,7 +50,7 @@ export const GetTotalUserAction = () => async (dispatch) => {
 export const GetTotalUserActionByUserId = () => async (dispatch) => {
   try {
     const userId = localStorage.getItem("user_id");
-    const response = await axios.get(
+    const response = await api.get(
       `${import.meta.env.VITE_API_CUSTOM_USERS}/${userId}`
     );
 
@@ -64,13 +65,14 @@ export const GetTotalUserActionByUserId = () => async (dispatch) => {
 
 export const GetAttendanceDataAction = () => async (dispatch) => {
   try {
-    const attendanceResponse = await axios.get(
-      `${import.meta.env.VITE_API_GET_ATTENDANCE}`,
-      {
-        headers: {
-          Authorization: `Bearer ${localStorage.getItem("authtoken")}`,
-        },
-      }
+    const attendanceResponse = await api.get(
+      `${import.meta.env.VITE_API_GET_ATTENDANCE}`
+      // ,
+      // {
+      //   headers: {
+      //     Authorization: `Bearer ${localStorage.getItem("authtoken")}`,
+      //   },
+      // }
     );
     const attendanceData = attendanceResponse.data || [];
     dispatch(TotalAttendanceReduser(attendanceData));
@@ -84,13 +86,14 @@ export const GetAttendanceDataAction = () => async (dispatch) => {
 export const GetAttendanceDataActionByDate = () => async (dispatch) => {
   const currentDate = new Date().toISOString().split("T")[0];
   try {
-    const attendanceResponse = await axios.get(
-      `${import.meta.env.VITE_API_GET_ATTENDANCE}?date=${currentDate}`,
-      {
-        headers: {
-          Authorization: `Bearer ${localStorage.getItem("authtoken")}`,
-        },
-      }
+    const attendanceResponse = await api.get(
+      `${import.meta.env.VITE_API_GET_ATTENDANCE}?date=${currentDate}`
+      // ,
+      // {
+      //   headers: {
+      //     Authorization: `Bearer ${localStorage.getItem("authtoken")}`,
+      //   },
+      // }
     );
     const attendanceData = attendanceResponse?.data || [];
     dispatch(TotalAttendanceReduserByDate(attendanceData));
@@ -105,15 +108,15 @@ export const GetAttendanceDataActionById =
     const userId = localStorage.getItem("user_id");
     const formattedMonth = month.toString().padStart(2, "0");
     try {
-      const attendanceResponse = await axios.get(
+      const attendanceResponse = await api.get(
         `${
           import.meta.env.VITE_API_GET_ATTENDANCE
         }/${userId}?month=${formattedMonth}&year=${year}`,
-        {
-          headers: {
-            Authorization: `Bearer ${localStorage.getItem("authtoken")}`,
-          },
-        }
+        // {
+        //   headers: {
+        //     Authorization: `Bearer ${localStorage.getItem("authtoken")}`,
+        //   },
+        // }
       );
 
       const attendanceData = attendanceResponse.data || [];
@@ -128,13 +131,9 @@ export const GetAttendanceDataActionByIdAndDate = () => async (dispatch) => {
   const userId = localStorage.getItem("user_id");
   const currentDate = new Date().toISOString().split("T")[0];
   try {
-    const attendanceResponse = await axios.get(
+    const attendanceResponse = await api.get(
       `${import.meta.env.VITE_API_GET_ATTENDANCE}/${userId}/${currentDate}`,
-      {
-        headers: {
-          Authorization: `Bearer ${localStorage.getItem("authtoken")}`,
-        },
-      }
+      //  
     );
 
     const attendanceData = attendanceResponse.data || [];
@@ -148,7 +147,7 @@ export const GetAttendanceDataActionByIdAndDate = () => async (dispatch) => {
 
 export const GetEmployeeLeaveDetailAction = () => async (dispatch) => {
   try {
-    const response = await axios.get(`${import.meta.env.VITE_API_LEAVE}`, {
+    const response = await api.get(`${import.meta.env.VITE_API_LEAVE}`, {
       headers: {
         Authorization: `Bearer ${localStorage.getItem("authtoken")}`,
       },
@@ -168,7 +167,7 @@ export const GetEmployeeLeaveDetailActionById = () => async (dispatch) => {
   const userId = localStorage.getItem("user_id");
   const currentDate = new Date().toISOString().split("T")[0];
   try {
-    const response = await axios.get(
+    const response = await api.get(
       `${import.meta.env.VITE_API_LEAVE}/${userId}`,
       {
         headers: {
@@ -189,7 +188,7 @@ export const GetEmployeeLeaveDetailActionById = () => async (dispatch) => {
 
 export const submitAttendanceAction = (payload) => async (dispatch) => {
   try {
-    const response = await axios.post(
+    const response = await api.post(
       `${import.meta.env.VITE_API_ATTENDANCE}`,
       payload,
       {
@@ -199,16 +198,18 @@ export const submitAttendanceAction = (payload) => async (dispatch) => {
       }
     );
 
-    return response.data; // return the response so it can be awaited
+    // console.log("Redux Response:", response.data);
+    return response.data; // success case
   } catch (error) {
-    console.error("Error performing action", error);
-    // toast.error("An error occurred. Please try again.");
+    // console.error("Redux API Error:", error?.response || error);
+    throw error.response || error;
   }
 };
 
+
 export const EditAttDeatilByAdminHr = (payload, callback) => async (dispatch) => {
   try {
-    const response = await axios.put(
+    const response = await api.put(
       `${import.meta.env.VITE_API_ATTENDANCE}`,
       payload,
       {
@@ -231,7 +232,7 @@ export const EditAttDeatilByAdminHr = (payload, callback) => async (dispatch) =>
 
 export const LeaveRequestChangeAction = (payload) => async (dispatch) => {
   try {
-    const response = await axios.put(
+    const response = await api.put(
       `${import.meta.env.VITE_API_LEAVE}`,
       payload,
       {
@@ -248,7 +249,7 @@ export const LeaveRequestChangeAction = (payload) => async (dispatch) => {
 
 export const SubmitLeave = (payload, callback) => async () => {
   try {
-    const response = await axios.post(
+    const response = await api.post(
       `${import.meta.env.VITE_API_LEAVE}`,
       payload,
       {
@@ -257,17 +258,20 @@ export const SubmitLeave = (payload, callback) => async () => {
         },
       }
     );
-    if (response.data) {
-      callback(response.data);
-    }
+    
+    // if (response.data) {
+    //   callback(response.data);
+    // }
+    return response;
   } catch (error) {
     console.error("Error performing action", error);
+    throw error;
   }
 };
 
 export const GetEmpPersonalInfoAction = () => async (dispatch) => {
   try {
-    const response = await axios.get(
+    const response = await api.get(
       `${import.meta.env.VITE_API_PERSONAL_INFO}`
     );
 
@@ -286,7 +290,7 @@ export const GetEmpPersonalInfoAction = () => async (dispatch) => {
 
 export const GetHolidayAction = () => async (dispatch) => {
   try {
-    const response = await axios.get(`${import.meta.env.VITE_API_HOLIDAYS}`, {
+    const response = await api.get(`${import.meta.env.VITE_API_HOLIDAYS}`, {
       headers: {
         Authorization: `Bearer ${localStorage.getItem("authtoken")}`,
       },
@@ -307,7 +311,7 @@ export const GetHolidayAction = () => async (dispatch) => {
 
 export const GetLeavePolicyAction = () => async (dispatch) => {
   try {
-    const response = await axios.get(
+    const response = await api.get(
       `${import.meta.env.VITE_API_LEAVE_POLICIES}`,
       {
         headers: {
@@ -331,7 +335,7 @@ export const GetLeavePolicyAction = () => async (dispatch) => {
 
 export const GetOfficeShiftsAction = () => async (dispatch) => {
   try {
-    const response = await axios.get(`${import.meta.env.VITE_API_SHIFTS}`, {
+    const response = await api.get(`${import.meta.env.VITE_API_SHIFTS}`, {
       headers: {
         Authorization: `Bearer ${localStorage.getItem("authtoken")}`,
       },
@@ -354,13 +358,8 @@ export const GetOfficeShiftsAction = () => async (dispatch) => {
 export const fetchNotificationsAll =
   (page, callback) => async (dispatch) => {
     try {
-      const response = await axios.get(
-        `${import.meta.env.VITE_API_NOTIFICATION}?page=${page}`,
-        {
-          headers: {
-            Authorization: `Bearer ${localStorage.getItem("authtoken")}`,
-          },
-        }
+      const response = await api.get(
+        `${import.meta.env.VITE_API_NOTIFICATION}?page=${page}`
       );
 
       if (response?.data) {
@@ -376,7 +375,7 @@ export const fetchNotificationsAll =
 export const changeReadUnreadAction =
   (notificationId, callback) => async () => {
     try {
-      const response = await axios.post(
+      const response = await api.post(
         `${import.meta.env.VITE_API_NOTIFICATION}/${notificationId}`,
         {},
         {
@@ -398,7 +397,7 @@ export const changeReadUnreadAction =
 export const GetSpecificUserCahts =
   (selecteduserid, pageNum, callback) => async (dispatch) => {
     try {
-      const response = await axios.get(
+      const response = await api.get(
         `${
           import.meta.env.VITE_API_CHATTING
         }?receiver_id=${selecteduserid}&page=${pageNum}`,
@@ -421,7 +420,7 @@ export const GetSpecificUserCahts =
   };
 export const messageSentSpecificUser = (payload, callback) => async () => {
   try {
-    const response = await axios.post(
+    const response = await api.post(
       `${import.meta.env.VITE_API_CHATTING}`,
       payload,
       {
@@ -441,7 +440,7 @@ export const messageSentSpecificUser = (payload, callback) => async () => {
 };
 export const unseenUserandMessagecount = (callback) => async (dispatch) => {
   try {
-    const response = await axios.get(
+    const response = await api.get(
       `${import.meta.env.VITE_UNSEEN_USER_AND_MESSAGE_COUNT}`,
       {
         headers: {
@@ -462,7 +461,7 @@ export const unseenUserandMessagecount = (callback) => async (dispatch) => {
 };
 export const readMessageOnSelectUser = (messageIds, callback) => async () => {
   try {
-    const response = await axios.put(
+    const response = await api.put(
       `${import.meta.env.VITE_API_CHATTING}`,
       { messageIds },
       {

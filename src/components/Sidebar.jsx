@@ -1,8 +1,8 @@
 import React, { useEffect, useState } from "react";
-import { Nav, Container, Offcanvas, Button } from "react-bootstrap";
+import { Nav, Container } from "react-bootstrap";
 import { NavLink } from "react-router-dom";
-import axios from "axios";
 import "./Sidebar.css"; 
+import api from "./api";
 
 
 const Sidebar = ({ userRole, pendingCount }) => {
@@ -13,7 +13,7 @@ const Sidebar = ({ userRole, pendingCount }) => {
   useEffect(() => {
     const fetchUserStatus = async () => {
       try {
-        const response = await axios.get(
+        const response = await api.get(
           `${import.meta.env.VITE_API_CUSTOM_USERS}/${userId}`
         );
         setUserStatus(response.data.user_state);
@@ -25,11 +25,6 @@ const Sidebar = ({ userRole, pendingCount }) => {
     fetchUserStatus();
   }, [userId]);
 
-  const toggleMenu = () => {
-    if (window.innerWidth < 992) {
-      setShow((prev) => !prev);
-    }
-  };
    const handleNavClick = () => {
      if (window.innerWidth < 992) {
        setShow(false);
@@ -41,7 +36,7 @@ const Sidebar = ({ userRole, pendingCount }) => {
       {
         to: "/admin-dashboard",
         icon: "bi-house-door",
-        label: "Admin Dashboard",
+        label: "Dashboard",
       },
       {
         to: "/today-attendance",
@@ -81,7 +76,7 @@ const Sidebar = ({ userRole, pendingCount }) => {
       {
         to: "/attendance-csv",
         icon: "bi-filetype-csv",
-        label: "Attendance CSV",
+        label: "Attendance Overview",
       },
       {
         to: "/manage-documents",
@@ -90,7 +85,7 @@ const Sidebar = ({ userRole, pendingCount }) => {
       },
     ],
     hr: [
-      { to: "/hr-dashboard", icon: "bi-house-door", label: "HR Dashboard" },
+      { to: "/hr-dashboard", icon: "bi-house-door", label: "Dashboard" },
       ...(userStatus === "active"
         ? [
             {
@@ -144,7 +139,7 @@ const Sidebar = ({ userRole, pendingCount }) => {
             {
               to: "/attendance-csv",
               icon: "bi-calendar-check",
-              label: "Attendance Csv",
+              label: "Attendance Overview",
             },
           ]
         : []),
@@ -154,7 +149,7 @@ const Sidebar = ({ userRole, pendingCount }) => {
       {
         to: "/employee-dashboard",
         icon: "bi-house-door",
-        label: "Employee Dashboard",
+        label: "Dashboard",
       },
       ...(userStatus === "active"
         ? [
@@ -202,35 +197,7 @@ const Sidebar = ({ userRole, pendingCount }) => {
     ));
 
   return (
-    <>
-      {/* Toggle Button for Mobile */}
-      <Button
-        variant="danger"
-        onClick={toggleMenu}
-        className="d-md-none togglemobile"
-      >
-        <i className="bi bi-list"></i>
-      </Button>
-
-      {/* Mobile Sidebar */}
-      <Offcanvas
-        show={show}
-        onHide={toggleMenu}
-        className="sidenav sidenavmobile"
-      >
-        <Offcanvas.Header closeButton>
-          <Offcanvas.Title className="sidebar-logo">
-            <img
-              src="/assets/Docusoft-logo-red.svg"
-              alt="HRM"
-              className="img-fluid"
-            />
-          </Offcanvas.Title>
-        </Offcanvas.Header>
-        <Offcanvas.Body>
-          <Nav className="flex-column sidebar">{renderNavItems()}</Nav>
-        </Offcanvas.Body>
-      </Offcanvas>
+    <>    
 
       {/* Desktop Sidebar (Always Visible) */}
       <div className="d-none d-md-block position-fixed sidenav">

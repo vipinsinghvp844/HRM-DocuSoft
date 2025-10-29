@@ -79,7 +79,7 @@ color: #495057;
 }
 
 .nav-link:hover {
-   background-color: #9e2950;
+   background-color:#d42027;
   color: #fff;
   transform: translateX(4px);
   box-shadow: 0 2px 6px rgba(158, 41, 80, 0.3);
@@ -90,8 +90,9 @@ color: #495057;
   background: #f1f1f1;
   padding: 6px;
   border-radius: 8px;
-  color: #9e2950;
+  color: #d42027;
   transition: all 0.3s ease;
+  height: 33px;
 }
 
 .nav-link:hover i.bi {
@@ -111,16 +112,14 @@ color: #495057;
   }
 }
 
-.togglemobile{
+/* .togglemobile{
   position: fixed !important;
   z-index: 1045;
   top: 15 !important;
   left: 150;
   margin-top: 10px;
-}
-.sidenavmobile{
-  width: 360px !important;
-}
+} */
+
 span .badge .bg-danger{
   background-color: #9e2950 !important;
   font-weight: bold !important;
@@ -133,7 +132,7 @@ span .badge .bg-danger{
 
 /* * Active Link */
 .sidebar .nav-link.active {
-  background: linear-gradient(90deg, #dc3545, #9e2950);
+  background: #d42027;
   color: #fff;
   font-weight: 600;
   box-shadow: 0 3px 10px rgba(220, 53, 69, 0.3);

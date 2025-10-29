@@ -1,17 +1,4 @@
 import React, { useState, useEffect } from "react";
-// import "../App.css";
-import {
-  Button,
-  Table,
-  Modal,
-  Form,
-  Spinner,
-  Row,
-  Col,
-  Collapse,
-  Container,
-} from "react-bootstrap";
-import axios from "axios";
 import { useDispatch, useSelector } from "react-redux";
 import { GetEmployeeLeaveDetailAction } from "../../redux/actions/EmployeeDetailsAction";
 import LoaderSpiner from "./LoaderSpiner";
@@ -24,6 +11,9 @@ import DataGrid, {
   HeaderFilter,
   SearchPanel,
 } from "devextreme-react/data-grid";
+import api from "./api"
+import { ArrowLeftCircle } from "lucide-react";
+import { FaCheckCircle, FaTimesCircle, FaTrash } from "react-icons/fa";
 
 const LeaveRequests = ({ setPendingCount }) => {
   const location = useLocation();
@@ -83,8 +73,6 @@ const LeaveRequests = ({ setPendingCount }) => {
 
   useEffect(() => {
     const fetchAndProcessRequests = async () => {
-      setLoading(true);
-
       try {
         let fetchedRequests = [];
 
@@ -102,13 +90,14 @@ const LeaveRequests = ({ setPendingCount }) => {
             apply_date: request.apply_date || "N/A",
             user_name: request.user_name || "Unknown",
             user_id: request.user_id || "N/A",
-            leave_type: request.leave_type || "N/A",
+            paid_leave_count: request.paid_leave_count || "N/A",
+            unpaid_leave_count: request.unpaid_leave_count || "N/A",
             start_date: request.start_date || null,
             end_date: request.end_date || null,
             reason_for_leave: request.reason_for_leave || "No reason provided",
             status: request.status || "Pending",
             hr_note: request.hr_note || "",
-            totalLeaveDays: calculateTotalLeaveDays(
+            total_leave_days: calculateTotalLeaveDays(
               request.start_date,
               request.end_date
             ),
@@ -122,7 +111,7 @@ const LeaveRequests = ({ setPendingCount }) => {
             validRequest.status = "Reject";
             validRequest.hr_note = "Auto-rejected as the leave date has passed";
 
-            axios
+            api
               .put(
                 `${import.meta.env.VITE_API_LEAVE}/${validRequest.id}`,
                 validRequest,
@@ -151,8 +140,6 @@ const LeaveRequests = ({ setPendingCount }) => {
         setPendingCount(pendingCount);
       } catch (error) {
         console.error("Error fetching leave requests:", error);
-      } finally {
-        setLoading(false);
       }
     };
 
@@ -174,13 +161,13 @@ const LeaveRequests = ({ setPendingCount }) => {
       ...selectedRequest,
       status: action,
       hr_note: note,
-      totalLeaveDays: calculateTotalLeaveDays(
+      total_leave_days: calculateTotalLeaveDays(
         selectedRequest.start_date,
         selectedRequest.end_date
       ),
     };
 
-    axios
+    api
       .put(
         `${import.meta.env.VITE_API_LEAVE}/${selectedRequest.id}`,
         updatedRequest,
@@ -219,7 +206,7 @@ const LeaveRequests = ({ setPendingCount }) => {
     if (!deleteRequest) return;
 
     try {
-      await axios.delete(
+      await api.delete(
         `${import.meta.env.VITE_API_LEAVE}/${deleteRequest.id}`,
         {
           headers: {
@@ -243,37 +230,31 @@ const LeaveRequests = ({ setPendingCount }) => {
   };
 
   return (
-    <Container fluid className="p-3">
-      <Row className="align-items-center mb-3">
-        <Col md={1}>
-          <i
-            className="bi bi-arrow-left-circle"
-            onClick={() => window.history.back()}
-            style={{ cursor: "pointer", fontSize: "32px", color: "#343a40" }}
-          ></i>
-        </Col>
-        <Col md={7}>
-          <h3 className="mb-0">My Leave Requests</h3>
-        </Col>
-        <Col className="text-end ">
-          {/* <Button variant="secondary" onClick={resetFilters} className="me-2">
-            Reset Filters
-          </Button> */}
-          <Link to={"/add-employee-leaves"}>
-            <Button>Add Leaves</Button>{" "}
-          </Link>
-        </Col>
-      </Row>
+    <div className="pt-4 px-2">
+      <div className="flex md:flex-row items-center justify-between gap-2 mb-6">
+        <button
+          onClick={() => window.history.back()}
+          className="flex items-center text-gray-700 hover:text-gray-900 transition-colors"
+        >
+          <ArrowLeftCircle size={32} className="mr-2" />
+          <span className="hidden md:inline text-lg font-semibold">Back</span>
+        </button>
+        <h3 className="text-xl md:text-2xl font-semibold text-center flex-1">Leave Requests</h3>
 
-      <div style={{ overflowX: "auto" }}>
+        <Link to="/add-employee-leaves">
+          <button className="bg-blue-500 text-white px-4 py-2 rounded-lg shadow hover:bg-blue-700 transition">
+            Add Leaves
+          </button>
+        </Link>
+      </div>
+
+      <div className="overflow-x-auto bg-white rounded-xl shadow-md p-3">
         <DataGrid
-          // ref={gridRef}
           dataSource={requests}
           keyExpr="id"
           showBorders={true}
           rowAlternationEnabled={true}
-          className="shadow-sm rounded"
-          height="auto"
+          height="500px"
           columnAutoWidth={true}
           wordWrapEnabled={true}
           columnHidingEnabled={true}
@@ -282,7 +263,8 @@ const LeaveRequests = ({ setPendingCount }) => {
           <SearchPanel visible={true} placeholder="Search..." />
           <FilterRow visible={true} />
           <HeaderFilter visible={true} />
-          <Paging defaultPageSize={5} />
+          <Paging defaultPageSize={20} />
+
           <Column
             caption="#"
             width={50}
@@ -290,119 +272,154 @@ const LeaveRequests = ({ setPendingCount }) => {
           />
           <Column dataField="user_name" caption="User Name" />
           <Column dataField="apply_date" caption="Apply Date" dataType="date" />
-          <Column dataField="leave_type" caption="Leave Type" />
+          <Column dataField="paid_leave_count" caption="Paid Count" />
+          <Column dataField="unpaid_leave_count" caption="Unpaid Count" />
           <Column dataField="start_date" caption="Start Date" dataType="date" />
           <Column dataField="end_date" caption="End Date" dataType="date" />
           <Column dataField="reason_for_leave" caption="Reason" />
-          <Column dataField="total_leave_days" caption="Days" width={70} />
+          <Column dataField="total_leave_days" caption="Days" />
           <Column dataField="status" caption="Status" />
           <Column dataField="hr_note" caption="HR Note" />
 
           <Column
             caption="Actions"
             cellRender={({ data }) => (
-              <>
-                <Button
-                  variant="success"
-                  size="sm"
-                  className="me-2"
-                  onClick={() => {
-                    setSelectedRequest(data);
-                    setModalType("Accept");
-                  }}
-                  disabled={new Date(data.start_date) < new Date(currentDate)}
-                >
-                  Accept
-                </Button>
+              <div className="flex gap-3 justify-center">
+                <div className="relative group">
+                  <FaCheckCircle
+                    size={22}
+                    className={`cursor-pointer text-green-600 hover:text-green-700 ${new Date(data.start_date) < new Date(currentDate)
+                        ? "opacity-40 pointer-events-none"
+                        : ""
+                      }`}
+                    onClick={() => {
+                      setSelectedRequest(data);
+                      setModalType("Accept");
+                    }}
+                  />
+                  <span className="absolute bottom-full mb-1 hidden group-hover:block bg-gray-800 text-white text-xs px-2 py-1 rounded">
+                    Accept
+                  </span>
+                </div>
 
-                <Button
-                  variant="danger"
-                  size="sm"
-                  className="me-2"
-                  onClick={() => {
-                    setSelectedRequest(data);
-                    setModalType("Reject");
-                  }}
-                  disabled={new Date(data.start_date) < new Date(currentDate)}
-                >
-                  Reject
-                </Button>
+                <div className="relative group">
+                  <FaTimesCircle
+                    size={22}
+                    className={`cursor-pointer text-red-600 hover:text-red-700 ${new Date(data.start_date) < new Date(currentDate)
+                        ? "opacity-40 pointer-events-none"
+                        : ""
+                      }`}
+                    onClick={() => {
+                      setSelectedRequest(data);
+                      setModalType("Reject");
+                    }}
+                  />
+                  <span className="absolute bottom-full mb-1 hidden group-hover:block bg-gray-800 text-white text-xs px-2 py-1 rounded">
+                    Reject
+                  </span>
+                </div>
 
-                <Button
-                  variant="danger"
-                  size="sm"
-                  onClick={() => {
-                    setDeleteRequest(data);
-                    setShowDeleteModal(true);
-                  }}
-                  disabled={new Date(data.start_date) < new Date(currentDate)}
-                >
-                  Delete
-                </Button>
-              </>
+                <div className="relative group">
+                  <FaTrash
+                    size={20}
+                    className={`cursor-pointer text-gray-700 hover:text-gray-900 ${new Date(data.start_date) < new Date(currentDate)
+                        ? "opacity-40 pointer-events-none"
+                        : ""
+                      }`}
+                    onClick={() => {
+                      setDeleteRequest(data);
+                      setShowDeleteModal(true);
+                    }}
+                  />
+                  <span className="absolute bottom-full mb-1 hidden group-hover:block bg-gray-800 text-white text-xs px-2 py-1 rounded">
+                    Delete
+                  </span>
+                </div>
+              </div>
             )}
           />
         </DataGrid>
+
+        {loading && (
+          <div className="absolute inset-0 flex items-center justify-center bg-white/70 z-10">
+            <LoaderSpiner />
+          </div>
+        )}
       </div>
 
-      <Modal
-        show={!!selectedRequest}
-        onHide={() => setSelectedRequest(null)}
-        centered
-      >
-        <Modal.Header closeButton>
-          <Modal.Title>{modalType} Note</Modal.Title>
-        </Modal.Header>
-        <Modal.Body>
-          <Form>
-            <Form.Group controlId="hrNote">
-              <Form.Label>Note</Form.Label>
-              <Form.Control
-                as="textarea"
+      {selectedRequest && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50">
+          <div className="bg-white w-full max-w-md rounded-lg shadow-lg">
+            <div className="flex justify-between items-center border-b px-4 py-2">
+              <h2 className="text-lg font-semibold">{modalType} Note</h2>
+              <button
+                className="text-gray-500 hover:text-gray-700"
+                onClick={() => setSelectedRequest(null)}
+              >
+                ✕
+              </button>
+            </div>
+            <div className="p-4">
+              <label className="block text-sm font-medium mb-2">Note</label>
+              <textarea
                 rows={3}
+                className="w-full border border-gray-300 rounded-lg px-3 py-2 focus:ring-2 focus:ring-blue-500"
                 value={note}
                 onChange={(e) => setNote(e.target.value)}
               />
-            </Form.Group>
-          </Form>
-        </Modal.Body>
-        <Modal.Footer>
-          <Button variant="secondary" onClick={() => setSelectedRequest(null)}>
-            Cancel
-          </Button>
-          <Button
-            variant="primary"
-            onClick={() => handleAction(modalType)}
-            disabled={loading}
-          >
-            Save
-            {loading && (
-              <Spinner animation="border" size="sm" className="ms-2" />
-            )}
-          </Button>
-        </Modal.Footer>
-      </Modal>
-      <Modal
-        show={showDeleteModal}
-        onHide={() => setShowDeleteModal(false)}
-        centered
-      >
-        <Modal.Header closeButton>
-          <Modal.Title>Confirm Delete</Modal.Title>
-        </Modal.Header>
-        <Modal.Body>
-          Are you sure you want to delete this leave request?
-        </Modal.Body>
-        <Modal.Footer>
-          <Button variant="secondary" onClick={() => setShowDeleteModal(false)}>
-            Cancel
-          </Button>
-          <Button variant="danger" onClick={handleDeleteRequest}>
-            Yes, Delete
-          </Button>
-        </Modal.Footer>
-      </Modal>
-    </Container>
+            </div>
+            <div className="flex justify-end gap-2 border-t px-4 py-2">
+              <button
+                className="px-4 py-2 rounded-lg border border-gray-300 hover:bg-gray-100"
+                onClick={() => setSelectedRequest(null)}
+              >
+                Cancel
+              </button>
+              <button
+                className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 disabled:opacity-50"
+                onClick={() => handleAction(modalType)}
+                disabled={loading}
+              >
+                Save
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {showDeleteModal && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50">
+          <div className="bg-white w-full max-w-md rounded-lg shadow-lg">
+            <div className="flex justify-between items-center border-b px-4 py-2">
+              <h2 className="text-lg font-semibold">Confirm Delete</h2>
+              <button
+                className="text-gray-500 hover:text-gray-700"
+                onClick={() => setShowDeleteModal(false)}
+              >
+                ✕
+              </button>
+            </div>
+            <div className="p-4">
+              Are you sure you want to delete this leave request?
+            </div>
+            <div className="flex justify-end gap-2 border-t px-4 py-2">
+              <button
+                className="px-4 py-2 rounded-lg border border-gray-300 hover:bg-gray-100"
+                onClick={() => setShowDeleteModal(false)}
+              >
+                Cancel
+              </button>
+              <button
+                className="px-4 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700"
+                onClick={handleDeleteRequest}
+              >
+                Yes, Delete
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+    </div>
   );
 };
 

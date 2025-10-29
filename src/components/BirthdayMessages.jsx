@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import axios from 'axios';
 import {Card, Alert} from 'react-bootstrap'
+import api from './api';
 
 function birthdayMessages() {
   const [birthdayMessages, setBirthdayMessages] = useState("");
@@ -9,7 +10,7 @@ function birthdayMessages() {
   const [error, setError] = useState(null);
 
   useEffect(() => {
-    axios.get(`${import.meta.env.VITE_API_CUSTOM_USERS}`)
+    api.get(`${import.meta.env.VITE_API_CUSTOM_USERS}`)
       .then((response) => {
         const users = response.data;
         setTotalUsers(users.length);

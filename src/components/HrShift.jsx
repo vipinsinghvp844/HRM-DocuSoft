@@ -1,11 +1,16 @@
 import React, { useEffect, useState } from 'react';
-import axios from 'axios';
-import { Col, Container, Row, Table, Button, Modal, Form } from 'react-bootstrap';
-import './HrShift.css';
 import { useDispatch, useSelector } from 'react-redux';
 import { toast } from 'react-toastify';
 import { GetOfficeShiftsAction } from "../../redux/actions/EmployeeDetailsAction";
-import LoaderSpiner from "./LoaderSpiner"
+import DataGrid, {
+  Column,
+  Paging,
+  FilterRow,
+  HeaderFilter,
+  SearchPanel,
+} from "devextreme-react/data-grid";
+import { FaEdit, FaTrash } from 'react-icons/fa';
+import { ArrowLeftCircle } from 'lucide-react';
 
 function HrShift() {
   const [shifts, setShifts] = useState([]);
@@ -16,9 +21,9 @@ function HrShift() {
   const [isUpdating, setIsUpdating] = useState(false);
   const [currentShiftId, setCurrentShiftId] = useState(null);
   const [isLoading, setIsLoading] = useState(false);
-  const { TotalOfficeShifts } = useSelector(
-    ({ EmployeeDetailReducers }) => EmployeeDetailReducers
-  );
+  // const { TotalOfficeShifts } = useSelector(
+  //   ({ EmployeeDetailReducers }) => EmployeeDetailReducers
+  // );
   const dispatch = useDispatch();
 
   function convertTo12Hour(time24) {
@@ -51,22 +56,20 @@ function HrShift() {
 
   const fetchShifts = async () => {
     setIsLoading(true);
-      try {
-        // const response = TotalOfficeShifts;
-        const response = await dispatch(GetOfficeShiftsAction());
-        // Convert shift times to 12-hour format before setting state
-        const formattedShifts = response.map((shift) => ({
-          ...shift,
-          start_time: convertTo12Hour(shift.start_time),
-          end_time: convertTo12Hour(shift.end_time),
-        }));
-        setShifts(formattedShifts);
-      } catch (error) {
-        console.error("Error fetching shifts:", error);
-      } finally {
-        setIsLoading(false);
-      }
-    };
+    try {
+      const response = await dispatch(GetOfficeShiftsAction());
+      const formattedShifts = response.map((shift) => ({
+        ...shift,
+        start_time: convertTo12Hour(shift.start_time),
+        end_time: convertTo12Hour(shift.end_time),
+      }));
+      setShifts(formattedShifts);
+    } catch (error) {
+      console.error("Error fetching shifts:", error);
+    } finally {
+      setIsLoading(false);
+    }
+  };
 
 
   useEffect(() => {
@@ -84,7 +87,7 @@ function HrShift() {
 
   const deleteShift = async (shiftId) => {
     try {
-      await axios.delete(`${import.meta.env.VITE_API_SHIFTS}/${shiftId}`);
+      await api.delete(`${import.meta.env.VITE_API_SHIFTS}/${shiftId}`);
       setShifts(shifts.filter((shift) => shift.id !== shiftId));
       toast.success("Shift deleted successfully");
     } catch (error) {
@@ -111,12 +114,12 @@ function HrShift() {
       };
 
       if (isUpdating) {
-        await axios.put(
+        await api.put(
           `${import.meta.env.VITE_API_SHIFTS}/${currentShiftId}`,
           newShift
         );
       } else {
-        await axios.post(`${import.meta.env.VITE_API_SHIFTS}`, newShift);
+        await api.post(`${import.meta.env.VITE_API_SHIFTS}`, newShift);
       }
 
       fetchShifts();
@@ -134,140 +137,153 @@ function HrShift() {
   };
 
   return (
-    <Container className="hrshift-container">
-      <Row className="mb-4 d-flex">
-        <Col md={1}>
-          <i
-            className="bi bi-arrow-left-circle"
-            onClick={() => window.history.back()}
-            style={{
-              cursor: "pointer",
-              fontSize: "32px",
-              color: "#343a40",
-            }}
-          ></i>
-        </Col>
-        <Col md={9}>
-          <h3 className="mt-2">Add Shifts</h3>
-        </Col>
-      </Row>
-      <div className="hrshift-header">
-        <h2>Office Shifts</h2>
-        <Button className="add-shift-button" onClick={() => setShowModal(true)}>
-          Add Shift
-        </Button>
+    <div className="pt-4 px-2">
+      <div className="flex md:flex-row items-center justify-between gap-2 mb-6">
+        <button
+          onClick={() => window.history.back()}
+          className="flex items-center text-gray-700 hover:text-gray-900 transition-colors"
+        >
+          <ArrowLeftCircle size={32} className="mr-2" />
+          <span className="hidden md:inline text-lg font-semibold">Back</span>
+        </button>
+        <h3 className="text-xl md:text-2xl font-semibold text-center flex-1">Add Shifts</h3>
+        <button
+        onClick={() => setShowModal(true)}
+        className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition"
+      >
+        Add Shift
+      </button>
       </div>
-      <Row>
-        <Col>
-          <Table striped bordered hover className="hrshift-table">
-            <thead>
-              <tr>
-                <th>No.</th>
-                <th>Shift Name</th>
-                <th>In Time</th>
-                <th>Out Time</th>
-                <th>Total Time</th>
-                <th>Created At</th>
-                <th>Updated At</th>
-                <th>Shift Status</th>
-                <th>Actions</th>
-              </tr>
-            </thead>
-            <tbody>
-              {isLoading ? (
-                <tr>
-                  <td colSpan={9} className="text-center">
-                    <div
-                      className="d-flex justify-content-center align-items-center"
-                      style={{ height: "200px" }}
-                    >
-                      <LoaderSpiner />
-                    </div>
-                  </td>
-                </tr>
-              ) : shifts.length > 0 ? (
-                shifts.map((shift, index) => (
-                  <tr key={shift.id}>
-                    <td>{index + 1}</td>
-                    <td>{shift.shift_name}</td>
-                    <td>{shift.start_time}</td>
-                    <td>{shift.end_time}</td>
-                    <td>{shift.total_time}</td>
-                    <td>{shift.created_at}</td>
-                    <td>{shift.updated_at}</td>
-                    <td>{shift.shift_status}</td>
-                    <td>
-                      <Button variant="info" onClick={() => onUpdate(shift)}>
-                        Update
-                      </Button>{" "}
-                      <Button
-                        variant="danger"
-                        onClick={() => onDelete(shift.id)}
-                      >
-                        Delete
-                      </Button>
-                    </td>
-                  </tr>
-                ))
-              ) : (
-                <tr>
-                  <td colSpan={9}>No shifts found</td>
-                </tr>
-              )}
-            </tbody>
-          </Table>
-        </Col>
-      </Row>
 
-      <Modal show={showModal} onHide={() => setShowModal(false)}>
-        <Modal.Header closeButton className="modal-header">
-          <Modal.Title>
-            {isUpdating ? "Update Shift" : "Add New Shift"}
-          </Modal.Title>
-        </Modal.Header>
-        <Modal.Body>
-          <Form>
-            <Form.Group controlId="formShiftName">
-              <Form.Label>Shift Name</Form.Label>
-              <Form.Control
-                type="text"
-                placeholder="Enter shift name"
-                value={newShiftName}
-                onChange={(e) => setNewShiftName(e.target.value)}
-              />
-            </Form.Group>
+      
 
-            <Form.Group controlId="formStartTime">
-              <Form.Label>Office In Time (e.g., 09:00 AM)</Form.Label>
-              <Form.Control
-                type="text"
-                placeholder="Enter office in time"
-                value={newStartTime}
-                onChange={(e) => setNewStartTime(e.target.value)}
-              />
-            </Form.Group>
+      {/* DataGrid Table */}
+      <div className="overflow-x-auto bg-white rounded-xl shadow-md p-3">
+        <DataGrid
+          dataSource={shifts}
+          keyExpr="id"
+          showBorders={true}
+          rowAlternationEnabled={true}
+          columnAutoWidth={true}
+          wordWrapEnabled={true}
+          columnHidingEnabled={true}
+        >
+          <SearchPanel visible={true} placeholder="Search..." />
+          <FilterRow visible={true} />
+          <HeaderFilter visible={true} />
+          <Paging defaultPageSize={20} />
 
-            <Form.Group controlId="formEndTime">
-              <Form.Label>Office Out Time (e.g., 05:00 PM)</Form.Label>
-              <Form.Control
-                type="text"
-                placeholder="Enter office out time"
-                value={newEndTime}
-                onChange={(e) => setNewEndTime(e.target.value)}
-              />
-            </Form.Group>
-          </Form>
-        </Modal.Body>
-        <Modal.Footer>
-          <Button variant="secondary" onClick={() => setShowModal(false)}>
-            Close
-          </Button>
-          <Button variant="primary" onClick={handleAddShift}>
-            {isUpdating ? "Update Shift" : "Add Shift"}
-          </Button>
-        </Modal.Footer>
-      </Modal>
-    </Container>
+          <Column
+            caption="#"
+            width={50}
+            cellRender={({ rowIndex }) => rowIndex + 1}
+          />
+          <Column dataField="shift_name" caption="Shift Name" />
+          <Column dataField="start_time" caption="In Time" />
+          <Column dataField="end_time" caption="Out Time" />
+          <Column dataField="total_time" caption="Total Time" />
+          <Column dataField="created_at" caption="Created At" />
+          <Column dataField="updated_at" caption="Updated At" />
+          <Column dataField="shift_status" caption="Shift Status" />
+
+          {/* Actions */}
+          <Column
+            caption="Actions"
+            cellRender={({ data }) => (
+              <div className="flex justify-center gap-3">
+                <button
+                  onClick={() => onUpdate(data)}
+                  className="flex items-center gap-1 text-yellow-500 hover:text-yellow-600"
+                  title="Edit"
+                >
+                  <FaEdit size={18} />
+                  <span className="hidden md:inline">Edit</span>
+                </button>
+                <button
+                  onClick={() => onDelete(data.id)}
+                  className="flex items-center gap-1 text-red-600 hover:text-red-700"
+                  title="Delete"
+                >
+                  <FaTrash size={18} />
+                  <span className="hidden md:inline">Delete</span>
+                </button>
+              </div>
+            )}
+          />
+        </DataGrid>
+      </div>
+
+      {/* Modal */}
+      {showModal && (
+        <div className="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50 z-50">
+          <div className="bg-white rounded-lg w-full max-w-lg p-6 space-y-4">
+            <div className="flex justify-between items-center">
+              <h3 className="text-lg font-semibold">
+                {isUpdating ? "Update Shift" : "Add New Shift"}
+              </h3>
+              <button
+                onClick={() => setShowModal(false)}
+                className="text-gray-600 hover:text-gray-800"
+              >
+                ✕
+              </button>
+            </div>
+
+            <form className="space-y-4">
+              <div>
+                <label className="block text-sm font-medium">Shift Name</label>
+                <input
+                  type="text"
+                  placeholder="Enter shift name"
+                  value={newShiftName}
+                  onChange={(e) => setNewShiftName(e.target.value)}
+                  className="w-full border border-gray-300 rounded-lg px-3 py-2 focus:ring-2 focus:ring-blue-500"
+                />
+              </div>
+
+              <div>
+                <label className="block text-sm font-medium">Office In Time</label>
+                <input
+                  type="text"
+                  placeholder="09:00 AM"
+                  value={newStartTime}
+                  onChange={(e) => setNewStartTime(e.target.value)}
+                  className="w-full border border-gray-300 rounded-lg px-3 py-2 focus:ring-2 focus:ring-blue-500"
+                />
+              </div>
+
+              <div>
+                <label className="block text-sm font-medium">Office Out Time</label>
+                <input
+                  type="text"
+                  placeholder="05:00 PM"
+                  value={newEndTime}
+                  onChange={(e) => setNewEndTime(e.target.value)}
+                  className="w-full border border-gray-300 rounded-lg px-3 py-2 focus:ring-2 focus:ring-blue-500"
+                />
+              </div>
+
+              <div className="flex justify-end gap-2">
+                <button
+                  type="button"
+                  onClick={() => setShowModal(false)}
+                  className="px-4 py-2 bg-gray-300 rounded hover:bg-gray-400"
+                >
+                  Close
+                </button>
+                <button
+                  type="button"
+                  onClick={handleAddShift}
+                  className="px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700"
+                >
+                  {isUpdating ? "Update Shift" : "Add Shift"}
+                </button>
+              </div>
+            </form>
+          </div>
+        </div>
+      )}
+    </div>
   );
 }
 

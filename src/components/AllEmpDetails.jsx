@@ -1,13 +1,9 @@
 import React, { useState, useEffect } from "react";
-import { Table, Button, Container, Alert, Row, Col } from "react-bootstrap";
 import { Link } from "react-router-dom";
-import axios from "axios";
+import { useNavigate } from "react-router-dom";
 import EditEmployee from "./EditEmployee";
 import ToggleButton from "./ToggleButton";
-import LoaderSpiner from "./LoaderSpiner";
-import "./AllEmpDetails.css";
 import { useDispatch, useSelector } from "react-redux";
-import { FetchAllUserProfileAction } from "../../redux/actions/dev-aditya-action";
 import { toast } from "react-toastify";
 import { GetTotalUserAction } from "../../redux/actions/EmployeeDetailsAction";
 import DataGrid, {
@@ -17,6 +13,8 @@ import DataGrid, {
   HeaderFilter,
   SearchPanel,
 } from "devextreme-react/data-grid";
+import api from "./api";
+import { ArrowLeftCircle } from "lucide-react";
 
 const AllEmpDetails = () => {
   const [employees, setEmployees] = useState([]);
@@ -24,8 +22,10 @@ const AllEmpDetails = () => {
   const [showEditModal, setShowEditModal] = useState(false);
   const [selectedEmployeeId, setSelectedEmployeeId] = useState(null);
   const [loading, setLoading] = useState(true);
+  const navigate = useNavigate();
 
-  const placeholderImage = import.meta.env.VITE_PLACEHOLDER_IMAGE;
+
+  const placeholderImage = `${import.meta.env.VITE_API_BASE_URL}/2024/07/placeholder-image-hrm.png`;
   const dispatch = useDispatch();
 
   const { AllProfilesImage } = useSelector(({ AllReducers }) => AllReducers);
@@ -35,26 +35,6 @@ const AllEmpDetails = () => {
   const employeeUsers = TotalUsers.filter(
     (user) => user.role === "employee" || user.role === "hr"
   );
-
-  // useEffect(() => {
-  //   const fetchEmployees = async () => {
-  //     setLoading(true);
-  //     try {
-  //       const response = await dispatch(GetTotalUserAction());
-  //       const employeeUsers = TotalUsers.filter(
-  //         (user) => user.role === "employee" || user.role === "hr"
-  //       );
-  //       setEmployees(employeeUsers);
-  //     } catch (error) {
-  //       console.error("Error fetching employees:", error);
-  //       setErrorMessage("Failed to fetch employees.");
-  //     } finally {
-  //       setLoading(false);
-  //     }
-  //   };
-
-  //   fetchEmployees();
-  // }, [dispatch]);
 
   const getProfileImage = (userId) => {
     if (!AllProfilesImage) return placeholderImage;
@@ -84,7 +64,7 @@ const AllEmpDetails = () => {
 
     if (confirmToggle) {
       try {
-        await axios.put(
+        await api.put(
           `${import.meta.env.VITE_API_CUSTOM_USERS}/${employeeId}`,
           { user_state: newState },
           {
@@ -108,38 +88,48 @@ const AllEmpDetails = () => {
     }
   };
 
+  // full detail with card profile
+
+  const handleFullDetail = async (userId) => {
+    try {
+      navigate(`/show-full-profile/${userId}`, {
+        state: {
+          fullDetails: employees,
+        },
+      });
+    } catch (error) {
+      console.error("Error fetching attendance details:", error);
+    }
+  };
+
   const userRole = localStorage.getItem("role");
   // console.log(userRole,"rol");
 
   return (
-    <Container className="all-emp-details">
-      <Row className="mb-4 d-flex">
-        <Col md={1}>
-          <i
-            className="bi bi-arrow-left-circle"
-            onClick={() => window.history.back()}
-            style={{
-              cursor: "pointer",
-              fontSize: "32px",
-              color: "#343a40",
-            }}
-          ></i>
-        </Col>
-        <Col md={9}>
-          <h3 className="mt-2">All Employee Details</h3>
-        </Col>
-        <Col className="text-right">
-          {(userRole === "admin" || userRole === "hr") && (
-            <Link to={"/add-employee"}>
-              <Button variant="warning" className="add-employee-button">
-                Add Employee
-              </Button>
-            </Link>
-          )}
-        </Col>
-      </Row>
+   <div className="pt-4 px-2">
+      <div className="flex md:flex-row items-center justify-between gap-2 mb-6">
+        <button
+          onClick={() => window.history.back()}
+          className="flex items-center text-gray-700 hover:text-gray-900 transition-colors"
+        >
+          <ArrowLeftCircle size={32} className="mr-2" />
+          <span className="hidden md:inline text-lg font-semibold">Back</span>
+        </button>
 
-      <div style={{ overflowX: "auto" }}>
+        <h3 className="text-xl md:text-2xl font-semibold text-center flex-1">
+          All Employee Details
+        </h3>
+
+        {(userRole === "admin" || userRole === "hr") && (
+          <Link to="/add-employee">
+            <button className="bg-yellow-500 text-white px-4 py-2 rounded-lg shadow hover:bg-yellow-700 transition">
+              Add Employee
+            </button>
+          </Link>
+        )}
+      </div>
+
+      <div className="overflow-x-auto bg-white rounded-xl shadow-md p-3">
         <DataGrid
           dataSource={employeeUsers}
           keyExpr="id"
@@ -155,63 +145,62 @@ const AllEmpDetails = () => {
           <FilterRow visible={true} />
           <HeaderFilter visible={true} />
           <Paging defaultPageSize={10} />
+
           <Column
             caption="#"
             width={50}
             cellRender={({ rowIndex }) => rowIndex + 1}
           />
+
           <Column
             caption="Profile"
             cellRender={({ data }) => (
-              <>
-                <img
-                  src={getProfileImage(data.id)}
-                  alt="Profile"
-                  className="popup-profile-image"
-                  style={{ objectFit: "cover" }}
-                />
-              </>
+              <img
+                src={getProfileImage(data.id)}
+                alt="Profile"
+                className="w-10 h-10 rounded-full object-cover cursor-pointer border"
+                onClick={() => handleFullDetail(data.id)}
+              />
             )}
           />
+
           <Column dataField="first_name" caption="First Name" />
           <Column dataField="dob" caption="DOB" />
           <Column dataField="address" caption="Address" />
           <Column dataField="email" caption="E-Mail" />
           <Column dataField="mobile" caption="Mobile" />
           <Column dataField="role" caption="Role" />
+
           <Column
             caption="UState"
             cellRender={({ data }) => (
-              <>
-                <ToggleButton
-                  checked={data.user_state === "active"}
-                  onToggle={() => toggleUserStatus(data.id, data.user_state)}
-                />
-              </>
+              <ToggleButton
+                checked={data.user_state === "active"}
+                onToggle={() => toggleUserStatus(data.id, data.user_state)}
+              />
             )}
           />
+
           <Column
             caption="Actions"
             cellRender={({ data }) => (
-              <>
-                <Button
-                  variant="warning"
-                  onClick={() => handleEditClick(data.id)}
-                  className="edit-button"
-                >
-                  Edit
-                </Button>
-              </>
+              <button
+                onClick={() => handleEditClick(data.id)}
+                className="px-3 py-1 bg-yellow-500 text-white rounded hover:bg-yellow-600"
+              >
+                Edit
+              </button>
             )}
           />
         </DataGrid>
       </div>
+
       <EditEmployee
         employeeId={selectedEmployeeId}
         show={showEditModal}
         handleClose={handleCloseEditModal}
       />
-    </Container>
+    </div>
   );
 };
 

@@ -11,6 +11,17 @@ import {
 } from "react-bootstrap";
 import jsPDF from "jspdf";
 import { toast } from "react-toastify";
+import api from "./api";
+import DataGrid, {
+  Column,
+  Paging,
+  FilterRow,
+  HeaderFilter,
+  SearchPanel,
+  Export,
+} from "devextreme-react/data-grid";
+import { ArrowLeftCircle } from "lucide-react";
+import { Link } from "react-router-dom";
 
 function ManageDocument() {
   const [users, setUsers] = useState([]);
@@ -25,16 +36,16 @@ function ManageDocument() {
 
   const fetchUsers = async () => {
     try {
-      const response = await axios.get(import.meta.env.VITE_API_CUSTOM_USERS, {
+      const response = await api.get(import.meta.env.VITE_API_CUSTOM_USERS, {
         headers: {
           Authorization: `Bearer ${localStorage.getItem("authtoken")}`,
         },
       });
-      const filteredUsers = response.data.filter(
+      const filteredUsers = response?.data?.filter(
         (user) => user.role === "employee" || user.role === "hr"
       );
       setUsers(filteredUsers);
-      toast.success("Users loaded successfully!");
+      // toast.success("Users loaded successfully!");
     } catch (error) {
       toast.error("Failed to fetch users!");
     }
@@ -49,7 +60,7 @@ function ManageDocument() {
   };
 
   const handleDownload = (userId, documentType) => {
-    axios
+    api
       .get(`${import.meta.env.VITE_API_LETTER}/${userId}/${documentType}`, {
         headers: {
           Authorization: `Bearer ${localStorage.getItem("authtoken")}`,
@@ -68,7 +79,7 @@ function ManageDocument() {
   };
 
   const handleDelete = (userId, documentType) => {
-    axios
+    api
       .delete(`${import.meta.env.VITE_API_LETTER}/${userId}/${documentType}`, {
         headers: {
           Authorization: `Bearer ${localStorage.getItem("authtoken")}`,
@@ -85,7 +96,7 @@ function ManageDocument() {
 
   const fetchDocumentData = async (userId, documentType, actionType) => {
     try {
-      const response = await axios.get(
+      const response = await api.get(
         `${import.meta.env.VITE_API_LETTER}/${userId}/${documentType}`,
         {
           headers: {
@@ -120,7 +131,7 @@ function ManageDocument() {
         selectedDocument.userId
       }/${selectedDocument.documentType}`;
 
-      await axios.put(
+      await api.put(
         url,
         { content: documentContent },
         {
@@ -146,163 +157,208 @@ function ManageDocument() {
   };
 
   return (
-    <Container>
-      <Row className="mb-4 d-flex">
-        <Col md={1}>
-          <i
-            className="bi bi-arrow-left-circle"
-            onClick={() => window.history.back()}
-            style={{
-              cursor: "pointer",
-              fontSize: "32px",
-              color: "#343a40",
-            }}
-          ></i>
-        </Col>
-        <Col md={7}>
-          <h3 className="mt-2">Manage Document</h3>
-        </Col>
-        <Col className="text-center mt-3">
-          <Button href="/offer-letter">Add Offer</Button>
-          <Button href="/experience-letter">Add Experience</Button>
-          <Button href="/noc-letter">Add NOC</Button>
-        </Col>
-      </Row>
+   <div className="pt-4 px-2">
+  {/* Header */}
+  <div className="flex md:flex-row items-center justify-between gap-2 mb-6">
+    <button
+          onClick={() => window.history.back()}
+          className="flex items-center text-gray-700 hover:text-gray-900 transition-colors"
+        >
+          <ArrowLeftCircle size={32} className="mr-2" />
+          <span className="hidden md:inline text-lg font-semibold">Back</span>
+        </button>
 
-      <Row>
-        <Col>
-          <Table striped bordered hover>
-            <thead>
-              <tr>
-                <th>No.</th>
-                <th>ID</th>
-                <th>Name</th>
-                <th>Role</th>
-                <th>Offer Letter</th>
-                <th>Experience Letter</th>
-                <th>NOC</th>
-              </tr>
-            </thead>
-            <tbody>
-              {users.map((user, index) => (
-                <tr key={user.id}>
-                  <td>{index + 1}</td>
-                  <td>{user.id}</td>
-                  <td>{user.username}</td>
-                  <td>{user.role}</td>
-                  <td>
-                    <i
-                      className="bi bi-pencil-square"
-                      onClick={() => handleEdit(user, "offer_letter")}
-                      style={{ cursor: "pointer" }}
-                    ></i>
-                    <i
-                      className="bi bi-eye"
-                      onClick={() => handlePreview(user, "offer_letter")}
-                      style={{ cursor: "pointer" }}
-                    ></i>
-                    <i
-                      className="bi bi-trash"
-                      onClick={() => handleDelete(user.id, "offer_letter")}
-                      style={{ cursor: "pointer" }}
-                    ></i>
-                    <button
-                      onClick={() => handleDownload(user.id, "offer_letter")}
-                    >
-                      Download
-                    </button>
-                  </td>
-                  <td>
-                    <i
-                      className="bi bi-pencil-square"
-                      onClick={() => handleEdit(user, "experience_letter")}
-                      style={{ cursor: "pointer" }}
-                    ></i>
-                    <i
-                      className="bi bi-eye"
-                      onClick={() => handlePreview(user, "experience_letter")}
-                      style={{ cursor: "pointer" }}
-                    ></i>
-                    <i
-                      className="bi bi-trash"
-                      onClick={() => handleDelete(user.id, "experience_letter")}
-                      style={{ cursor: "pointer" }}
-                    ></i>
-                    <button
-                      onClick={() =>
-                        handleDownload(user.id, "experience_letter")
-                      }
-                    >
-                      Download
-                    </button>
-                  </td>
-                  <td>
-                    <i
-                      className="bi bi-pencil-square"
-                      onClick={() => handleEdit(user, "noc")}
-                      style={{ cursor: "pointer" }}
-                    ></i>
-                    <i
-                      className="bi bi-eye"
-                      onClick={() => handlePreview(user, "noc")}
-                      style={{ cursor: "pointer" }}
-                    ></i>
-                    <i
-                      className="bi bi-trash"
-                      onClick={() => handleDelete(user.id, "noc")}
-                      style={{ cursor: "pointer" }}
-                    ></i>
-                    <button onClick={() => handleDownload(user.id, "noc")}>
-                      Download
-                    </button>
-                  </td>
-                </tr>
-              ))}
-            </tbody>
-          </Table>
-        </Col>
-      </Row>
+    <h3 className="text-xl md:text-2xl font-semibold text-center flex-1">Manage Document</h3>
 
-      {/* {status && <div className="mt-3">{status}</div>} */}
+      <Link to="/offer-letter">
+        <button className="bg-yellow-500 text-white px-4 py-2 rounded-lg shadow hover:bg-yellow-700 transition">
+          Add Offer
+        </button>
+      </Link>
+      <Link to="/experience-letter">
+        <button className="bg-blue-500 text-white px-4 py-2 rounded-lg shadow hover:bg-blue-700 transition">
+          Add Experience
+        </button>
+      </Link>
+      <Link to="/noc-letter">
+        <button className="bg-red-500 text-white px-4 py-2 rounded-lg shadow hover:bg-red-700 transition">
+          Add NOC
+        </button>
+      </Link>
+  </div>
 
-      {/* Modal */}
-      <Modal show={showModal} onHide={closeModal} size="lg">
-        <Modal.Header closeButton>
-          <Modal.Title>
-            {modalType === "edit" ? "Edit Document" : "Preview Document"}
-          </Modal.Title>
-        </Modal.Header>
-        <Modal.Body>
-          {modalType === "edit" ? (
-            <Form>
-              <Form.Group controlId="formDocumentContent">
-                <Form.Label>Document Content</Form.Label>
-                <Form.Control
-                  as="textarea"
-                  rows={20}
-                  value={documentContent}
-                  onChange={(e) => setDocumentContent(e.target.value)}
-                />
-              </Form.Group>
-            </Form>
-          ) : (
-            <div>
-              <pre>{documentContent}</pre>
-            </div>
-          )}
-        </Modal.Body>
-        <Modal.Footer>
-          <Button variant="secondary" onClick={closeModal}>
-            Close
-          </Button>
-          {modalType === "edit" && (
-            <Button variant="primary" onClick={handleSaveChanges}>
-              Save Changes
-            </Button>
-          )}
-        </Modal.Footer>
-      </Modal>
-    </Container>
+  {/* DataGrid Table */}
+  <div className="overflow-x-auto bg-white rounded-xl shadow-md p-3">
+    <DataGrid
+      dataSource={users}
+      keyExpr="id"
+      showBorders={true}
+      rowAlternationEnabled={true}
+      className="shadow-sm rounded"
+      height="auto"
+      columnAutoWidth={true}
+      wordWrapEnabled={true}
+      columnHidingEnabled={true}
+    >
+      <SearchPanel visible={true} placeholder="Search..." />
+      <FilterRow visible={true} />
+      <HeaderFilter visible={true} />
+      <Paging defaultPageSize={20} />
+
+      <Column
+        caption="#"
+        width={50}
+        cellRender={({ rowIndex }) => rowIndex + 1}
+      />
+      <Column dataField="id" caption="ID" />
+      <Column dataField="username" caption="Name" />
+      <Column dataField="role" caption="Role" />
+
+      <Column
+        caption="Offer Letter"
+        cellRender={({ data }) => (
+          <div className="flex items-center gap-2">
+            <button
+              className="text-yellow-500 hover:text-yellow-600"
+              onClick={() => handleEdit(data, "offer_letter")}
+              title="Edit"
+            >
+              <i className="bi bi-pencil-square"></i>
+            </button>
+            <button
+              className="text-blue-500 hover:text-blue-600"
+              onClick={() => handlePreview(data, "offer_letter")}
+              title="Preview"
+            >
+              <i className="bi bi-eye"></i>
+            </button>
+            <button
+              className="text-red-600 hover:text-red-700"
+              onClick={() => handleDelete(data.id, "offer_letter")}
+              title="Delete"
+            >
+              <i className="bi bi-trash"></i>
+            </button>
+            <button
+              className="px-2 py-1 bg-gray-200 rounded hover:bg-gray-300"
+              onClick={() => handleDownload(data.id, "offer_letter")}
+            >
+              Download
+            </button>
+          </div>
+        )}
+      />
+
+      <Column
+        caption="Experience Letter"
+        cellRender={({ data }) => (
+          <div className="flex items-center gap-2">
+            <button
+              className="text-yellow-500 hover:text-yellow-600"
+              onClick={() => handleEdit(data, "experience_letter")}
+              title="Edit"
+            >
+              <i className="bi bi-pencil-square"></i>
+            </button>
+            <button
+              className="text-blue-500 hover:text-blue-600"
+              onClick={() => handlePreview(data, "experience_letter")}
+              title="Preview"
+            >
+              <i className="bi bi-eye"></i>
+            </button>
+            <button
+              className="text-red-600 hover:text-red-700"
+              onClick={() => handleDelete(data.id, "experience_letter")}
+              title="Delete"
+            >
+              <i className="bi bi-trash"></i>
+            </button>
+            <button
+              className="px-2 py-1 bg-gray-200 rounded hover:bg-gray-300"
+              onClick={() => handleDownload(data.id, "experience_letter")}
+            >
+              Download
+            </button>
+          </div>
+        )}
+      />
+
+      <Column
+        caption="NOC"
+        cellRender={({ data }) => (
+          <div className="flex items-center gap-2">
+            <button
+              className="text-yellow-500 hover:text-yellow-600"
+              onClick={() => handleEdit(data, "noc")}
+              title="Edit"
+            >
+              <i className="bi bi-pencil-square"></i>
+            </button>
+            <button
+              className="text-blue-500 hover:text-blue-600"
+              onClick={() => handlePreview(data, "noc")}
+              title="Preview"
+            >
+              <i className="bi bi-eye"></i>
+            </button>
+            <button
+              className="text-red-600 hover:text-red-700"
+              onClick={() => handleDelete(data.id, "noc")}
+              title="Delete"
+            >
+              <i className="bi bi-trash"></i>
+            </button>
+            <button
+              className="px-2 py-1 bg-gray-200 rounded hover:bg-gray-300"
+              onClick={() => handleDownload(data.id, "noc")}
+            >
+              Download
+            </button>
+          </div>
+        )}
+      />
+    </DataGrid>
+  </div>
+
+  {/* Modal */}
+  <Modal show={showModal} onHide={closeModal} size="lg">
+    <Modal.Header closeButton className="bg-gray-100">
+      <Modal.Title className="font-semibold">
+        {modalType === "edit" ? "Edit Document" : "Preview Document"}
+      </Modal.Title>
+    </Modal.Header>
+    <Modal.Body>
+      {modalType === "edit" ? (
+        <textarea
+          rows={20}
+          value={documentContent}
+          onChange={(e) => setDocumentContent(e.target.value)}
+          className="w-full border border-gray-300 rounded p-2"
+        />
+      ) : (
+        <pre className="whitespace-pre-wrap">{documentContent}</pre>
+      )}
+    </Modal.Body>
+    <Modal.Footer className="space-x-2">
+      <button
+        className="px-4 py-2 bg-gray-300 rounded hover:bg-gray-400"
+        onClick={closeModal}
+      >
+        Close
+      </button>
+      {modalType === "edit" && (
+        <button
+          className="px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700"
+          onClick={handleSaveChanges}
+        >
+          Save Changes
+        </button>
+      )}
+    </Modal.Footer>
+  </Modal>
+</div>
+
   );
 }
 

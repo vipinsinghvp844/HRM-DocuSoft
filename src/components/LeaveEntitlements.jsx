@@ -1,17 +1,24 @@
 import React, { useState, useEffect } from "react";
-import axios from "axios";
-import { Table, Spinner, Container, Row, Col } from "react-bootstrap";
-import LoaderSpiner from "./LoaderSpiner";
 import { toast } from "react-toastify";
+import api from "./api";
+import DataGrid, {
+  Column,
+  Paging,
+  FilterRow,
+  HeaderFilter,
+  SearchPanel,
+} from "devextreme-react/data-grid";
+import { ArrowLeftCircle } from "lucide-react";
 
 const LeaveEntitlements = () => {
   const [leavePolicies, setLeavePolicies] = useState([]);
   const [leaveRequests, setLeaveRequests] = useState([]);
   const [leaveBalances, setLeaveBalances] = useState([]);
   const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
 
-  const currentYear = new Date().getFullYear().toString(); // Assume current year is 2024
-  const userId = localStorage.getItem("user_id"); // Retrieve user ID from localStorage
+
+  const userId = localStorage.getItem("user_id"); 
 
   useEffect(() => {
     setLoading(true);
@@ -28,7 +35,7 @@ const LeaveEntitlements = () => {
 
   const fetchLeavePolicies = async () => {
     try {
-      const response = await axios.get(
+      const response = await api.get(
         `${import.meta.env.VITE_API_LEAVE_POLICIES}`,
         {
           headers: {
@@ -44,11 +51,12 @@ const LeaveEntitlements = () => {
 
   const fetchLeaveRequests = async () => {
     try {
-      const response = await axios.get(`${import.meta.env.VITE_API_LEAVE}`, {
+      const response = await api.get(`${import.meta.env.VITE_API_LEAVE}`, {
         headers: {
           Authorization: `Bearer ${localStorage.getItem("authtoken")}`,
         },
       });
+
       setLeaveRequests(response.data);
     } catch (error) {
       console.error("Error fetching leave requests:", error);
@@ -56,32 +64,52 @@ const LeaveEntitlements = () => {
   };
 
   const calculateLeaveBalances = () => {
+    setLoading(true);
+
     if (!userId) {
-      setLoading(false);
       toast.error("No user ID found.");
+      setError("Error calculating leave balances.");
       return;
     }
 
     const balances = leavePolicies.map((policy) => {
       const totalLeave = parseInt(policy.leave_days);
 
-      // Calculate taken leaves for this policy
-      const takenLeave = leaveRequests
-        .filter(
-          (request) =>
+      const paidLeaveCount = leaveRequests
+        .filter((request) => {
+          const year = new Date(request.start_date).getFullYear().toString();
+          return (
             request.user_id === userId &&
-            request.leave_type === policy.leave_type &&
+            parseInt(request.paid_leave_count) > 0 &&
             request.status === "Accept" &&
-            policy.leave_year === currentYear
-        )
-        .reduce((sum, req) => sum + parseInt(req.total_leave_days), 0);
+            year === policy.leave_year
+          );
+        })
+        .reduce((sum, req) => sum + parseInt(req.paid_leave_count), 0);
 
-      const balanceLeave = totalLeave - takenLeave;
+      const unpaidLeaveCount = leaveRequests
+        .filter((request) => {
+          const year = new Date(request.start_date).getFullYear().toString();
+          return (
+            request.user_id === userId &&
+            parseInt(request.unpaid_leave_count) > 0 &&
+            request.status === "Accept" &&
+            year === policy.leave_year
+          );
+        })
+        .reduce((sum, req) => sum + parseInt(req.unpaid_leave_count), 0);
+
+      const takenLeave = paidLeaveCount + unpaidLeaveCount;
+
+      const balanceLeave = totalLeave - paidLeaveCount;
 
       return {
-        leave_type: policy.leave_type,
+        id: `${userId}-${policy.leave_type}`,
+        user_id: userId,
         year: policy.leave_year,
         total_leave: totalLeave,
+        paid_leave_count: paidLeaveCount,
+        unpaid_leave_count: unpaidLeaveCount,
         taken_leave: takenLeave,
         balance_leave: balanceLeave,
       };
@@ -91,71 +119,53 @@ const LeaveEntitlements = () => {
     setLoading(false);
   };
 
-  return (
-    <Container>
-      <Row className="mb-4">
-        <Col className="d-flex text-center">
-          <i
-            className="bi bi-arrow-left-circle"
-            onClick={() => window.history.back()}
-            style={{
-              cursor: "pointer",
-              fontSize: "32px",
-              color: "#343a40",
-            }}
-          ></i>
-        </Col>
-        <Col md={9}>
-          <h3 className="mt-2">Leave Balance</h3>
-        </Col>
-      </Row>
 
-      <Row>
-        <Col>
-          <Table striped bordered hover responsive>
-            <thead>
-              <tr>
-                <th>Leave Type</th>
-                <th>Year</th>
-                <th>Total Leave</th>
-                <th>Leave Taken</th>
-                <th>Balance Leave</th>
-              </tr>
-            </thead>
-            <tbody>
-              {loading ? (
-                <tr>
-                  <td colSpan="9" className="text-center">
-                    <div
-                      className="d-flex justify-content-center align-items-center"
-                      style={{ height: "200px" }}
-                    >
-                      <LoaderSpiner />
-                    </div>
-                  </td>
-                </tr>
-              ) : leaveBalances.length > 0 ? (
-                leaveBalances.map((balance, index) => (
-                  <tr key={index}>
-                    <td>{balance.leave_type}</td>
-                    <td>{balance.year}</td>
-                    <td>{balance.total_leave}</td>
-                    <td>{balance.taken_leave}</td>
-                    <td>{balance.balance_leave}</td>
-                  </tr>
-                ))
-              ) : (
-                <tr>
-                  <td colSpan="5" className="text-center">
-                    No Leave Data Found
-                  </td>
-                </tr>
-              )}
-            </tbody>
-          </Table>
-        </Col>
-      </Row>
-    </Container>
+
+  return (
+    <div className="pt-4 px-2">
+      <div className="flex md:flex-row items-center justify-between gap-2 mb-6">
+        <button
+          onClick={() => window.history.back()}
+          className="flex items-center text-gray-700 hover:text-gray-900 transition-colors"
+        >
+          <ArrowLeftCircle size={32} className="mr-2" />
+          <span className="hidden md:inline text-lg font-semibold">Back</span>
+        </button>
+        <h3 className="text-xl md:text-2xl font-semibold text-center flex-1">Leave Balance</h3>
+      </div>
+
+      <div className="overflow-x-auto bg-white rounded-xl shadow-md p-3 relative">
+        <DataGrid
+          dataSource={leaveBalances}
+          keyExpr="id"
+          showBorders={true}
+          height="auto"
+          rowAlternationEnabled={true}
+          className="shadow-sm rounded table-grid-2 table-grid w-100"
+          columnAutoWidth={true}
+          wordWrapEnabled={true}
+        >
+          <SearchPanel visible={true} placeholder="Search..." />
+          <FilterRow visible={true} />
+          <HeaderFilter visible={true} />
+          <Paging defaultPageSize={20} />
+
+          <Column
+            caption="#"
+            width={50}
+            cellRender={({ rowIndex }) => rowIndex + 1}
+          />
+          <Column dataField="year" caption="Year" />
+          <Column dataField="total_leave" caption="Total Paid Leave" />
+          <Column dataField="paid_leave_count" caption="Paid Count" />
+          <Column dataField="unpaid_leave_count" caption="Unpaid Count" />
+          <Column dataField="taken_leave" caption="Taken Leave" />
+          <Column dataField="balance_leave" caption="Balance Leave" />
+        </DataGrid>
+      </div>
+    </div>
+
+
   );
 };
 

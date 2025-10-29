@@ -1,6 +1,5 @@
 import React, { useState, useEffect, useRef } from "react";
 import { Button, Table, Container, Row, Col, Modal } from "react-bootstrap";
-import axios from "axios";
 import { toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css"; // Import the toastify CSS
 import LoaderSpiner from "./LoaderSpiner";
@@ -10,9 +9,9 @@ import {
   submitAttendanceAction,
 } from "../../redux/actions/EmployeeDetailsAction";
 import { useDispatch, useSelector } from "react-redux";
-import { LoginUserAction } from "../../redux/actions/dev-aditya-action";
-import { setValueForSideBarClick } from "../../redux/redecer/EmployeeDetailReducers";
-// Function to format duration in seconds to hh:mm:ss
+import { Coffee, LogIn, LogOut } from "lucide-react";
+import "../App.css";
+
 const formatDuration = (minutes) => {
   const hours = Math.floor(minutes / 60);
   const mins = Math.floor(minutes % 60);
@@ -20,7 +19,6 @@ const formatDuration = (minutes) => {
   return `${padZero(hours)}:${padZero(mins)}`;
 };
 
-// Helper function to pad single digits with a leading zero
 const padZero = (num) => num.toString().padStart(2, "0");
 
 const MarkAttendance = () => {
@@ -44,20 +42,12 @@ const MarkAttendance = () => {
   const [breakInTimes, setBreakInTimes] = useState([]);
   const [breakOutTimes, setBreakOutTimes] = useState([]);
   const [disableButton, setDisableButton] = useState(false);
-  const token = useSelector(({ AllReducers }) => AllReducers.token);
-
-  const ValueForSideBarClick = useSelector(
-    (state) => state.EmployeeDetailReducers.ValueForSideBarClick
-  );
-
-
   const [time, setTime] = useState("");
   const intervalRef = useRef(null);
   const [timeDisabled, setTimeDisabled] = useState(false);
- 
+
   useEffect(() => {
     setTimeDisabled(true);
-
     intervalRef.current = setInterval(() => {
       const localTime = new Intl.DateTimeFormat("en-US", {
         timeZone: Intl.DateTimeFormat().resolvedOptions().timeZone,
@@ -69,9 +59,7 @@ const MarkAttendance = () => {
 
       setTime(localTime);
     }, 1000);
-
     setTimeDisabled(false);
-
     return () => {
       if (intervalRef.current) {
         clearInterval(intervalRef.current);
@@ -100,34 +88,6 @@ const MarkAttendance = () => {
 
     return `${hours}:${minutes}:${seconds} ${period} `;
   }
-
-  const fetchData = async () => {
-    try {
-      const requestData = {
-        email: localStorage.getItem("user_email"),
-        password: localStorage.getItem("password"),
-      };
-
-      if (ValueForSideBarClick == 0) {
-        dispatch(LoginUserAction(requestData)).then(async (response1) => {
-          dispatch(setValueForSideBarClick(1));
-          if (token) {
-            // dispatch(SetCounterSliceForSideBarClick(false))
-            performDataAction();
-          }
-        });
-      } else {
-        if (token) {
-          performDataAction();
-        }
-      }
-    } catch (error) {
-      console.error("Error fetching data", error);
-      toast.error(
-        "Failed to fetch attendance records please hard refresh the page"
-      );
-    }
-  };
 
   async function performDataAction() {
     try {
@@ -183,9 +143,7 @@ const MarkAttendance = () => {
 
 
   useEffect(() => {
-    if (token) {
-      fetchData();
-    }
+    performDataAction();
   }, []);
 
   const handleAction = (action) => {
@@ -196,8 +154,8 @@ const MarkAttendance = () => {
   const confirmAction = async () => {
     setModalVisible(false);
     setDisableButton(false);
-
     setIsLoading(true);
+
     const payload = {
       user_id: userId,
       user_name: userName,
@@ -206,42 +164,54 @@ const MarkAttendance = () => {
       type: modalAction,
     };
 
-
     try {
       const response = await dispatch(submitAttendanceAction(payload));
-      if (modalAction === "clock_in") {
-        setCheckInTime(time);
-        setCheckInDisabled(true);
-        setCheckOutDisabled(false);
-        setBreakInDisabled(false);
-        toast.success("Checked in successfully!");
-      } else if (modalAction === "clock_out") {
-        setCheckOutTime(time);
-        setCheckOutDisabled(true);
-        setBreakInDisabled(true);
-        setBreakOutDisabled(true);
-        toast.success("Checked out successfully!");
-      } else if (modalAction === "break_in") {
-        setBreakInTime(time);
-        setBreakInDisabled(true);
-        setBreakOutDisabled(false);
-        setCheckOutDisabled(true);
-        toast.info("Break started successfully!");
-      } else if (modalAction === "break_out") {
-        setBreakOutTime(time);
-        setBreakOutDisabled(true);
-        setBreakInDisabled(false);
-        setCheckOutDisabled(false);
-        toast.info("Break ended successfully!");
+      const resData = response?.data || response;
+      if (resData?.status === "success") {
+        if (modalAction === "clock_in") {
+          setCheckInTime(time);
+          setCheckInDisabled(true);
+          setCheckOutDisabled(false);
+          setBreakInDisabled(false);
+          toast.success("Checked in successfully!");
+        } else if (modalAction === "clock_out") {
+          setCheckOutTime(time);
+          setCheckOutDisabled(true);
+          setBreakInDisabled(true);
+          setBreakOutDisabled(true);
+          toast.success("Checked out successfully!");
+        } else if (modalAction === "break_in") {
+          setBreakInTime(time);
+          setBreakInDisabled(true);
+          setBreakOutDisabled(false);
+          setCheckOutDisabled(true);
+          toast.info("Break started successfully!");
+        } else if (modalAction === "break_out") {
+          setBreakOutTime(time);
+          setBreakOutDisabled(true);
+          setBreakInDisabled(false);
+          setCheckOutDisabled(false);
+          toast.info("Break ended successfully!");
+        }
+        performDataAction();
+      } else {
+        toast.error(resData?.message || "Something went wrong!");
       }
-      fetchData();
-   
-
     } catch (error) {
-      console.error("Error performing action", error);
-      toast.error("An error occurred. Please try again.");
+      console.error("Frontend API Error:", error);
+      const errorMessage =
+        error?.data?.message ||
+        error?.data?.data?.message ||
+        error?.statusText ||
+        "An error occurred. Please try again.";
+
+      toast.error(errorMessage);
+    } finally {
+      setIsLoading(false);
     }
   };
+
+
 
   return (
     <>
@@ -250,130 +220,149 @@ const MarkAttendance = () => {
           <LoaderSpiner />
         </div>
       )}
-      <Container fluid className="border rounded shadow-sm">
-        <Row className="p-3 mb-4">
-          <Col>
-            <Button
-              onClick={() => handleAction("clock_in")}
-              disabled={isLoading || checkInDisabled || disableButton}
-              className="btn btn-success w-100 d-flex flex-column align-items-center p-3"
-            >
-              <i className="bi bi-box-arrow-in-right"></i>
-              <p className="mb-0">
+
+      <div className="min-h-screen bg-gray-50 p-sm-2">
+
+        <div className="grid grid-cols-2 md:grid-cols-2 gap-6 mb-8">
+          <button
+            onClick={() => handleAction("clock_in")}
+            disabled={isLoading || checkInDisabled || disableButton}
+            className={`rounded-xl p-6 text-white shadow-lg bg-gradient-to-r from-green-500 to-green-400 flex items-center justify-between transition-opacity ${isLoading || checkInDisabled || disableButton ? "opacity-50 cursor-not-allowed" : "hover:opacity-90"
+              }`}
+          >
+            <div>
+              <p className="text-xl font-semibold">
                 {checkInTime || convertTo12HourFormat(time)}
               </p>
-              <p className="mb-0">Check In</p>
-            </Button>
-          </Col>
-          <Col>
-            <Button
-              onClick={() => handleAction("clock_out")}
-              disabled={checkOutDisabled || disableButton}
-              className="btn btn-primary w-100 d-flex flex-column align-items-center p-3"
-            >
-              <i className="bi bi-box-arrow-in-left"></i>
-              <p className="mb-0">
-                {checkOutTime || convertTo12HourFormat(time)}
-              </p>
-              <p className="mb-0">Check Out</p>
-            </Button>
-          </Col>
-        </Row>
-        <Row className="p-3 mb-4">
-          <Col>
-            <Button
-              onClick={() => handleAction("break_in")}
-              disabled={breakInDisabled || disableButton}
-              className="btn btn-warning w-100 d-flex flex-column align-items-center p-3"
-            >
-              <i className="bi bi-box-arrow-in-right"></i>
-              <p className="mb-0">
-                {convertTo12HourFormat(time)}
-                {/* {breakInTime || convertTo12HourFormat(time)} */}
-              </p>
-              <p className="mb-0">Break In</p>
-            </Button>
-          </Col>
-          <Col>
-            <Button
-              onClick={() => handleAction("break_out")}
-              disabled={breakOutDisabled || disableButton}
-              className="btn btn-danger w-100 d-flex flex-column align-items-center p-3"
-            >
-              <i className="bi bi-box-arrow-in-left"></i>
-              <p className="mb-0">
-                {convertTo12HourFormat(time)}
-                {/* {breakOutTime || convertTo12HourFormat(time)} */}
-              </p>
-              <p className="mb-0">Break Out</p>
-            </Button>
-          </Col>
-        </Row>
-        <Row>
-          <Col>
-            <Table striped bordered hover responsive>
-              <thead>
-                <tr>
-                  <th>Check In</th>
-                  <th>Break In</th>
-                  <th>Break Out</th>
-                  <th>Total Break Duration</th>
-                  <th>Total Work Duration</th>
-                  <th>Check Out</th>
-                </tr>
-              </thead>
-              <tbody>
-                <tr>
-                  <td>{checkInTime || "--:--:--"}</td>
-                  <td colSpan="2">
-                    {breakInTimes.length > 0
-                      ? breakInTimes.map((breakIn, index) => (
-                          <p key={index}>
-                            {breakIn} - {breakOutTimes[index] || "--:--:--"}
-                          </p>
-                        ))
-                      : "--:--:--"}
-                  </td>
-                  <td>{totalBreakDuration}</td>
-                  <td>{totalWorkDuration}</td>
-                  <td>{checkOutTime || "--:--:--"}</td>
-                </tr>
-              </tbody>
-            </Table>
-          </Col>
-        </Row>
-      </Container>
+              <p className="text-sm opacity-90">Check In</p>
+            </div>
+            <LogIn size={28} />
+          </button>
 
-      <div className="modaldiv">
-        <Modal
-          show={modalVisible}
-          onHide={() => setModalVisible(false)}
-          className="btnmodal"
-          centered
-        >
-          <div className="text-center hellooo">
-            <i
-              className="bi bi-patch-question"
-              style={{ fontSize: "80px", color: "red", marginBottom: "20px" }}
-            ></i>
 
-            <Modal.Body>
-              Are you sure you want to proceed with{" "}
-              {modalAction ? modalAction.replace("_", " ") : ""}?
-            </Modal.Body>
+          <button
+            onClick={() => handleAction("clock_out")}
+            disabled={checkOutDisabled || disableButton}
+            className={`rounded-xl p-6 text-white shadow-lg bg-gradient-to-r from-blue-500 to-blue-400 flex items-center justify-between transition-opacity ${checkOutDisabled || disableButton ? "opacity-50 cursor-not-allowed" : "hover:opacity-90"}`}>
+            <div>
+              <p className="text-xl font-semibold">{checkOutTime || convertTo12HourFormat(time)}</p>
+              <p className="text-sm opacity-90">Check Out</p>
+            </div>
+            <LogOut size={28} />
+          </button>
 
-            <Button
-              className="mb-4 me-3"
-              variant="secondary"
-              onClick={() => setModalVisible(false)}
-            >
-              Cancel
-            </Button>
-            <Button className="mb-4" variant="primary" onClick={confirmAction}>
-              Confirm
-            </Button>
+          <button
+            onClick={() => handleAction("break_in")}
+            disabled={breakInDisabled || disableButton}
+            className={`rounded-xl p-6 text-white shadow-lg bg-gradient-to-r from-indigo-500 to-blue-400 flex items-center justify-between transition-opacity ${breakInDisabled || disableButton ? "opacity-50 cursor-not-allowed" : "hover:opacity-90"
+              }`}
+          >
+            <div>
+              <p className="text-xl font-semibold">{convertTo12HourFormat(time)}</p>
+              <p className="text-sm opacity-90">Break In</p>
+            </div>
+            <Coffee size={28} />
+          </button>
+
+          <button
+            onClick={() => handleAction("break_out")}
+            disabled={breakOutDisabled || disableButton}
+            className={`rounded-xl p-6 text-white shadow-lg bg-gradient-to-r from-red-500 to-pink-400 flex items-center justify-between transition-opacity ${breakOutDisabled || disableButton ? "opacity-50 cursor-not-allowed" : "hover:opacity-90"
+              }`}
+          >
+            <div>
+              <p className="text-xl font-semibold">{convertTo12HourFormat(time)}</p>
+              <p className="text-sm opacity-90">Break Out</p>
+            </div>
+            <Coffee size={28} />
+          </button>
+        </div>
+
+        <div className="bg-white rounded-xl shadow-md p-6 mb-8">
+          <h2 className="text-lg font-semibold mb-4">Today's Summary</h2>
+          <div className="grid grid-cols-2 md:grid-cols-4 gap-4 text-center">
+            <div>
+              <p className="text-sm text-gray-500">Total Break</p>
+              <p className="text-lg font-bold">{totalBreakDuration}</p>
+            </div>
+            <div>
+              <p className="text-sm text-gray-500">Total Work</p>
+              <p className="text-lg font-bold">{totalWorkDuration}</p>
+            </div>
+            <div>
+              <p className="text-sm text-gray-500">Check In</p>
+              <p className="text-lg font-bold">{checkInTime || "--:--:--"}</p>
+            </div>
+            <div>
+              <p className="text-sm text-gray-500">Check Out</p>
+              <p className="text-lg font-bold">{checkOutTime || "--:--:--"}</p>
+            </div>
           </div>
-        </Modal>
+        </div>
+
+        {/* Table Section */}
+        <div className="bg-white rounded-xl shadow-md overflow-auto">
+          <table className="min-w-full border-collapse">
+            <thead className="bg-gray-100 text-gray-600 text-sm">
+              <tr>
+                <th className="py-3 px-4 text-center">Check In</th>
+                <th className="py-3 px-4 text-center">Check Out</th>
+                <th className="py-3 px-4 text-center">Work Duration</th>
+                <th className="py-3 px-4 text-center">Break In</th>
+                <th className="py-3 px-4 text-center">Break Out</th>
+                <th className="py-3 px-4 text-center">Total Break</th>
+              </tr>
+            </thead>
+            <tbody className="text-sm text-gray-700">
+              <tr className="border-t">
+                <td className="py-3 px-4 text-center">{checkInTime || "--:--:--"}</td>
+                <td className="py-3 px-4 text-center">{checkOutTime || "--:--:--"}</td>
+                <td className="py-3 px-4 text-center">{totalWorkDuration}</td>
+
+                <td colSpan={2} className="py-3 px-4 text-center colspan-2">{breakInTimes.length > 0
+                  ? breakInTimes.map((breakIn, index) => (
+                    <p key={index}>
+                      {breakIn} - {breakOutTimes[index] || "--:--:--"}
+                    </p>
+                  ))
+                  : "--:--:--"}</td>
+                <td className="py-3 px-4 text-center">{totalBreakDuration}</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+
+        <div className="modaldiv">
+          <Modal
+            show={modalVisible}
+            onHide={() => setModalVisible(false)}
+            className="btnmodal"
+            centered
+          >
+            <div className="text-center hellooo">
+              <i
+                className="bi bi-patch-question"
+                style={{ fontSize: "80px", color: "red", marginBottom: "20px" }}
+              ></i>
+
+              <Modal.Body>
+                Are you sure you want to proceed with{" "}
+                {modalAction ? modalAction.replace("_", " ") : ""}?
+              </Modal.Body>
+
+              <Button
+                className="mb-4 me-3"
+                variant="secondary"
+                onClick={() => setModalVisible(false)}
+              >
+                Cancel
+              </Button>
+              <Button className="mb-4" variant="primary" onClick={confirmAction}>
+                Confirm
+              </Button>
+            </div>
+          </Modal>
+        </div>
       </div>
     </>
   );
