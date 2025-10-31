@@ -3,7 +3,6 @@ import { Button, Table, Container, Row, Col, Modal } from "react-bootstrap";
 import { toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css"; // Import the toastify CSS
 import LoaderSpiner from "./LoaderSpiner";
-import "./MarkAttendance.css";
 import {
   GetAttendanceDataActionByIdAndDate,
   submitAttendanceAction,
