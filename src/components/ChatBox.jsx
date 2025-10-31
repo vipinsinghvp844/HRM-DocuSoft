@@ -3,7 +3,6 @@ import ChatSidebar from "./ChatSidebar";
 import ChatWindow from "./ChatWindow";
 import { useEffect, useRef, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
-import axios from "axios";
 import EmojiPicker from "emoji-picker-react";
 import { GetTotalUserAction } from "../../redux/actions/EmployeeDetailsAction";
 import {
@@ -63,7 +62,6 @@ const ChatBox = () => {
   }, [selectedUser, messages]);
 
   //Edit message by sender user
-
   const handleEditMessage = async (messageId) => {
     try {
       const response = await api.put(
@@ -91,7 +89,6 @@ const ChatBox = () => {
       console.error("Failed to edit message:", error);
     }
   };
-
   //delete message by sender user
   const handleDeleteMessage = async (messageId) => {
     try {
@@ -158,15 +155,12 @@ const ChatBox = () => {
       };
     }
   }, [socket]);
-
   const handleInputChange = (e) => {
     setSearchItem(e.target.value);
   };
-
   const filteredUsers = TotalUsers.filter((user) =>
     user.username.toLowerCase().includes(searchItem.toLowerCase())
   );
-
   const getProfileImage = (userId) => {
     const profile = AllProfilesImage?.find(
       (profile) => String(profile.user_id) === String(userId)
@@ -176,7 +170,6 @@ const ChatBox = () => {
       ? profile.profile_image
       : placeholderImage;
   };
-
   const fetchMessages = async (pageNum) => {
     if (!selectedUser && !hasMore) return;
 
@@ -232,11 +225,10 @@ const ChatBox = () => {
     }
   }, [selectedUser, allMessages, userId]);
 
+
   useEffect(() => {
     if (selectedUser) {
-      const ws = new WebSocket(import.meta.env.VITE_API_WEBSOCKET_URL); // on local use
-      // const ws = new WebSocket("ws://localhost:8080"); // on local use
-
+      const ws = new WebSocket(import.meta.env.VITE_API_WEBSOCKET_URL);
       ws.onopen = () => {
         console.log("WebSocket Connected!");
       };
@@ -362,21 +354,13 @@ const ChatBox = () => {
       console.log(file, "file")
       const formData = new FormData();
       formData.append("file", file);
-      console.log(formData, "file")
-
-
       const uploadRes = await api.post(`${import.meta.env.VITE_API_FILE_UPLOAD}`, formData, {
         headers: {
           "Content-Type": "multipart/form-data",
           Authorization: `Bearer ${localStorage.getItem("authtoken")}`,
         },
       });
-
-      console.log(uploadRes, "uploadRes");
-      
-
       const uploadData = await uploadRes.data;
-
       if (uploadData.success) {
         fileName = uploadData.fileName;
       }

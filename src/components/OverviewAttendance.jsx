@@ -2,6 +2,7 @@ import React, { useState, useEffect } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { GetAttendanceDataActionByDate } from "../../redux/actions/EmployeeDetailsAction";
 import EditEmployeeAttendance from "./EditEmployeeAttendance";
+import LoaderSpiner from "./LoaderSpiner";
 import DataGrid, {
   Column,
   Paging,
@@ -18,14 +19,16 @@ function OverviewAttendance() {
   const handleClose = () => setShow(false);
   const handleShow = () => setShow(true);
   const dispatch = useDispatch();
- const { getAttendanceByDate } = useSelector(
-   ({ EmployeeDetailReducers }) => EmployeeDetailReducers
- );
+  const { getAttendanceByDate } = useSelector(
+    ({ EmployeeDetailReducers }) => EmployeeDetailReducers
+  );
 
   useEffect(() => {
+    setIsLoading(true);
     fetchAttendanceRecords();
-       dispatch(GetAttendanceDataActionByDate());
-    
+    dispatch(GetAttendanceDataActionByDate());
+    setIsLoading(false);
+
   }, []);
 
   const fetchAttendanceRecords = async () => {
@@ -70,21 +73,21 @@ function OverviewAttendance() {
             (new Date(`1970-01-01T${record.time}Z`) -
               new Date(`1970-01-01T${userRecord.break_in}Z`)) /
             1000 /
-            60; 
+            60;
           userRecord.total_break_time += breakDuration;
         }
         return acc;
       }, []);
       setAttendanceRecords(combinedData);
     } finally {
-      setIsLoading(false); 
+      setIsLoading(false);
     }
   };
   function convertTo12HourFormat(time24) {
-    if (!time24) return "--:--"; 
+    if (!time24) return "--:--";
     let [hours, minutes, seconds] = time24.split(":");
     hours = parseInt(hours, 10);
-    const period = hours >= 12 ? "PM" : "AM"; 
+    const period = hours >= 12 ? "PM" : "AM";
     hours = hours % 12 || 12;
     return `${hours}:${minutes} ${period}`;
   }
@@ -108,14 +111,14 @@ function OverviewAttendance() {
           Edit Attendance
         </button>
       </div>
-      <div className="overflow-x-auto bg-white rounded-xl shadow-md p-3">
+      <div className="overflow-x-auto bg-white rounded-xl shadow-md p-3 relative">
         <DataGrid
           dataSource={attendanceRecords}
           keyExpr="user_id"
           showBorders={true}
           rowAlternationEnabled={true}
           className="w-full"
-          height="auto"
+          height="100vh"
           columnAutoWidth={true}
           wordWrapEnabled={true}
           columnHidingEnabled={true}
@@ -135,6 +138,11 @@ function OverviewAttendance() {
           <Column dataField="total_break" caption="Total Break" />
           <Column dataField="total_work" caption="Total Work" />
         </DataGrid>
+        {isLoading && (
+          <div className="absolute inset-0 flex items-center justify-center bg-white/70 z-10">
+            <LoaderSpiner />
+          </div>
+        )}
       </div>
       {show && (
         <div className="fixed inset-0 bg-black bg-opacity-50 z-40">

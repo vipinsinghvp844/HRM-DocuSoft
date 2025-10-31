@@ -248,13 +248,13 @@ const LeaveRequests = ({ setPendingCount }) => {
         </Link>
       </div>
 
-      <div className="overflow-x-auto bg-white rounded-xl shadow-md p-3">
+      <div className="overflow-x-auto bg-white rounded-xl shadow-md p-3 relative">
         <DataGrid
           dataSource={requests}
           keyExpr="id"
           showBorders={true}
           rowAlternationEnabled={true}
-          height="500px"
+          height="100vh"
           columnAutoWidth={true}
           wordWrapEnabled={true}
           columnHidingEnabled={true}
