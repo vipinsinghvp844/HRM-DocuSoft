@@ -41,10 +41,10 @@
   transition: .5s all ease;
   white-space: nowrap;
   color: $white !important;
-  padding: 10px 14px !important;
+  padding: 5px 14px !important;
   box-shadow: none !important;
   text-transform: capitalize !important;
-  // font-size: 20px !important;
+  font-size: 11px !important;
 }
 
 .btn-blue {
@@ -52,7 +52,7 @@
   background: #4780FF !important;
   @extend .btn;
   border-radius: 5px;
-  font-size: 14px !important;
+  font-size: 11px !important;
 
   &:hover {
     border: 1px solid $vermilion !important;
@@ -74,7 +74,6 @@
   background: $vermilion !important;
   border: 1px solid $vermilion !important;
   @extend .btn;
-   font-size: 14px !important;
 }
 
 .toggle-btn.Mui-selected {
@@ -91,9 +90,6 @@
 .btn-outline-danger {
   color: $vermilion !important;
   border-color: $vermilion !important;
-  &:hover{
-    color: #fff !important;
-  }
 }
 
 .Mui-disabled.btn-blue {

@@ -5,7 +5,6 @@ import EditEmployee from "./EditEmployee";
 import ToggleButton from "./ToggleButton";
 import { useDispatch, useSelector } from "react-redux";
 import { toast } from "react-toastify";
-import LoaderSpiner from "./LoaderSpiner";
 import { GetTotalUserAction } from "../../redux/actions/EmployeeDetailsAction";
 import DataGrid, {
   Column,
@@ -107,7 +106,7 @@ const AllEmpDetails = () => {
   // console.log(userRole,"rol");
 
   return (
-    <div className="pt-4 px-2">
+   <div className="pt-4 px-2">
       <div className="flex md:flex-row items-center justify-between gap-2 mb-6">
         <button
           onClick={() => window.history.back()}
@@ -130,14 +129,14 @@ const AllEmpDetails = () => {
         )}
       </div>
 
-      <div className="overflow-x-auto bg-white rounded-xl shadow-md p-3 relative">
+      <div className="overflow-x-auto bg-white rounded-xl shadow-md p-3">
         <DataGrid
           dataSource={employeeUsers}
           keyExpr="id"
           showBorders={true}
           rowAlternationEnabled={true}
           className="shadow-sm rounded"
-          height="100vh"
+          height="auto"
           columnAutoWidth={true}
           wordWrapEnabled={true}
           columnHidingEnabled={true}
@@ -145,7 +144,7 @@ const AllEmpDetails = () => {
           <SearchPanel visible={true} placeholder="Search..." />
           <FilterRow visible={true} />
           <HeaderFilter visible={true} />
-          <Paging defaultPageSize={20} />
+          <Paging defaultPageSize={10} />
 
           <Column
             caption="#"
@@ -194,11 +193,6 @@ const AllEmpDetails = () => {
             )}
           />
         </DataGrid>
-        {/* {loading && (
-          <div className="absolute inset-0 flex items-center justify-center bg-white/70 z-10">
-            <LoaderSpiner />
-          </div>
-        )} */}
       </div>
 
       <EditEmployee

@@ -2,7 +2,6 @@ import React, { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import AddAttendance from "./AddAttendance";
 import { useSelector } from "react-redux";
-import LoaderSpiner from "./LoaderSpiner";
 import DataGrid, {
   Column,
   Paging,
@@ -14,7 +13,6 @@ import { ArrowLeftCircle, CalendarCheck, Eye } from "lucide-react";
 
 const ManageAttendance = () => {
   const [employees, setEmployees] = useState([]);
-  const [isLoading, setIsLoading] = useState("false");
   const navigate = useNavigate();
   const [show, setShow] = useState(false);
   const handleClose = () => setShow(false);
@@ -24,7 +22,6 @@ const ManageAttendance = () => {
   );
 
   useEffect(() => {
-    setIsLoading(true);
     const fetchEmployees = async () => {
       try {
         const employeeUsers = TotalUsers.filter(
@@ -34,7 +31,6 @@ const ManageAttendance = () => {
       } catch (error) {
         console.error("Error fetching employees:", error);
       } finally {
-        setIsLoading(false);
       }
     };
 
@@ -88,14 +84,14 @@ const ManageAttendance = () => {
         </button>
       </div>
 
-      <div className="overflow-x-auto bg-white rounded-xl shadow-md p-3 relative">
+      <div className="overflow-x-auto bg-white rounded-xl shadow-md p-3">
         <DataGrid
           dataSource={employees}
           keyExpr="id"
           showBorders={true}
           rowAlternationEnabled={true}
           className="w-full"
-          height="100vh"
+          height="auto"
           columnAutoWidth={true}
           wordWrapEnabled={true}
           columnHidingEnabled={true}
@@ -103,7 +99,7 @@ const ManageAttendance = () => {
           <SearchPanel visible={true} placeholder="Search..." />
           <FilterRow visible={true} />
           <HeaderFilter visible={true} />
-          <Paging defaultPageSize={20} />
+          <Paging defaultPageSize={10} />
 
           <Column caption="#" width={50} cellRender={({ rowIndex }) => rowIndex + 1} />
           <Column dataField="id" caption="ID" />
@@ -135,11 +131,6 @@ const ManageAttendance = () => {
             )}
           />
         </DataGrid>
-        {isLoading && (
-          <div className="absolute inset-0 flex items-center justify-center bg-white/70 z-10">
-            <LoaderSpiner />
-          </div>
-        )}
       </div>
 
       {show && (

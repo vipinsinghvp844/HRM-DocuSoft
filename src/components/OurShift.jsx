@@ -60,7 +60,7 @@ function OurShift() {
           keyExpr="id"
           showBorders={true}
           rowAlternationEnabled={true}
-          className="shadow-sm rounded table-grid-2 table-grid w-100"
+          className="shadow-sm rounded"
           height="auto"
           columnAutoWidth={true}
           wordWrapEnabled={true}

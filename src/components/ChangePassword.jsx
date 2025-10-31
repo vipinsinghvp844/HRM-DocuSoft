@@ -3,7 +3,6 @@ import React, { useState } from "react";
 import { Container, Row, Col, Form, Button, Alert } from "react-bootstrap";
 import { useDispatch } from "react-redux";
 import { ChangePasswordAction } from "../../redux/actions/dev-aditya-action";
-import { Box } from "@mui/material";
 // import { toast } from "react-toastify";
 
 const ChangePassword = () => {
@@ -43,53 +42,47 @@ const ChangePassword = () => {
   return (
     <Container>
       <Row className="justify-content-md-center">
-        <Col xs={12} md={12}>
-          <h3 className="my-4 text-center text-primary">Change Password</h3>
+        <Col xs={12} md={6}>
+          <h3 className="my-4">Change Password</h3>
           {message && <Alert variant={messageType}>{message}</Alert>}
-          <Form className="p-4 shadow rounded bg-white">
+          <Form>
             <Form.Group controlId="currentPassword">
-              <Form.Label className="fw-bold">Current Password</Form.Label>
+              <Form.Label>Current Password</Form.Label>
               <Form.Control
                 type="password"
                 placeholder="Enter current password"
                 value={currentPassword}
                 onChange={(e) => setCurrentPassword(e.target.value)}
-                className="form-control-lg"
               />
             </Form.Group>
 
-            <Form.Group controlId="newPassword" className="mt-3">
-              <Form.Label className="fw-bold">New Password</Form.Label>
+            <Form.Group controlId="newPassword" className="mt-2">
+              <Form.Label>New Password</Form.Label>
               <Form.Control
                 type="password"
                 placeholder="Enter new password"
                 value={newPassword}
                 onChange={(e) => setNewPassword(e.target.value)}
-                className="form-control-lg"
               />
             </Form.Group>
 
-            <Form.Group controlId="confirmPassword" className="mt-3">
-              <Form.Label className="fw-bold">Confirm New Password</Form.Label>
+            <Form.Group controlId="confirmPassword" className="mt-2">
+              <Form.Label>Confirm New Password</Form.Label>
               <Form.Control
                 type="password"
                 placeholder="Confirm new password"
                 value={confirmPassword}
                 onChange={(e) => setConfirmPassword(e.target.value)}
-                className="form-control-lg"
               />
             </Form.Group>
 
-           <Box className="flex items-center justify-end">
-             <Button
+            <Button
               variant="primary"
               onClick={handleChangePassword}
-              className="btn-blue  mt-2"
-              size="lg"
+              className="mt-4"
             >
               Change Password
             </Button>
-           </Box>
           </Form>
         </Col>
       </Row>

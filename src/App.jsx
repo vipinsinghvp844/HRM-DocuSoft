@@ -156,7 +156,7 @@ function App() {
                     element={<RequestPasswordReset />}
                   />
                   <Route
-                    path="/reset-pas sword/:key/:login"
+                    path="/reset-password/:key/:login"
                     element={<ResetPassword />}
                   />
                   <Route

@@ -379,51 +379,46 @@ const Header = ({ onLogout, userRole, pendingCount }) => {
               {showPopup && (
                 <div
                   ref={popupRef}
-                  className="absolute right-0 mt-2 w-80 bg-white rounded-2xl shadow-2xl border border-gray-100 p-4 z-50 transform transition-all duration-200 ease-out"
+                  className="absolute right-0 mt-1 w-64 bg-white rounded-xl shadow-lg border border-gray-200 p-2 z-50 animate-fade-in"
                 >
                   <button
-                    className="absolute top-3 right-3 text-gray-400 hover:text-gray-600 transition-colors"
+                    className="absolute top-2 right-2 text-gray-400 hover:text-gray-600"
                     onClick={() => setShowPopup(false)}
                   >
-                    <i className="bi bi-x-lg text-lg"></i>
+                    ✕
                   </button>
 
-                  <div className="flex flex-col items-center pt-2">
-                    <div className="relative">
-                      <img
-                        src={loginUserProfile || placeholderImage}
-                        alt="Profile"
-                        className="w-24 h-24 rounded-full border-4 border-white shadow-lg object-cover"
-                      />
-                      <div className="absolute bottom-1 right-1 w-4 h-4 bg-green-500 rounded-full border-2 border-white"></div>
-                    </div>
-
-                    <h5 className="mt-4 text-xl font-bold text-gray-800">
+                  <div className="flex flex-col items-center mt-2">
+                    <img
+                      src={loginUserProfile || placeholderImage}
+                      alt="Profile"
+                      className="w-20 h-20 rounded-full border border-gray-300 shadow-md"
+                    />
+                    <h5 className="mt-3 text-lg font-semibold text-gray-800">
                       {loginUserData?.user_display_name}
                     </h5>
-                    <p className="text-sm text-gray-500 font-medium">
+                    <p className="text-sm text-gray-500">
                       {loginUserData?.user_email}
                     </p>
                   </div>
 
-                  <div className="mt-6 space-y-3">
+                  <div className="mt-0 space-y-2">
                     <Link
                       to="/manage-your-account"
                       onClick={handleManageAccountClick}
-                      className="flex btn-blue items-center justify-center gap-2 w-full py-2.5 px-4 rounded-xl text-blue-600 hover:bg-blue-50 font-semibold transition-colors"
+                      className="block text-center py-2 rounded-lg text-blue-600 hover:bg-blue-50 font-medium"
                     >
-                      <i className="bi bi-gear-fill"></i>
                       Manage Your Account
                     </Link>
                     <button
                       onClick={handleLogout}
-                      className="btn-red btn w-100 gap-2"
+                      className="w-full py-2 rounded-lg bg-red-500 text-white font-semibold hover:bg-red-600 transition"
                     >
-                      <i className="bi bi-box-arrow-right me-2"></i>
                       Logout
                     </button>
                   </div>
-                </div>)}
+                </div>
+              )}
             </div>
           </div>
         </div>
