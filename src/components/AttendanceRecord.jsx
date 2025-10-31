@@ -220,51 +220,75 @@ const AttendanceRecord = () => {
     {/* Month & Year Selector */}
     <div className="flex flex-wrap gap-4">
       <div className="flex flex-col">
-        <label className="font-medium">Select Month:</label>
-        <select
-          className="border rounded px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-400"
-          value={selectedMonth}
-          onChange={(e) => handleMonthChange(e.target.value)}
-        >
-          {months.map((month) => (
-            <option key={month} value={month}>
-              {month}
-            </option>
-          ))}
-        </select>
-      </div>
-
+  <label className="font-medium bold">Select Month:</label>
+  <FormControl fullWidth size="small">
+    <Select
+      value={selectedMonth}
+      onChange={(e) => handleMonthChange(e.target.value)}
+      className="min-w-[100px]"
+      sx={{
+        '& .MuiOutlinedInput-root': {
+          '&:hover fieldset': {
+            borderColor: '#60a5fa',
+          },
+        },
+        '& .MuiSelect-select': {
+          padding: '8px 14px',
+        }
+      }}
+    >
+      {months.map((month) => (
+        <MenuItem key={month} value={month}>
+          {month}
+        </MenuItem>
+      ))}
+    </Select>
+  </FormControl>
+</div>
       <div className="flex flex-col">
         <label className="font-medium">Select Year:</label>
-        <select
-          className="border rounded px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-400"
-          value={selectedYear}
-          onChange={(e) => handleYearChange(e.target.value)}
-        >
-          {years.map((year) => (
-            <option key={year} value={year}>
-              {year}
-            </option>
-          ))}
-        </select>
+        <FormControl fullWidth size="small">
+          <Select
+            value={selectedYear}
+            onChange={(e) => handleYearChange(e.target.value)}
+            className="min-w-[120px]"
+            sx={{
+              '& .MuiOutlinedInput-root': {
+                '&:hover fieldset': {
+                  borderColor: '#60a5fa',
+                },
+              },
+              '& .MuiSelect-select': {
+                padding: '8px 14px',
+              }
+            }}
+          >
+            {years.map((year) => (
+              <MenuItem key={year} value={year}>
+                {year}
+              </MenuItem>
+            ))}
+          </Select>
+        </FormControl>
       </div>
     </div>
 
     <div className="flex gap-4 justify-end ml-auto">
-      <div className="flex gap-4 p-1 border border-green-300 rounded shadow-sm justify-center align-items-center h-10">
-        <h5 className="text-green-600 font-semibold text-sm m-0">Total Work</h5>
-        <p className="text-base font-medium m-0">
-          {padZero(workDuration.hours)} hrs {padZero(workDuration.minutes)} mins
+      <div className="flex gap-4 p-3 g-gradient-to-r from-green-50 to-green-100 border border-green-200 rounded-lg shadow-md hover:shadow-lg transition-shadow duration-200 justify-center items-center">
+        <h5 className="text-green-700 font-semibold text-sm m-0 uppercase tracking-wide">Total Work</h5>
+        <p className="text-base font-bold m-0 text-black-800">
+          {padZero(workDuration.hours)}<span className="text-black-600 text-sm font-medium"> hrs </span> 
+          {padZero(workDuration.minutes)}<span className="text-black-600 text-sm font-medium"> mins</span>
         </p>
       </div>
 
-      <div className="flex gap-4 p-1 border border-green-300 rounded shadow-sm justify-center align-items-center h-10">
-        <h5 className="text-red-600 font-semibold text-sm m-0">Total Break</h5>
-        <p className="text-base font-medium m-0">
-          {padZero(breakDuration.hours)} hrs {padZero(breakDuration.minutes)} mins
-        </p>
-      </div>
-    </div>
+      <div className="flex gap-4 p-3 b-gradient-to-r from-red-50 to-red-100 border border-red-200 rounded-lg shadow-md hover:shadow-lg transition-shadow duration-200 justify-center items-center">
+  <h5 className="text-red-700 font-semibold text-sm m-0 uppercase tracking-wide">Total Break</h5>
+  <p className="text-base font-bold m-0 text-black-800">
+    {padZero(breakDuration.hours)}<span className="text-black-600 text-sm font-medium"> hrs </span>
+    {padZero(breakDuration.minutes)}<span className="text-black-600 text-sm font-medium"> mins</span>
+  </p>
+</div>    </div>
   </div>
 
   <div className="overflow-x-auto bg-white rounded-xl shadow-md p-3 relative">
@@ -273,7 +297,7 @@ const AttendanceRecord = () => {
       keyExpr="id"
       showBorders={true}
       rowAlternationEnabled={true}
-      className="shadow-sm rounded"
+      className="shadow-sm rounded table-grid-2 table-grid w-100"
       // height="500px"
       columnAutoWidth={true}
       wordWrapEnabled={true}
