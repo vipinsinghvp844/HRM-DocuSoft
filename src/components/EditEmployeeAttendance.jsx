@@ -15,6 +15,7 @@ const EditEmployeeAttendance = () => {
   const [showDropdown, setShowDropdown] = useState(false);
   const [prevAttendance, setPrevAttendance] = useState({});
   const [isLoading, setIsLoading] = useState(false);
+  const [attLoading, setAttLoading] = useState(false);
   const dispatch = useDispatch();
 
   useEffect(() => {
@@ -93,7 +94,9 @@ const EditEmployeeAttendance = () => {
     setUserId(employee.id);
     setShowDropdown(false);
     if (date) {
+      setAttLoading(true);
       await fetchUserAttendance(employee.id, date);
+      setAttLoading(false);
     }
   };
 
@@ -185,25 +188,27 @@ const handleSubmit = async (e) => {
 
 
   return (
-    <Container className="edit-attendance-container">
-      <Form onSubmit={handleSubmit}>
-        <Form.Group controlId="formUserName">
-          <Form.Label>User Name</Form.Label>
-          <div className="dropdown-wrapper">
-            <Form.Control
+    <div className="max-w-lg mx-auto bg-white p-6 rounded-2xl shadow-md mt-6">
+      <form onSubmit={handleSubmit} className="space-y-5">
+        <div>
+          <label className="block text-gray-700 font-medium mb-1">User Name</label>
+          <div className="relative">
+            <input
               type="text"
-              placeholder="Click to select user"
+              placeholder="Click to select user name"
               value={userName}
               readOnly
               onClick={() => setShowDropdown(!showDropdown)}
               required
+              className="w-full border border-gray-300 rounded-lg px-3 py-2 text-gray-700 focus:ring-2 focus:ring-blue-500 focus:outline-none cursor-pointer"
             />
+            
             {showDropdown && (
-              <ul className="dropdown-menu">
+              <ul className="absolute z-10 bg-white border border-gray-200 rounded-lg shadow-md w-full max-h-48 overflow-y-auto mt-1">
                 {employees.map((employee) => (
                   <li
                     key={employee.id}
-                    className="dropdown-item"
+                    className="px-4 py-2 hover:bg-blue-50 cursor-pointer text-gray-700"
                     onClick={() => handleUserSelection(employee)}
                   >
                     {employee.username}
@@ -212,10 +217,10 @@ const handleSubmit = async (e) => {
               </ul>
             )}
           </div>
-        </Form.Group>
-        <Form.Group controlId="formDate">
-          <Form.Label>Date</Form.Label>
-          <Form.Control
+        </div>
+        <div className="relative">
+          <label className="block text-gray-700 font-medium mb-1">Date</label>
+          <input
             type="date"
             value={date}
             onChange={(e) => {
@@ -223,48 +228,59 @@ const handleSubmit = async (e) => {
               if (userId) fetchUserAttendance(userId, e.target.value);
             }}
             required
+            className="w-full border border-gray-300 rounded-lg px-3 py-2 text-gray-700 focus:ring-2 focus:ring-blue-500 focus:outline-none"
+            disabled={attLoading}
           />
-        </Form.Group>
-        <Form.Group controlId="formClockIn">
-          <Form.Label>Clock In</Form.Label>
-          <Form.Control
+          {attLoading && (
+            <div className="absolute inset-y-0 right-3 top-7 flex items-center">
+              <Spinner animation="border" size="sm" />
+            </div>
+          )}
+        </div>
+        <div className="relative">
+          <label className="block text-gray-700 font-medium mb-1">Clock In</label>
+          <input
             type="time"
             value={attendance.clock_in || ""}
             onChange={(e) =>
               setAttendance({ ...attendance, clock_in: e.target.value })
             }
+            className="w-full border border-gray-300 rounded-lg px-3 py-2 text-gray-700 focus:ring-2 focus:ring-blue-500 focus:outline-none"
           />
-        </Form.Group>
-        <Form.Group controlId="formBreakIn">
-          <Form.Label>Break In</Form.Label>
-          <Form.Control
+        </div>
+        <div className="relative">
+          <label className="block text-gray-700 font-medium mb-1">Break In</label>
+          <input
             type="time"
             value={attendance.break_in || ""}
             onChange={(e) =>
               setAttendance({ ...attendance, break_in: e.target.value })
             }
+            className="w-full border border-gray-300 rounded-lg px-3 py-2 text-gray-700 focus:ring-2 focus:ring-blue-500 focus:outline-none"
           />
-        </Form.Group>
-        <Form.Group controlId="formBreakOut">
-          <Form.Label>Break Out</Form.Label>
-          <Form.Control
+        </div>
+        <div className="relative">
+          <label className="block text-gray-700 font-medium mb-1">Break Out</label>
+          <input
             type="time"
             value={attendance.break_out || ""}
             onChange={(e) =>
               setAttendance({ ...attendance, break_out: e.target.value })
             }
+            className="w-full border border-gray-300 rounded-lg px-3 py-2 text-gray-700 focus:ring-2 focus:ring-blue-500 focus:outline-none"
           />
-        </Form.Group>
-        <Form.Group controlId="formClockOut">
-          <Form.Label>Clock Out</Form.Label>
-          <Form.Control
+        </div>
+        <div className="relative">
+          <label className="block text-gray-700 font-medium mb-1">Clock Out</label>
+          <input
             type="time"
             value={attendance.clock_out || ""}
             onChange={(e) =>
               setAttendance({ ...attendance, clock_out: e.target.value })
             }
+            className="w-full border border-gray-300 rounded-lg px-3 py-2 text-gray-700 focus:ring-2 focus:ring-blue-500 focus:outline-none"
           />
-        </Form.Group>
+        </div>
         <Button variant="primary" type="submit" disabled={isLoading}>
           {isLoading ? (
             <>
@@ -281,8 +297,8 @@ const handleSubmit = async (e) => {
             "Update Attendance"
           )}
         </Button>
-      </Form>
-    </Container>
+      </form>
+    </div>
   );
 };
 export default EditEmployeeAttendance;

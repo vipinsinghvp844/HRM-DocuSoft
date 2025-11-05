@@ -97,7 +97,6 @@ const AddAttendance = ({ currentUserRole }) => {
   return (
    <div className="max-w-lg mx-auto bg-white p-6 rounded-2xl shadow-md mt-6">
   <form onSubmit={handleSubmit} className="space-y-5">
-    {/* User Name Dropdown */}
     <div>
       <label className="block text-gray-700 font-medium mb-1">
         User Name

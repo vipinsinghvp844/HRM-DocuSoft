@@ -1,6 +1,4 @@
-import React, { useEffect, useState, useRef, useContext } from "react";
-import { ListGroup } from "react-bootstrap";
-import { format } from "date-fns";
+import { useContext } from "react";
 import { WebSocketContext } from "./WebSocketContext";
 import { useSelector } from "react-redux";
 
@@ -10,69 +8,94 @@ function ChatSidebar({
   searchItem,
   handleInputChange,
   getProfileImage,
-  // getLastMessageForUser,
+  allMessages,
 }) {
- 
+  const currentUserId = localStorage.getItem("user_id");
   const { userStatus } = useContext(WebSocketContext);
-    const { TotalNotifications, AllUnseenUserAndMessages } = useSelector(
+  const { AllUnseenUserAndMessages } = useSelector(
     ({ EmployeeDetailReducers }) => EmployeeDetailReducers
   );
 
+  //  Get last message per user
+  const getLastMessageForUser = (userId) => {
+    const userMessages = allMessages.filter(
+      (msg) =>
+        (String(msg.sender_id) === String(userId) &&
+          String(msg.receiver_id) === String(currentUserId)) ||
+        (String(msg.receiver_id) === String(userId) &&
+          String(msg.sender_id) === String(currentUserId))
+    );
+    if (userMessages.length === 0) return null;
+    return userMessages.reduce((latest, current) =>
+      new Date(current.timestamp) > new Date(latest.timestamp)
+        ? current
+        : latest
+    );
+  };
+
+  //  Sort by latest message timestamp
+  const sortedUsers = [...filteredUsers].sort((a, b) => {
+    const lastA = getLastMessageForUser(a.id);
+    const lastB = getLastMessageForUser(b.id);
+    const timeA = lastA ? new Date(lastA.timestamp).getTime() : 0;
+    const timeB = lastB ? new Date(lastB.timestamp).getTime() : 0;
+    return timeB - timeA;
+  });
+
   return (
-   <div className="flex flex-col h-screen">
-  <div className="sticky top-30 z-10 bg-white p-3 border-b border-gray-200">
-    <input
-      type="text"
-      value={searchItem}
-      onChange={handleInputChange}
-      placeholder="🔍 Search user..."
-      className="w-full p-2 text-sm border rounded-full focus:outline-none focus:ring-2 focus:ring-blue-400"
-    />
-  </div>
+    <div className="flex flex-col h-screen">
+      <div className="sticky top-30 z-10 bg-white p-3 border-b border-gray-200">
+        <input
+          type="text"
+          value={searchItem}
+          onChange={handleInputChange}
+          placeholder="🔍 Search user..."
+          className="w-full p-2 text-sm border rounded-full focus:outline-none focus:ring-2 focus:ring-blue-400"
+        />
+      </div>
 
-  <div className="flex-1 overflow-y-auto">
-    {filteredUsers.map((user) => {
-      const unseenMessages =
-        AllUnseenUserAndMessages?.[0]?.unread_messages?.find(
-          (msg) => String(msg.sender_id) === String(user.id)
-        )?.unread_count || 0;
+      <div className="flex-1 overflow-y-auto">
+        {sortedUsers.map((user) => {
+          const unseenMessages =
+            AllUnseenUserAndMessages?.[0]?.unread_messages?.find(
+              (msg) => String(msg.sender_id) === String(user.id)
+            )?.unread_count || 0;
 
-      const isOnline = userStatus[String(user.id)]?.status === "online";
+          const isOnline = userStatus[String(user.id)]?.status === "online";
 
-      return (
-        <div
-          key={user.id}
-          onClick={() => selectUser(user)}
-          className="flex items-center px-3 py-2 hover:bg-gray-100 cursor-pointer transition"
-        >
-          <div className="relative mr-3">
-            <img
-              src={getProfileImage(user.id)}
-              alt="Profile"
-              className="w-10 h-10 rounded-full object-cover"
-            />
-            <span
-              className={`absolute bottom-0 right-0 w-3.5 h-3.5 rounded-full border-2 border-white ${
-                isOnline ? "bg-green-500" : "bg-gray-400"
-              }`}
-            />
-          </div>
+          return (
+            <div
+              key={user.id}
+              onClick={() => selectUser(user)}
+              className="flex items-center px-3 py-2 hover:bg-gray-100 cursor-pointer transition"
+            >
+              <div className="relative mr-3">
+                <img
+                  src={getProfileImage(user.id)}
+                  alt="Profile"
+                  className="w-10 h-10 rounded-full object-cover"
+                />
+                <span
+                  className={`absolute bottom-0 right-0 w-3.5 h-3.5 rounded-full border-2 border-white ${
+                    isOnline ? "bg-green-500" : "bg-gray-400"
+                  }`}
+                />
+              </div>
 
-          <div className="flex-1">
-            <p className="font-medium text-gray-800">{user.username}</p>
-          </div>
+              <div className="flex-1">
+                <p className="font-medium text-gray-800">{user.username}</p>
+              </div>
 
-          {unseenMessages > 0 && (
-            <span className="bg-red-500 text-white text-xs font-semibold px-2 py-1 rounded-full">
-              {unseenMessages}
-            </span>
-          )}
-        </div>
-      );
-    })}
-  </div>
-</div>
-
+              {unseenMessages > 0 && (
+                <span className="bg-red-500 text-white text-xs font-semibold px-2 py-1 rounded-full">
+                  {unseenMessages}
+                </span>
+              )}
+            </div>
+          );
+        })}
+      </div>
+    </div>
   );
 }
 

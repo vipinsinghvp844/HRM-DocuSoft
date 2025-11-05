@@ -7,14 +7,14 @@ import {
   useLocation,
 } from "react-router-dom";
 import ChatBox from "./components/ChatBox.jsx";
-import { Container, Col } from "react-bootstrap";
+import { Container } from "react-bootstrap";
 import "bootstrap-icons/font/bootstrap-icons.css";
 import "bootstrap/dist/css/bootstrap.min.css";
 import "react-toastify/dist/ReactToastify.css";
 import Header from "./components/Header";
 import AdDashboard from "./components/AdDashboard";
 import HrDashboard from "./components/HrDashboard";
-import HrShift from "./components/HrShift"; 
+import HrShift from "./components/HrShift";
 import LeaveRequests from "./components/LeaveRequests";
 import LeaveEntitlements from "./components/LeaveEntitlements";
 import AllEmpDetails from "./components/AllEmpDetails";
@@ -61,17 +61,29 @@ import EmployeeFullDetails from "./components/EmployeeFullDetails.jsx";
 function App() {
   const [userRole, setUserRole] = useState(null);
   const [userId, setUserId] = useState(null);
-  const [pendingCount, setPendingCount] = useState(0); //sidebar notifications
+  const [pendingCount, setPendingCount] = useState(0);
   const handleLogin = (role, id) => {
     setUserRole(role);
     setUserId(id);
     localStorage.setItem("user", JSON.stringify({ roles: [role], id }));
   };
   const handleLogout = () => {
-    setUserRole(null); 
-    setUserId(null); 
+    setUserRole(null);
+    setUserId(null);
     localStorage.removeItem("user");
   };
+
+  //show gretting timewise
+  const CurrentTime = new Date();
+  const hours = CurrentTime.getHours();
+  let greeting;
+  if (hours < 12) {
+    greeting = "Good Morning";
+  } else if (hours < 18) {
+    greeting = "Good Afternoon";
+  } else {
+    greeting = "Good Evening";
+  }
 
 
   useEffect(() => {
@@ -88,7 +100,7 @@ function App() {
         } else {
           console.error("Roles is not defined or not an array or is empty");
         }
-        
+
         if (userData.id) {
           setUserId(userData.id);
         }
@@ -103,8 +115,8 @@ function App() {
     const location = useLocation();
     const isLoginPage = location.pathname === "/";
     const isPasswordChangePage =
-      location.pathname === "/request-password-reset";
-
+    location.pathname === "/request-password-reset" ||
+    location.pathname.startsWith("/reset-password");
     return (
       <Container fluid className="p-0">
         {!isLoginPage && !isPasswordChangePage && (
@@ -154,6 +166,7 @@ function App() {
                         element={AdDashboard}
                         allowedRoles={["admin"]}
                         userRole={userRole}
+                        greeting={greeting}
                       />
                     }
                   />
@@ -162,8 +175,9 @@ function App() {
                     element={
                       <ProtectedRoute
                         element={HrDashboard}
-                        allowedRoles={["hr", "admin"]}
+                        allowedRoles={["hr"]}
                         userRole={userRole}
+                        greeting={greeting}
                       />
                     }
                   />
@@ -175,6 +189,7 @@ function App() {
                         allowedRoles={["employee"]}
                         userRole={userRole}
                         userId={userId}
+                        greeting={greeting}
                       />
                     }
                   />

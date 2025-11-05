@@ -132,7 +132,6 @@ const ManageYourAccount = () => {
           show={showCropModal}
           onHide={() => setShowCropModal(false)}
           centered
-          className="custom-modal"
         >
           <Modal.Header closeButton>
             <Modal.Title>Crop Image</Modal.Title>
@@ -155,10 +154,10 @@ const ManageYourAccount = () => {
             </div>
           </Modal.Body>
           <Modal.Footer>
-            <Button variant="secondary" className="btn-red" onClick={() => setShowCropModal(false)}>
+            <Button variant="secondary" onClick={() => setShowCropModal(false)}>
               Cancel
             </Button>
-            <Button variant="primary" className="btn-blue" onClick={handleCropConfirm}>
+            <Button variant="primary" onClick={handleCropConfirm}>
               Crop and Save
             </Button>
           </Modal.Footer>

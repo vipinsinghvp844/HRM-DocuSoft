@@ -5,9 +5,10 @@ import TodayOnLeave from './TodayOnLeave';
 import TodayAbsent from './TodayAbsent';
 import CalendarComponent from './CalendarComponent ';
 
-const AdDashboard = () => {
+const AdDashboard = ({greeting}) => {
   const [birthdayMessages, setBirthdayMessages] = useState("");
   const firstName = localStorage.getItem("firstname") || "";
+  
 
 
   return (
@@ -15,7 +16,7 @@ const AdDashboard = () => {
       <div className="p-4 bg-gray-50 min-h-screen">
         <div className="mb-6">
           <h1 className="text-3xl md:text-4xl font-bold text-gray-800">
-            👋 Welcome Back,{" "}
+            {greeting},{" "}
             <span className="text-blue-600">
               {firstName}
             </span>
