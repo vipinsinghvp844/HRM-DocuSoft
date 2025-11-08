@@ -1,7 +1,5 @@
 import React, { useState, useEffect } from "react";
-import { Table, Container, Row, Col, Button, Card, Spinner } from "react-bootstrap";
 import { useParams } from "react-router-dom";
-import axios from "axios";
 import LoaderSpiner from "./LoaderSpiner";
 import DataGrid, {
   Column,
@@ -12,8 +10,9 @@ import DataGrid, {
   MasterDetail,
 } from "devextreme-react/data-grid";
 import api from "./api";
+import { ArrowLeftCircle } from "lucide-react";
+import { useSelector } from "react-redux";
 
-// ===== Utils =====
 const padZero = (num) => String(num).padStart(2, "0");
 
 const formatDuration = (minutes = 0) => {
@@ -35,32 +34,25 @@ const convertTo12Hour = (time24) => {
   return `${padZero(hours)}:${padZero(minutes)} ${period}`;
 };
 
-// ===== Custom Dropdown =====
+// Tailwind Dropdown
 const CustomDropdown = ({ title, options, onSelect }) => {
   const [isOpen, setIsOpen] = useState(false);
 
   return (
-    <div
-      style={{ position: "relative", display: "inline-block", marginLeft: 10 }}
-    >
-      <Button
-        variant="secondary"
-        size="sm"
-        style={{ borderRadius: 6, fontSize: 14 }}
+    <div className="relative inline-block">
+      <button
         onClick={() => setIsOpen(!isOpen)}
+        className="px-3 py-2 bg-gray-200 text-sm rounded-md hover:bg-gray-300 transition"
       >
         {title}
-      </Button>
+      </button>
+
       {isOpen && (
-        <div
-          className="dropdown-menu show"
-          style={{ maxHeight: 200, overflowY: "auto", fontSize: 14 }}
-        >
+        <div className="absolute z-20 bg-white border rounded shadow-md mt-1 max-h-48 overflow-y-auto text-sm">
           {options.map((option, index) => (
             <div
               key={index}
-              className="dropdown-item"
-              style={{ cursor: "pointer" }}
+              className="px-3 py-2 hover:bg-gray-100 cursor-pointer"
               onClick={() => {
                 onSelect(option);
                 setIsOpen(false);
@@ -75,7 +67,6 @@ const CustomDropdown = ({ title, options, onSelect }) => {
   );
 };
 
-// ===== Main Component =====
 const EmployeeAttendance = () => {
   const { userId } = useParams();
   const [attendanceData, setAttendanceData] = useState([]);
@@ -84,23 +75,38 @@ const EmployeeAttendance = () => {
   const [workDuration, setWorkDuration] = useState({ hours: 0, minutes: 0 });
   const [breakDuration, setBreakDuration] = useState({ hours: 0, minutes: 0 });
   const [isLoading, setIsLoading] = useState(false);
+  const [holidays, setHolidays] = useState([]);
+  const { TotalEmployeeInLeave, TotalHolidays } = useSelector(
+    ({ EmployeeDetailReducers }) => EmployeeDetailReducers
+  );
 
   const formattedMonth = padZero(selectedMonth);
+
+  // useEffect(() => {
+  //   const fetchHolidays = async () => {
+  //     try {
+  //       const res = await api.get(import.meta.env.VITE_API_HOLIDAYS);
+  //       setHolidays(res.data);
+  //     } catch (error) { }
+  //   };
+  //   fetchHolidays();
+  // }, []);
 
   useEffect(() => {
     const fetchData = async () => {
       setIsLoading(true);
       try {
         const { data } = await api.get(
-          `${import.meta.env.VITE_API_GET_ATTENDANCE
-          }/${userId}/?month=${formattedMonth}&year=${selectedYear}`,
-          {
-            headers: {
-              Authorization: `Bearer ${localStorage.getItem("authtoken")}`,
-            },
-          }
+          `${import.meta.env.VITE_API_GET_ATTENDANCE}/${userId}/?month=${formattedMonth}&year=${selectedYear}`
         );
+        // Sort by time to ensure proper sequence of clock/break events
+        data.sort((a, b) => new Date(`1970-01-01T${a.time}`) - new Date(`1970-01-01T${b.time}`));
 
+        // const Holires = await api.get(import.meta.env.VITE_API_HOLIDAYS);
+        const holidaysData = TotalHolidays;
+
+        // const Leaveres = await api.get(`${import.meta.env.VITE_API_LEAVE}`);
+        const leaveData = TotalEmployeeInLeave;
 
         let totalWorkMinutes = 0;
         let totalBreakMinutes = 0;
@@ -110,8 +116,7 @@ const EmployeeAttendance = () => {
           totalBreakMinutes += Math.round(Number(record.total_break || 0));
 
           let userRecord = acc.find(
-            (item) =>
-              item.user_id === record.user_id && item.date === record.date
+            (item) => item.user_id === record.user_id && item.date === record.date
           );
 
           if (!userRecord) {
@@ -124,6 +129,7 @@ const EmployeeAttendance = () => {
               clock_out: "N/A",
               total_work: "00:00",
               breaks: [],
+              status: "",
             };
             acc.push(userRecord);
           }
@@ -131,10 +137,14 @@ const EmployeeAttendance = () => {
           if (record.type === "clock_in") {
             userRecord.clock_in = convertTo12Hour(record.time);
           }
+
           if (record.type === "clock_out") {
             userRecord.clock_out = convertTo12Hour(record.time);
-            userRecord.total_work = formatDuration(record.total_work);
+            if (record.total_work) {
+              userRecord.total_work = formatDuration(Math.round(Number(record.total_work)));
+            }
           }
+
           if (record.type === "break_in") {
             userRecord.breaks.push({
               break_in: convertTo12Hour(record.time),
@@ -142,157 +152,232 @@ const EmployeeAttendance = () => {
               total_break: "00:00",
             });
           }
+
           if (record.type === "break_out") {
-            let lastBreak = userRecord.breaks.find(
-              (b) => b.break_out === "N/A"
-            );
-            if (lastBreak) {
-              lastBreak.break_out = convertTo12Hour(record.time);
-              lastBreak.total_break = formatDuration(record.total_break);
+            let last = userRecord.breaks.find((b) => b.break_out === "N/A");
+            if (last) {
+              last.break_out = convertTo12Hour(record.time);
+              if (record.total_break) {
+                last.total_break = formatDuration(Math.round(Number(record.total_break)));
+              }
+            } else {
+              // fallback in case of missing break_in
+              userRecord.breaks.push({
+                break_in: "N/A",
+                break_out: convertTo12Hour(record.time),
+                total_break: record.total_break
+                  ? formatDuration(Math.round(Number(record.total_break)))
+                  : "00:00",
+              });
             }
           }
 
           return acc;
         }, []);
 
+        const daysInMonth = new Date(selectedYear, selectedMonth, 0).getDate();
+        const fullMonthData = [];
+
+        for (let day = 1; day <= daysInMonth; day++) {
+          const date = `${selectedYear}-${padZero(selectedMonth)}-${padZero(day)}`;
+          const record = combinedData.find((r) => r.date === date);
+          const holiday = holidaysData.find((h) => h.holiday_date === date);
+          const leave = leaveData.find(
+            (l) => l.start_date <= date && l.end_date >= date && l.status === "Accept"
+          );
+
+          fullMonthData.push(
+            record
+              ? record
+              : leave
+                ? {
+                  id: `leave-${day}`,
+                  date,
+                  clock_in: "-",
+                  clock_out: "-",
+                  total_work: "-",
+                  status: "On Leave",
+                  breaks: [],
+                }
+                : holiday
+                  ? {
+                    id: `holiday-${day}`,
+                    date,
+                    clock_in: "-",
+                    clock_out: "-",
+                    total_work: "-",
+                    status: `Holiday: ${holiday.holiday_name}`,
+                    breaks: [],
+                  }
+                  : {
+                    id: `absent-${day}`,
+                    date,
+                    clock_in: "-",
+                    clock_out: "-",
+                    total_work: "-",
+                    status: "Absent",
+                    breaks: [],
+                  }
+          );
+        }
 
         setWorkDuration(convertMinutes(totalWorkMinutes));
         setBreakDuration(convertMinutes(totalBreakMinutes));
-        setAttendanceData(
-          combinedData
-        );
+        setAttendanceData(fullMonthData);
       } catch (error) {
-        console.error("Error fetching data:", error);
+        console.error("Error fetching attendance data:", error);
       } finally {
         setIsLoading(false);
       }
     };
 
     fetchData();
-  }, [userId, selectedMonth, selectedYear]);
+  }, [selectedMonth, selectedYear]);
+
+  // Row Color Coding
+  const statusColorMap = {
+    Present: { bg: "bg-green-100 text-green-800", row: "#e6ffed" },
+    Holiday: { bg: "bg-blue-100 text-blue-800", row: "#e6f0ff" },
+    Leave: { bg: "bg-yellow-100 text-yellow-800", row: "#fff9e6" },
+    Absent: { bg: "bg-red-100 text-red-800", row: "#ffe6e6" },
+  };
+
+  const getStatusType = (status = "") => {
+    if (status.includes("Holiday")) return "Holiday";
+    if (status.includes("Leave")) return "Leave";
+    if (status === "Absent") return "Absent";
+    return "Present";
+  };
 
   const months = [...Array(12).keys()].map((m) => m + 1);
   const years = Array.from({ length: 5 }, (_, i) => selectedYear - 2 + i);
 
   return (
-    <Container className="border rounded shadow-sm p-4 bg-white">
+    <div className="pt-4 px-2">
       {/* Header */}
-      <Row className="mb-4 d-flex align-items-center">
-        <Col md={1}>
-          <i
-            className="bi bi-arrow-left-circle"
-            onClick={() => window.history.back()}
-            style={{ cursor: "pointer", fontSize: 32, color: "#343a40" }}
-          ></i>
-        </Col>
-        <Col md={9}>
-          <h3 className="mt-2">Attendance Records for {userId}</h3>
-        </Col>
-      </Row>
+      <div className="flex md:flex-row items-center justify-between gap-2 mb-6">
+        <button
+          onClick={() => window.history.back()}
+          className="flex items-center text-gray-700 hover:text-gray-900 transition-colors"
+        >
+          <ArrowLeftCircle size={32} className="mr-2" />
+          <span className="hidden md:inline text-lg font-semibold">Back</span>
+        </button>
+        <h3 className="text-xl md:text-2xl font-semibold text-center flex-1">Attendance Records for {userId}</h3>
+      </div>
 
-      {/* Monthly Summary */}
-      <Row className="mb-3">
-        <Col md={6}>
-          <Card className="p-3 shadow-sm border-success">
-            <h5 className="text-success">Total Work This Month</h5>
-            <p className="mb-0">
-              {padZero(workDuration.hours)} hrs {padZero(workDuration.minutes)}{" "}
-              mins
-            </p>
-          </Card>
-        </Col>
-        <Col md={6}>
-          <Card className="p-3 shadow-sm border-danger">
-            <h5 className="text-danger">Total Break This Month</h5>
-            <p className="mb-0">
-              {padZero(breakDuration.hours)} hrs{" "}
-              {padZero(breakDuration.minutes)} mins
-            </p>
-          </Card>
-        </Col>
-      </Row>
+      {/* Summary */}
+      <div className="flex flex-wrap gap-4 mb-4">
+        <div className="border border-green-300 rounded p-3 shadow-sm flex-1">
+          <h5 className="text-green-600 font-semibold text-sm">Total Work</h5>
+          <p className="text-base font-medium">
+            {padZero(workDuration.hours)} hrs {padZero(workDuration.minutes)} mins
+          </p>
+        </div>
+
+        <div className="border border-red-300 rounded p-3 shadow-sm flex-1">
+          <h5 className="text-red-600 font-semibold text-sm">Total Break</h5>
+          <p className="text-base font-medium">
+            {padZero(breakDuration.hours)} hrs {padZero(breakDuration.minutes)} mins
+          </p>
+        </div>
+      </div>
 
       {/* Filters */}
-      <Row>
-        <Col className="d-flex justify-content-end">
-          <CustomDropdown
-            title={`Month: ${formattedMonth}`}
-            options={months}
-            onSelect={setSelectedMonth}
-          />
-          <CustomDropdown
-            title={`Year: ${selectedYear}`}
-            options={years}
-            onSelect={setSelectedYear}
-          />
-        </Col>
-      </Row>
+      <div className="flex justify-end gap-3 mb-2">
+        <CustomDropdown title={`Month: ${formattedMonth}`} options={months} onSelect={setSelectedMonth} />
+        <CustomDropdown title={`Year: ${selectedYear}`} options={years} onSelect={setSelectedYear} />
+      </div>
 
-      {/* Attendance Table */}
-      <Row>
-       <div style={{ position: "relative" }}>
-  <DataGrid
-    dataSource={isLoading ? [] : attendanceData}
-    keyExpr="id"
-    showBorders={true}
-    rowAlternationEnabled={true}
-    className="shadow-sm rounded"
-    height="500px" 
-    columnAutoWidth={true}
-    wordWrapEnabled={true}
-    columnHidingEnabled={true}
-  >
-    <SearchPanel visible={true} placeholder="Search..." />
-    <FilterRow visible={true} />
-    <HeaderFilter visible={true} />
-    <Paging defaultPageSize={20} />
-    <Column caption="#" width={50} cellRender={({ rowIndex }) => rowIndex + 1} />
-    <Column dataField="date" caption="Date" dataType="date" />
-    <Column dataField="user_name" caption="User Name" />
-    <Column dataField="clock_in" caption="Check In" />
-    <Column dataField="clock_out" caption="Check Out" /> 
-    <Column dataField="total_work" caption="Total Work" />
-
-    <MasterDetail
-      enabled={true}
-      component={({ data }) => (
+      {/* Table */}
+      <div className="overflow-x-auto bg-white rounded-xl shadow-md p-3 relative">
         <DataGrid
-          dataSource={data.data.breaks}
-          showBorders={true}
-          columnAutoWidth={true}
+          dataSource={isLoading ? [] : attendanceData}
+          // rowAlternationEnabled
+          showBorders
+          columnAutoWidth
+          wordWrapEnabled
+          height="500px"
+          onRowPrepared={(e) => {
+            if (e.rowType !== "data") return;
+            const type = getStatusType(e.data.status);
+            const color = statusColorMap[type];
+            if (color?.row) e.rowElement.style.backgroundColor = color.row;
+          }}
         >
-          <Column dataField="break_in" caption="Break In" />
-          <Column dataField="break_out" caption="Break Out" />
-          <Column dataField="total_break" caption="Total Break" />
-        </DataGrid>
-      )}
-    />
-  </DataGrid>
+          <SearchPanel visible placeholder="Search..." />
+          <FilterRow visible />
+          <HeaderFilter visible />
+          <Paging defaultPageSize={31} />
 
-  {isLoading && (
-    <div
-      style={{
-        position: "absolute",
-        top: "50%",
-        left: "50%",
-        transform: "translate(-50%, -50%)",
-        background: "rgba(255,255,255,0.6)",
-        width: "100%",
-        height: "100%",
-        display: "flex",
-        alignItems: "center",
-        justifyContent: "center",
-        zIndex: 10,
-      }}
-    >
-      <div role="status"> 
-        <LoaderSpiner />  
+          <Column caption="#" width={50} cellRender={({ rowIndex }) => rowIndex + 1} />
+          <Column dataField="date" caption="Date" dataType="date" />
+          <Column dataField="clock_in" caption="Check In" />
+          <Column dataField="clock_out" caption="Check Out" />
+          <Column dataField="total_work" caption="Total Work" />
+          <Column
+            dataField="status"
+            caption="Status"
+            cellRender={({ data }) => {
+              const type = getStatusType(data.status);
+              const color = statusColorMap[type];
+              return (
+                <span
+                  className={`inline-block px-2 py-1 text-xs font-semibold rounded-full ${color.bg}`}
+                >
+                  {data.status}
+                </span>
+              );
+            }}
+          />
+
+          {/* Break Details */}
+          <MasterDetail
+            enabled
+            component={({ data }) => {
+              const breaks = data.data.breaks || [];
+              // Calculate total minutes of all breaks
+              const totalBreakMinutes = breaks.reduce((sum, b) => {
+                const [hours, mins] = b.total_break.split(":").map(Number);
+                return sum + (hours * 60 + mins);
+              }, 0);
+
+              const totalFormatted = formatDuration(totalBreakMinutes);
+
+              return (
+                <div className="p-2 bg-gray-50 rounded-md">
+                  <DataGrid
+                    dataSource={breaks}
+                    columnAutoWidth
+                    showBorders
+                    wordWrapEnabled
+                    noDataText="No breaks recorded"
+                  >
+                    <Column dataField="break_in" caption="Break In" />
+                    <Column dataField="break_out" caption="Break Out" />
+                    <Column dataField="total_break" caption="Break Duration" />
+                  </DataGrid>
+
+                  {/* Total Summary */}
+                  <div className="flex justify-end mt-2 pr-4">
+                    <div className="text-sm font-semibold text-gray-700">
+                      Total Break:{" "}
+                      <span className="text-red-600">{totalFormatted}</span>
+                    </div>
+                  </div>
+                </div>
+              );
+            }}
+          />
+        </DataGrid>
+
+        {isLoading && (
+          <div className="absolute inset-0 bg-white/60 flex items-center justify-center z-10">
+            <LoaderSpiner />
+          </div>
+        )}
       </div>
     </div>
-  )}
-</div>
-      </Row>
-    </Container>
   );
 };
 

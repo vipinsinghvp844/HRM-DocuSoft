@@ -6,6 +6,7 @@ import { toast } from "react-toastify";
 import { Link, useLocation } from "react-router-dom";
 import DataGrid, {
   Column,
+  
   Paging,
   FilterRow,
   HeaderFilter,
@@ -48,7 +49,7 @@ const LeaveRequests = ({ setPendingCount }) => {
 
   useEffect(() => {
     fetchRequests();
-  }, []);
+  }, [dispatch]);
 
   const fetchRequests = async () => {
     try {
@@ -248,7 +249,7 @@ const LeaveRequests = ({ setPendingCount }) => {
         </Link>
       </div>
 
-      <div className="overflow-x-auto bg-white rounded-xl shadow-md p-3">
+      <div className="overflow-x-auto bg-white rounded-xl shadow-md p-3 relative">
         <DataGrid
           dataSource={requests}
           keyExpr="id"
@@ -322,10 +323,7 @@ const LeaveRequests = ({ setPendingCount }) => {
                 <div className="relative group">
                   <FaTrash
                     size={20}
-                    className={`cursor-pointer text-gray-700 hover:text-gray-900 ${new Date(data.start_date) < new Date(currentDate)
-                        ? "opacity-40 pointer-events-none"
-                        : ""
-                      }`}
+                    className={`cursor-pointer text-gray-700 hover:text-gray-900`}
                     onClick={() => {
                       setDeleteRequest(data);
                       setShowDeleteModal(true);

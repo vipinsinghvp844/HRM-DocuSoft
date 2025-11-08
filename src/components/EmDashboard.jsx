@@ -2,7 +2,7 @@ import { useState, useEffect } from "react";
 import { Container } from "react-bootstrap";
 import MarkAttendance from "./MarkAttendance";
 import {
-  GetEmployeeLeaveDetailActionById
+  GetEmployeeLeaveDetailActionById,GetHolidayAction
 } from "../../redux/actions/EmployeeDetailsAction";
 import { useDispatch } from "react-redux";
 
@@ -13,6 +13,7 @@ function EmployeeDashboard({greeting}) {
 
   useEffect(() => {
     dispatch(GetEmployeeLeaveDetailActionById())
+    dispatch(GetHolidayAction());
     const user_name = localStorage.getItem("user_name");
 
     if (user_name) {

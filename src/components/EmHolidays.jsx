@@ -4,6 +4,7 @@ import 'react-calendar/dist/Calendar.css';
 import CalendarComponent from './CalendarComponent ';
 import api from './api';
 import { ArrowLeftCircle } from 'lucide-react';
+import Spinner from './LoaderSpiner';
 
 
 const EmHolidays = () => {
@@ -13,12 +14,14 @@ const EmHolidays = () => {
     date: '',
     type: '',
   });
+  const [isLoading, setIsLoading] = useState(false);
 
   useEffect(() => {
     fetchHolidays();
   }, []);
 
   const fetchHolidays = async () => {
+    setIsLoading(true);
     try {
       const response = await api.get(`${import.meta.env.VITE_API_HOLIDAYS}`, {
         headers: {
@@ -29,6 +32,8 @@ const EmHolidays = () => {
       setFilteredHolidays(response.data); 
     } catch (error) {
       console.error('Error fetching holidays:', error);
+    }finally {
+      setIsLoading(false);
     }
   };
 
@@ -143,9 +148,12 @@ const EmHolidays = () => {
         </form>
       </div>
 
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-        <div className="bg-white shadow rounded-lg p-4">
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-4 relative">
+        <div className="bg-white shadow rounded-lg p-2">
           <h4 className="text-lg font-semibold border-b pb-2 mb-4">Holiday List</h4>
+          {isLoading ? (
+            <Spinner />
+          ) : null}
           <ul className="divide-y">
             {filteredHolidays.length > 0 ? (
               filteredHolidays.map((holiday) => renderHolidayListItem(holiday))
@@ -155,7 +163,7 @@ const EmHolidays = () => {
           </ul>
         </div>
 
-        <div className="bg-white shadow rounded-lg p-4">
+        <div className="bg-white shadow rounded-lg p-2">
           <div>
             <CalendarComponent />
           </div>

@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from "react";
-import {  Form } from "react-bootstrap";
+import { Form } from "react-bootstrap";
 import { toast } from "react-toastify";
 import { useDispatch } from "react-redux";
 import {
@@ -9,8 +9,8 @@ import {
 import { ArrowLeftCircle } from "lucide-react";
 
 const initialState = {
-  firstName: "",
-  lastName: "",
+  firstname: "",
+  lastname: "",
   username: "",
   email: "",
   password: "",
@@ -18,7 +18,7 @@ const initialState = {
   mobile: "",
   dob: "",
   role: "",
-  userState: "active",
+  user_state: "active",
 };
 
 const AddNewEmployee = () => {
@@ -42,7 +42,6 @@ const AddNewEmployee = () => {
 
   const handleAddUser = async (e) => {
     e.preventDefault();
-
     try {
       const response = await dispatch(
         AddNewEmployeeAction(formData, async () => {
@@ -52,7 +51,7 @@ const AddNewEmployee = () => {
 
       if (response?.status === 200) {
         toast.success("User added successfully!");
-        setFormData(initialState); // reset form
+        setFormData(initialState);
       } else {
         toast.error("Failed to add user");
       }
@@ -62,7 +61,6 @@ const AddNewEmployee = () => {
     }
   };
 
-  // Utility for text inputs
   const renderInput = (label, name, type = "text", extraProps = {}) => (
     <Form.Group className="mb-3" controlId={`form${name}`}>
       <Form.Label>{label}</Form.Label>
@@ -89,13 +87,15 @@ const AddNewEmployee = () => {
           <span className="hidden md:inline text-lg font-semibold">Back</span>
         </button>
 
-        <h3 className="text-xl md:text-2xl font-semibold text-center flex-1">Add New Employee</h3>
+        <h3 className="text-xl md:text-2xl font-semibold text-center flex-1">
+          Add New Employee
+        </h3>
       </div>
 
       <form onSubmit={handleAddUser} className="space-y-6">
         <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-          {renderInput("First Name", "firstName")}
-          {renderInput("Last Name", "lastName")}
+          {renderInput("First Name", "firstname")}
+          {renderInput("Last Name", "lastname")}
         </div>
 
         <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
@@ -134,8 +134,8 @@ const AddNewEmployee = () => {
           <div>
             <label className="block text-sm font-medium mb-2">User State</label>
             <select
-              name="userState"
-              value={formData.userState}
+              name="user_state"
+              value={formData.user_state}
               onChange={handleChange}
               required
               className="w-full rounded-lg border border-gray-300 px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
