@@ -8,6 +8,8 @@ import "tippy.js/dist/tippy.css";
 import dayjs from "dayjs";
 import api from "./api";
 import Spinner from "./LoaderSpiner";
+import { useDispatch, useSelector } from "react-redux";
+import { GetHolidayAction } from "../../redux/actions/EmployeeDetailsAction";
 
 const CalendarComponent = () => {
   const [events, setEvents] = useState([]);
@@ -25,21 +27,21 @@ const CalendarComponent = () => {
   });
   const [selectedEvent, setSelectedEvent] = useState(null);
   const userRole = localStorage.getItem("role");
+  const dispatch = useDispatch();
+  const { TotalHolidays } = useSelector(
+    ({ EmployeeDetailReducers }) => EmployeeDetailReducers
+  );
 
-  const fetchHolidays = async () => {
-    setIsLoading(true);
-    try {
-      const response = await api.get(`${import.meta.env.VITE_API_HOLIDAYS}`, {
-        headers: { Authorization: `Bearer ${localStorage.getItem("authtoken")}` },
-      });
-
-      const formatted = response?.data?.map((holiday) => ({
+  useEffect(() => {
+    if (TotalHolidays && TotalHolidays.length > 0) {
+      const formatted = TotalHolidays.map((holiday) => ({
         id: holiday.id,
         title: holiday.holiday_name,
         start: holiday.holiday_date,
-        end: holiday.holiday_end_date
-          ? dayjs(holiday.holiday_end_date).add(1, "day").format("YYYY-MM-DD")
-          : holiday.holiday_date,
+        end:
+          holiday.holiday_end_date && holiday.holiday_end_date !== "0000-00-00"
+            ? dayjs(holiday.holiday_end_date).add(1, "day").format("YYYY-MM-DD")
+            : holiday.holiday_date,
         extendedProps: {
           type: holiday.holiday_type,
           description: holiday.description,
@@ -47,16 +49,11 @@ const CalendarComponent = () => {
         },
       }));
       setEvents(formatted);
-    } catch (err) {
-      console.error("Error fetching holidays:", err);
-    } finally {
-      setIsLoading(false);
+    } else {
+      setEvents([]);
     }
-  };
+  }, [TotalHolidays]);
 
-  useEffect(() => {
-    fetchHolidays();
-  }, []);
 
   const handleInputChange = (e) => {
     const { name, value, type, checked } = e.target;
@@ -85,7 +82,7 @@ const CalendarComponent = () => {
       await api.post(`${import.meta.env.VITE_API_HOLIDAYS}`, HoliDayData, {
         headers: { Authorization: `Bearer ${localStorage.getItem("authtoken")}` },
       });
-      fetchHolidays();
+      await dispatch(GetHolidayAction());
       setOpenModal(false);
       setHoliDayData({
         holiday_name: "",
@@ -112,7 +109,7 @@ const CalendarComponent = () => {
           headers: { Authorization: `Bearer ${localStorage.getItem("authtoken")}` },
         }
       );
-      fetchHolidays();
+      await dispatch(GetHolidayAction());
       setEditModal(false);
     } catch (err) {
       console.error("Error updating holiday:", err);
@@ -128,7 +125,7 @@ const CalendarComponent = () => {
       await api.delete(`${import.meta.env.VITE_API_HOLIDAYS}/${selectedEvent.id}`, {
         headers: { Authorization: `Bearer ${localStorage.getItem("authtoken")}` },
       });
-      fetchHolidays();
+      await dispatch(GetHolidayAction());
       setViewModal(false);
     } catch (err) {
       console.error("Error deleting holiday:", err);
@@ -145,17 +142,29 @@ const CalendarComponent = () => {
   };
 
   const eventDidMount = (info) => {
+    const startDate = dayjs(info.event.start).format("DD MMM YYYY");
+    const endDate = info.event.end
+      ? dayjs(info.event.end).subtract(1, "day").format("DD MMM YYYY")
+      : null;
+
+    const dateRange = endDate && endDate !== startDate
+      ? `${startDate} → ${endDate}`
+      : startDate;
+
     tippy(info.el, {
       content: `
+      <div style="text-align: left;">
         <strong>${info.event.title}</strong><br/>
-        📅 ${info.event.startStr}<br/>
+        📅 <b>${dateRange}</b><br/>
         🏷️ ${info.event.extendedProps.type}<br/>
         📝 ${info.event.extendedProps.description || "No description"}
-      `,
+      </div>
+    `,
       allowHTML: true,
       theme: "light-border",
     });
   };
+
 
   const filteredEvents =
     filterType === "All"
@@ -180,84 +189,92 @@ const CalendarComponent = () => {
         </select>
       </div>
 
-      <div className="bg-white rounded-lg shadow-lg p-1 sm:p-1">
+      <div className="bg-white rounded-lg shadow-lg p-1 sm:p-1 relative">
         {isLoading ? (
           <div className="flex justify-center items-center h-48">
-            <Spinner/>
+            <Spinner />
           </div>
         ) : (
-           <FullCalendar
-          plugins={[dayGridPlugin, timeGridPlugin, interactionPlugin]}
-          initialView="dayGridMonth"
-          selectable={true}
-          editable={["admin", "hr"].includes(userRole)}
-          eventResizableFromStart={true}
-          events={filteredEvents}
-          dateClick={handleDateClick}
-          headerToolbar={{
-            left: "prev,next today",
-            center: "title",
-            right: "dayGridMonth,timeGridWeek,timeGridDay,listWeek",
-          }}
-          eventClick={handleEventClick}
-          eventClassNames={eventClassNames}
-          eventDidMount={eventDidMount}
-          eventDrop={async (info) => {
-            try {
-              await api.put(
-                `${import.meta.env.VITE_API_HOLIDAYS}/${info.event.id}`,
-                {
-                  holiday_name: info.event.title,
-                  holiday_date: info.event.startStr,
-                  description: info.event.extendedProps.description,
-                  holiday_type: info.event.extendedProps.type,
-                  repeat_annually: info.event.extendedProps.repeat,
-                },
-                {
-                  headers: {
-                    Authorization: `Bearer ${localStorage.getItem(
-                      "authtoken"
-                    )}`,
+          <FullCalendar
+            plugins={[dayGridPlugin, timeGridPlugin, interactionPlugin]}
+            initialView="dayGridMonth"
+            selectable={true}
+            editable={["admin", "hr"].includes(userRole)}
+            eventResizableFromStart={true}
+            events={filteredEvents}
+            dateClick={handleDateClick}
+            headerToolbar={{
+              left: "prev,next today",
+              center: "title",
+              right: "dayGridMonth,timeGridWeek,timeGridDay,listWeek",
+            }}
+            dayCellDidMount={(info) => {
+              const day = info.date.getDay();
+              if (day === 0) {
+                info.el.style.backgroundColor = "#ffeaea";
+                info.el.style.color = "#b30000";
+                info.el.style.borderRadius = "6px";
+              }
+            }}
+            eventClick={handleEventClick}
+            eventClassNames={eventClassNames}
+            eventDidMount={eventDidMount}
+            eventDrop={async (info) => {
+              try {
+                await api.put(
+                  `${import.meta.env.VITE_API_HOLIDAYS}/${info.event.id}`,
+                  {
+                    holiday_name: info.event.title,
+                    holiday_date: info.event.startStr,
+                    description: info.event.extendedProps.description,
+                    holiday_type: info.event.extendedProps.type,
+                    repeat_annually: info.event.extendedProps.repeat,
                   },
-                }
-              );
-              fetchHolidays();
-            } catch (error) {
-              console.error("Error updating holiday date:", error);
-              info.revert(); // revert back if API fails
-            }
-          }}
-          //multi day event
-          eventResize={async (info) => {
-            try {
-              const adjustedEnd = info.event.end
-                ? dayjs(info.event.end).subtract(1, "day").format("YYYY-MM-DD")
-                : info.event.startStr;
-              await api.put(
-                `${import.meta.env.VITE_API_HOLIDAYS}/${info.event.id}`,
-                {
-                  holiday_name: info.event.title,
-                  holiday_date: info.event.startStr,
-                  holiday_end_date: adjustedEnd, // NEW field for multi-day
-                  description: info.event.extendedProps.description,
-                  holiday_type: info.event.extendedProps.type,
-                  repeat_annually: info.event.extendedProps.repeat,
-                },
-                {
-                  headers: {
-                    Authorization: `Bearer ${localStorage.getItem(
-                      "authtoken"
-                    )}`,
+                  {
+                    headers: {
+                      Authorization: `Bearer ${localStorage.getItem(
+                        "authtoken"
+                      )}`,
+                    },
+                  }
+                );
+                await dispatch(GetHolidayAction());
+              } catch (error) {
+                console.error("Error updating holiday date:", error);
+                info.revert(); // revert back if API fails
+              }
+            }}
+            //multi day event
+            eventResize={async (info) => {
+              try {
+                const adjustedEnd = info.event.end
+                  ? dayjs(info.event.end).subtract(1, "day").format("YYYY-MM-DD")
+                  : info.event.startStr;
+                await api.put(
+                  `${import.meta.env.VITE_API_HOLIDAYS}/${info.event.id}`,
+                  {
+                    holiday_name: info.event.title,
+                    holiday_date: info.event.startStr,
+                    holiday_end_date: adjustedEnd, // NEW field for multi-day
+                    description: info.event.extendedProps.description,
+                    holiday_type: info.event.extendedProps.type,
+                    repeat_annually: info.event.extendedProps.repeat,
                   },
-                }
-              );
-              fetchHolidays();
-            } catch (error) {
-              console.error("Error resizing holiday:", error);
-              info.revert();
-            }
-          }}
-        />
+                  {
+                    headers: {
+                      Authorization: `Bearer ${localStorage.getItem(
+                        "authtoken"
+                      )}`,
+                    },
+                  }
+                );
+                await dispatch(GetHolidayAction());
+              } catch (error) {
+                console.error("Error resizing holiday:", error);
+                info.revert();
+              }
+            }}
+          />
         )}
       </div>
 
@@ -329,8 +346,8 @@ const CalendarComponent = () => {
                       ? "Adding..."
                       : "Updating..."
                     : openModal
-                    ? "Add Holiday"
-                    : "Update Holiday"}
+                      ? "Add Holiday"
+                      : "Update Holiday"}
                 </button>
               </div>
             </form>
@@ -395,4 +412,3 @@ const CalendarComponent = () => {
 };
 
 export default CalendarComponent;
- 

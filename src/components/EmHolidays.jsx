@@ -5,6 +5,7 @@ import CalendarComponent from './CalendarComponent ';
 import api from './api';
 import { ArrowLeftCircle } from 'lucide-react';
 import Spinner from './LoaderSpiner';
+import { useSelector } from 'react-redux';
 
 
 const EmHolidays = () => {
@@ -15,27 +16,17 @@ const EmHolidays = () => {
     type: '',
   });
   const [isLoading, setIsLoading] = useState(false);
+  const { TotalHolidays } = useSelector(
+    ({ EmployeeDetailReducers }) => EmployeeDetailReducers
+  );
 
   useEffect(() => {
-    fetchHolidays();
-  }, []);
+  if (TotalHolidays && TotalHolidays.length > 0) {
+    setHolidays(TotalHolidays);
+    setFilteredHolidays(TotalHolidays);
+  }
+}, [TotalHolidays]);
 
-  const fetchHolidays = async () => {
-    setIsLoading(true);
-    try {
-      const response = await api.get(`${import.meta.env.VITE_API_HOLIDAYS}`, {
-        headers: {
-          Authorization: `Bearer ${localStorage.getItem('authtoken')}`,
-        },
-      });
-      setHolidays(response.data);
-      setFilteredHolidays(response.data); 
-    } catch (error) {
-      console.error('Error fetching holidays:', error);
-    }finally {
-      setIsLoading(false);
-    }
-  };
 
   const handleFilterChange = (e) => {
     const { name, value } = e.target;
@@ -155,7 +146,7 @@ const EmHolidays = () => {
             <Spinner />
           ) : null}
           <ul className="divide-y">
-            {filteredHolidays.length > 0 ? (
+            {filteredHolidays?.length > 0 ? (
               filteredHolidays.map((holiday) => renderHolidayListItem(holiday))
             ) : (
               <li className="p-2 text-center text-gray-500">No holidays available.</li>

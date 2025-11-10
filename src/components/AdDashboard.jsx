@@ -1,13 +1,23 @@
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import TotalUsers from './TotalUsers';
 import TodayPresent from './TodayPresent';
 import TodayOnLeave from './TodayOnLeave';
 import TodayAbsent from './TodayAbsent';
 import CalendarComponent from './CalendarComponent ';
+import {
+  GetEmployeeLeaveDetailAction,GetHolidayAction
+} from "../../redux/actions/EmployeeDetailsAction";
+import { useDispatch } from 'react-redux';
 
 const AdDashboard = ({greeting}) => {
   const [birthdayMessages, setBirthdayMessages] = useState("");
   const firstName = localStorage.getItem("firstname") || "";
+  const dispatch = useDispatch();
+
+  useEffect(() => {
+    dispatch(GetEmployeeLeaveDetailAction());
+    dispatch(GetHolidayAction());
+  }, []);
   
 
 

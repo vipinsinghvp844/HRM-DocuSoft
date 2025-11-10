@@ -70,6 +70,7 @@ const CustomDropdown = ({ title, options, onSelect }) => {
 
 // Main Component
 const AttendanceRecord = () => {
+  const userId = sessionStorage.getItem("user_id");
   const [attendanceData, setAttendanceData] = useState([]);
   const [selectedMonth, setSelectedMonth] = useState(new Date().getMonth() + 1);
   const [selectedYear, setSelectedYear] = useState(new Date().getFullYear());
@@ -175,10 +176,22 @@ const AttendanceRecord = () => {
         for (let day = 1; day <= daysInMonth; day++) {
           const date = `${selectedYear}-${padZero(selectedMonth)}-${padZero(day)}`;
           const record = combinedData.find((r) => r.date === date);
-          const holiday = holidaysData.find((h) => h.holiday_date === date);
+          const holiday = holidaysData.find((h) => {
+            const startDate = new Date(h.holiday_date);
+            const endDate =
+              h.holiday_end_date && h.holiday_end_date !== "0000-00-00"
+                ? new Date(h.holiday_end_date)
+                : new Date(h.holiday_date); // same as start if no end date
+
+            const currentDate = new Date(date);
+
+            // Check if current date lies between start and end (inclusive)
+            return currentDate >= startDate && currentDate <= endDate;
+          });
           const leave = leaveData.find(
-            (l) => l.start_date <= date && l.end_date >= date && l.status === "Accept"
+            (l) => l.user_id == userId && l.start_date <= date && l.end_date >= date && l.status === "Accept"
           );
+          const sunday = new Date(date).getDay() === 0;
 
           fullMonthData.push(
             record
@@ -203,15 +216,25 @@ const AttendanceRecord = () => {
                     status: `Holiday: ${holiday.holiday_name}`,
                     breaks: [],
                   }
-                  : {
-                    id: `absent-${day}`,
-                    date,
-                    clock_in: "-",
-                    clock_out: "-",
-                    total_work: "-",
-                    status: "Absent",
-                    breaks: [],
-                  }
+                  : sunday
+                    ? {
+                      id: `holiday-${day}`,
+                      date,
+                      clock_in: "-",
+                      clock_out: "-",
+                      total_work: "-",
+                      status: "Sunday",
+                      breaks: [],
+                    }
+                    : {
+                      id: `absent-${day}`,
+                      date,
+                      clock_in: "-",
+                      clock_out: "-",
+                      total_work: "-",
+                      status: "Absent",
+                      breaks: [],
+                    }
           );
         }
 
@@ -234,11 +257,13 @@ const AttendanceRecord = () => {
     Holiday: { bg: "bg-blue-100 text-blue-800", row: "#e6f0ff" },
     Leave: { bg: "bg-yellow-100 text-yellow-800", row: "#fff9e6" },
     Absent: { bg: "bg-red-100 text-red-800", row: "#ffe6e6" },
+    sunday: { bg: "bg-purple-100 text-purple-800", row: "#f3e6ff" },
   };
 
   const getStatusType = (status = "") => {
     if (status.includes("Holiday")) return "Holiday";
     if (status.includes("Leave")) return "Leave";
+    if (status.includes("Sunday")) return "sunday";
     if (status === "Absent") return "Absent";
     return "Present";
   };
@@ -368,7 +393,6 @@ const AttendanceRecord = () => {
           />
 
         </DataGrid>
-
         {isLoading && (
           <div className="absolute inset-0 bg-white/60 flex items-center justify-center z-10">
             <LoaderSpiner />
