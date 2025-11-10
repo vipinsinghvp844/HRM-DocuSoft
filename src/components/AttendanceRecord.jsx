@@ -290,19 +290,21 @@ const AttendanceRecord = () => {
 
       {/* Summary */}
       <div className="flex flex-wrap gap-4 mb-4">
-        <div className="border border-green-300 rounded p-3 shadow-sm flex-1">
-          <h5 className="text-green-600 font-semibold text-sm">Total Work</h5>
-          <p className="text-base font-medium">
-            {padZero(workDuration.hours)} hrs {padZero(workDuration.minutes)} mins
-          </p>
-        </div>
+        <div className="flex gap-4 p-3 g-gradient-to-r from-green-50 to-green-100 border border-green-200 rounded-lg shadow-md hover:shadow-lg transition-shadow duration-200 justify-center items-center">
+        <h5 className="text-green-700 font-semibold text-sm m-0 uppercase tracking-wide">Total Work</h5>
+        <p className="text-base font-bold m-0 text-black-800">
+          {padZero(workDuration.hours)}<span className="text-black-600 text-sm font-medium"> hrs </span> 
+          {padZero(workDuration.minutes)}<span className="text-black-600 text-sm font-medium"> mins</span>
+        </p>
+      </div>
 
-        <div className="border border-red-300 rounded p-3 shadow-sm flex-1">
-          <h5 className="text-red-600 font-semibold text-sm">Total Break</h5>
-          <p className="text-base font-medium">
-            {padZero(breakDuration.hours)} hrs {padZero(breakDuration.minutes)} mins
-          </p>
-        </div>
+       <div className="flex gap-4 p-3 b-gradient-to-r from-red-50 to-red-100 border border-red-200 rounded-lg shadow-md hover:shadow-lg transition-shadow duration-200 justify-center items-center">
+  <h5 className="text-red-700 font-semibold text-sm m-0 uppercase tracking-wide">Total Break</h5>
+  <p className="text-base font-bold m-0 text-black-800">
+    {padZero(breakDuration.hours)}<span className="text-black-600 text-sm font-medium"> hrs </span>
+    {padZero(breakDuration.minutes)}<span className="text-black-600 text-sm font-medium"> mins</span>
+  </p>
+</div>
       </div>
 
       {/* Filters */}
@@ -320,6 +322,7 @@ const AttendanceRecord = () => {
           columnAutoWidth
           wordWrapEnabled
           height="500px"
+          
           onRowPrepared={(e) => {
             if (e.rowType !== "data") return;
             const type = getStatusType(e.data.status);

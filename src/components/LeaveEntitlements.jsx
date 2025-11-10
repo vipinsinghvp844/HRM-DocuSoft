@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import { useState, useEffect } from "react";
 import { toast } from "react-toastify";
 import api from "./api";
 import DataGrid, {
@@ -18,7 +18,7 @@ const LeaveEntitlements = () => {
   const [error, setError] = useState(null);
 
 
-  const userId = localStorage.getItem("user_id"); 
+  const userId = localStorage.getItem("user_id");
 
   useEffect(() => {
     setLoading(true);
@@ -139,8 +139,9 @@ const LeaveEntitlements = () => {
           dataSource={leaveBalances}
           keyExpr="id"
           showBorders={true}
+          height="auto"
           rowAlternationEnabled={true}
-          className="shadow-sm rounded"
+          className="shadow-sm rounded table-grid-2 table-grid w-100"
           columnAutoWidth={true}
           wordWrapEnabled={true}
         >
