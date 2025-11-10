@@ -167,15 +167,40 @@ const ChatBox = () => {
     user.username.toLowerCase().includes(searchItem.toLowerCase())
   );
 
+  //profile and initials both function here
   const getProfileImage = (userId) => {
-    const profile = AllProfilesImage?.find(
-      (profile) => String(profile.user_id) === String(userId)
+    const userData = TotalUsers?.find(
+      (user) => String(user.id) === String(userId)
     );
 
-    return profile?.profile_image?.trim()
-      ? profile.profile_image
-      : placeholderImage;
+    const firstName = userData?.first_name?.trim() || "";
+    const lastName = userData?.last_name?.trim() || "";
+    const userName = `${firstName} ${lastName}`.trim();
+
+
+    const profile = AllProfilesImage?.find(
+      (p) => String(p.user_id) === String(userId)
+    );
+
+
+    if (profile?.profile_image?.trim()) {
+      return { type: "image", value: profile.profile_image };
+    }
+
+    if (userName) {
+      const nameParts = userName.split(" ");
+      const firstInitial = nameParts[0]?.[0]?.toUpperCase() || "";
+      const lastInitial =
+        nameParts.length > 1
+          ? nameParts[nameParts.length - 1]?.[0]?.toUpperCase()
+          : "";
+      const initials = `${firstInitial}${lastInitial}` || "?";
+      return { type: "initials", value: initials };
+    }
+
+    return { type: "image", value: placeholderImage };
   };
+
 
   const fetchMessages = async (pageNum) => {
     if (!selectedUser && !hasMore) return;
@@ -373,7 +398,7 @@ const ChatBox = () => {
       });
 
       console.log(uploadRes, "uploadRes");
-      
+
 
       const uploadData = await uploadRes.data;
 

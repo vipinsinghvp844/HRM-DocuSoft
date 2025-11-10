@@ -36,14 +36,47 @@ const AllEmpDetails = () => {
     (user) => user.role === "employee" || user.role === "hr"
   );
 
+  // const getProfileImage = (userId) => {
+  //   if (!AllProfilesImage) return placeholderImage;
+  //   const profile = AllProfilesImage.find(
+  //     (profile) => String(profile.user_id) === String(userId)
+  //   );
+  //   return profile?.profile_image && profile.profile_image.trim() !== ""
+  //     ? profile.profile_image
+  //     : placeholderImage;
+  // };
+  //profile and initials both function here
   const getProfileImage = (userId) => {
-    if (!AllProfilesImage) return placeholderImage;
-    const profile = AllProfilesImage.find(
-      (profile) => String(profile.user_id) === String(userId)
+    const userData = TotalUsers?.find(
+      (user) => String(user.id) === String(userId)
     );
-    return profile?.profile_image && profile.profile_image.trim() !== ""
-      ? profile.profile_image
-      : placeholderImage;
+
+    const firstName = userData?.first_name?.trim() || "";
+    const lastName = userData?.last_name?.trim() || "";
+    const userName = `${firstName} ${lastName}`.trim();
+
+
+    const profile = AllProfilesImage?.find(
+      (p) => String(p.user_id) === String(userId)
+    );
+
+
+    if (profile?.profile_image?.trim()) {
+      return { type: "image", value: profile.profile_image };
+    }
+
+    if (userName) {
+      const nameParts = userName.split(" ");
+      const firstInitial = nameParts[0]?.[0]?.toUpperCase() || "";
+      const lastInitial =
+        nameParts.length > 1
+          ? nameParts[nameParts.length - 1]?.[0]?.toUpperCase()
+          : "";
+      const initials = `${firstInitial}${lastInitial}` || "?";
+      return { type: "initials", value: initials };
+    }
+
+    return { type: "image", value: placeholderImage };
   };
 
   const handleEditClick = (employeeId) => {
@@ -103,10 +136,9 @@ const AllEmpDetails = () => {
   };
 
   const userRole = localStorage.getItem("role");
-  // console.log(userRole,"rol");
 
   return (
-   <div className="pt-4 px-2">
+    <div className="pt-4 px-2">
       <div className="flex md:flex-row items-center justify-between gap-2 mb-6">
         <button
           onClick={() => window.history.back()}
@@ -154,14 +186,26 @@ const AllEmpDetails = () => {
 
           <Column
             caption="Profile"
-            cellRender={({ data }) => (
-              <img
-                src={getProfileImage(data.id)}
-                alt="Profile"
-                className="w-10 h-10 rounded-full object-cover cursor-pointer border"
-                onClick={() => handleFullDetail(data.id)}
-              />
-            )}
+            cellRender={({ data }) => {
+              const avatar = getProfileImage(data.id);
+              return avatar.type === "image" ? (
+                <img
+                  src={avatar.value}
+                  alt={`${data.first_name} ${data.last_name}`}
+                  className="w-10 h-10 rounded-full object-cover cursor-pointer border"
+                  onClick={() => handleFullDetail(data.id)}
+                  onError={(e) => (e.target.src = placeholderImage)} // fallback agar broken link
+                />
+              ) : (
+                <div
+                  onClick={() => handleFullDetail(data.id)}
+                  className="w-10 h-10 flex items-center justify-center rounded-full bg-blue-600 text-white font-semibold cursor-pointer select-none"
+                  title={`${data.first_name} ${data.last_name}`}
+                >
+                  {avatar.value}
+                </div>
+              );
+            }}
           />
 
           <Column dataField="first_name" caption="First Name" />

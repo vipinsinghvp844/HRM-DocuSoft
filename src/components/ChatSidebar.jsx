@@ -62,7 +62,7 @@ function ChatSidebar({
             )?.unread_count || 0;
 
           const isOnline = userStatus[String(user.id)]?.status === "online";
-
+          const avatar = getProfileImage(user.id);
           return (
             <div
               key={user.id}
@@ -70,15 +70,26 @@ function ChatSidebar({
               className="flex items-center px-3 py-2 hover:bg-gray-100 cursor-pointer transition"
             >
               <div className="relative mr-3">
-                <img
-                  src={getProfileImage(user.id)}
-                  alt="Profile"
-                  className="w-10 h-10 rounded-full object-cover"
-                />
+                {avatar.type === "image" ? (
+                  <img
+                    src={avatar.value}
+                    alt="Profile"
+                    className="w-10 h-10 rounded-full object-cover"
+                  />
+                ) : (
+                  <div
+                    className="w-10 h-10 flex items-center justify-center rounded-full text-white font-semibold"
+                    style={{
+                      backgroundColor: "#3b82f6",
+                    }}
+                  >
+                    {avatar.value}
+                  </div>
+                )}
+
                 <span
-                  className={`absolute bottom-0 right-0 w-3.5 h-3.5 rounded-full border-2 border-white ${
-                    isOnline ? "bg-green-500" : "bg-gray-400"
-                  }`}
+                  className={`absolute bottom-0 right-0 w-3.5 h-3.5 rounded-full border-2 border-white ${isOnline ? "bg-green-500" : "bg-gray-400"
+                    }`}
                 />
               </div>
 
