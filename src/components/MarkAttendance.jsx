@@ -7,7 +7,7 @@ import {
   GetAttendanceDataActionByIdAndDate,
   submitAttendanceAction,
 } from "../../redux/actions/EmployeeDetailsAction";
-import { useDispatch, useSelector } from "react-redux";
+import { useDispatch } from "react-redux";
 import { Coffee, LogIn, LogOut } from "lucide-react";
 import "../App.css";
 
@@ -30,10 +30,9 @@ const MarkAttendance = () => {
   const [breakInDisabled, setBreakInDisabled] = useState(true);
   const [breakOutDisabled, setBreakOutDisabled] = useState(true);
   const [totalBreakDuration, setTotalBreakDuration] = useState(0);
-  const [totalWorkDuration, setTotalWorkDuration] = useState(0);
+  const [totalWorkDuration, setTotalWorkDuration] = useState("--:--:--");
   const userId = localStorage.getItem("user_id");
   const userName = localStorage.getItem("user_name");
-  const userRole = localStorage.getItem("role");
   const [modalVisible, setModalVisible] = useState(false);
   const [modalAction, setModalAction] = useState(null);
   const [isLoading, setIsLoading] = useState(true);
@@ -43,10 +42,12 @@ const MarkAttendance = () => {
   const [disableButton, setDisableButton] = useState(false);
   const [time, setTime] = useState("");
   const intervalRef = useRef(null);
-  const [timeDisabled, setTimeDisabled] = useState(false);
+  const [isTimerRunning, setIsTimerRunning] = useState(false);
+    const [checkInRaw, setCheckInRaw] = useState(null); // for timer (24h)
+  const timerRef = useRef(null);
+
 
   useEffect(() => {
-    setTimeDisabled(true);
     intervalRef.current = setInterval(() => {
       const localTime = new Intl.DateTimeFormat("en-US", {
         timeZone: Intl.DateTimeFormat().resolvedOptions().timeZone,
@@ -58,7 +59,6 @@ const MarkAttendance = () => {
 
       setTime(localTime);
     }, 1000);
-    setTimeDisabled(false);
     return () => {
       if (intervalRef.current) {
         clearInterval(intervalRef.current);
@@ -76,6 +76,7 @@ const MarkAttendance = () => {
   };
 
   const currentDate = getCurrentDate();
+  
 
   function convertTo12HourFormat(time24) {
     if (!time24) return "--:--";
@@ -91,14 +92,33 @@ const MarkAttendance = () => {
   async function performDataAction() {
     try {
       const response = await dispatch(GetAttendanceDataActionByIdAndDate());
-      // console.log(response, "Attendance Data");
-
       const todayRecords = response;
       setIsLoading(false);
 
       const breakInArray = [];
       const breakOutArray = [];
+      let lastCheckIn = null;
+      let lastCheckOut = null;
 
+      // Extract last check-in/out
+      todayRecords.forEach((entry) => {
+        if (entry.type === "clock_in") lastCheckIn = entry.time;
+        if (entry.type === "clock_out") lastCheckOut = entry.time;
+      });
+
+      // Handle check-in/check-out logic
+      if (lastCheckIn && !lastCheckOut) {
+        setCheckInRaw(lastCheckIn);
+        setCheckInTime(convertTo12HourFormat(lastCheckIn));
+        localStorage.setItem("checkInStart", lastCheckIn);
+        setIsTimerRunning(true);
+      } else if (lastCheckOut) {
+        setCheckOutTime(convertTo12HourFormat(lastCheckOut));
+        setIsTimerRunning(false);
+        localStorage.removeItem("checkInStart");
+      }
+
+      // Loop again for break info and totals
       todayRecords.forEach((entry) => {
         if (entry.type === "clock_in") {
           setCheckInTime(convertTo12HourFormat(entry.time));
@@ -122,8 +142,8 @@ const MarkAttendance = () => {
           setBreakInDisabled(false);
           setCheckOutDisabled(false);
         }
-        if (entry.total_break > 0) {
 
+        if (entry.total_break > 0) {
           setTotalBreakDuration(formatDuration(entry.total_break));
         }
         if (entry.total_work > 0) {
@@ -139,7 +159,32 @@ const MarkAttendance = () => {
       setIsLoading(false);
     }
   }
+useEffect(() => {
+    if (isTimerRunning && checkInRaw) {
+      timerRef.current = setInterval(() => {
+        const now = new Date();
+        const [h, m, s] = checkInRaw.split(":").map(Number);
+        const checkInDate = new Date();
+        checkInDate.setHours(h, m, s, 0);
 
+        const elapsed = Math.floor((now - checkInDate) / 1000);
+        setTotalWorkDuration(formatDuration(elapsed));
+      }, 1000);
+
+      return () => clearInterval(timerRef.current);
+    }
+  }, [isTimerRunning, checkInRaw]);
+
+  // ---------------------- ON MOUNT ----------------------
+  useEffect(() => {
+    const savedCheckIn = localStorage.getItem("checkInStart");
+    if (savedCheckIn) {
+      setCheckInRaw(savedCheckIn);
+      setCheckInTime(convertTo12HourFormat(savedCheckIn));
+      setIsTimerRunning(true);
+    }
+    performDataAction();
+  }, []);
 
   useEffect(() => {
     performDataAction();
@@ -287,15 +332,16 @@ const MarkAttendance = () => {
             </div>
             <div>
               <p className="text-sm text-gray-500">Total Work</p>
-              <p className="text-lg font-bold">{totalWorkDuration}</p>
+              <p className="text-lg font-bold">{totalWorkDuration} 
+              </p>
             </div>
             <div>
               <p className="text-sm text-gray-500">Check In</p>
-              <p className="text-lg font-bold">{checkInTime || "--:--:--"}</p>
+              <p className="text-lg font-bold">{checkInTime ? (checkInTime) : "--:--:--"}</p>
             </div>
             <div>
               <p className="text-sm text-gray-500">Check Out</p>
-              <p className="text-lg font-bold">{checkOutTime || "--:--:--"}</p>
+              <p className="text-lg font-bold">{checkOutTime ? (checkOutTime) : "--:--:--"}</p>
             </div>
           </div>
         </div>

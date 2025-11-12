@@ -14,6 +14,7 @@ import {
 } from "../../redux/actions/EmployeeDetailsAction";
 import api from "./api";
 
+
 const ChatBox = () => {
   const placeholderImage = `${import.meta.env.VITE_API_BASE_URL}/2024/07/placeholder-image-hrm.png`;
   const [selectedUser, setSelectedUser] = useState(null);
@@ -167,15 +168,6 @@ const ChatBox = () => {
     user.username.toLowerCase().includes(searchItem.toLowerCase())
   );
 
-  const getProfileImage = (userId) => {
-    const profile = AllProfilesImage?.find(
-      (profile) => String(profile.user_id) === String(userId)
-    );
-
-    return profile?.profile_image?.trim()
-      ? profile.profile_image
-      : placeholderImage;
-  };
 
   const fetchMessages = async (pageNum) => {
     if (!selectedUser && !hasMore) return;
@@ -373,7 +365,7 @@ const ChatBox = () => {
       });
 
       console.log(uploadRes, "uploadRes");
-      
+
 
       const uploadData = await uploadRes.data;
 
@@ -448,7 +440,7 @@ const ChatBox = () => {
             filteredUsers={filteredUsers}
             searchItem={searchItem}
             handleInputChange={handleInputChange}
-            getProfileImage={getProfileImage}
+            // getProfileImage={getProfileImage}
             userId={userId}
             hasMore={hasMore}
             allMessages={allMessages}
