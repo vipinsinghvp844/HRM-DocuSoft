@@ -2,21 +2,21 @@ import React, { useEffect, useState } from "react";
 import { Nav, Container } from "react-bootstrap";
 import { NavLink } from "react-router-dom";
 import "./Sidebar.css"; 
-import api from "./api";
+import { GetTotalUserActionByUserId } from "../../redux/actions/EmployeeDetailsAction";
+import { useDispatch } from "react-redux";
 
 
 const Sidebar = ({ userRole, pendingCount }) => {
   const [userStatus, setUserStatus] = useState("active");
   const [show, setShow] = useState(false);
   const userId = localStorage.getItem("user_id");
+  const dispatch = useDispatch();
 
   useEffect(() => {
     const fetchUserStatus = async () => {
       try {
-        const response = await api.get(
-          `${import.meta.env.VITE_API_CUSTOM_USERS}/${userId}`
-        );
-        setUserStatus(response.data.user_state);
+        const response = await dispatch(GetTotalUserActionByUserId(userId));
+        setUserStatus(response?.user_state);
       } catch (error) {
         console.error("Error fetching user status:", error);
       }

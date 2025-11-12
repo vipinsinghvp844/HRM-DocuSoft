@@ -1,5 +1,4 @@
 import { useState, useEffect } from "react";
-import { Container } from "react-bootstrap";
 import MarkAttendance from "./MarkAttendance";
 import {
   GetEmployeeLeaveDetailActionById,GetHolidayAction
@@ -19,11 +18,11 @@ function EmployeeDashboard({greeting}) {
     if (user_name) {
       setUserName(user_name);
     }
-  }, []);
+  }, [dispatch]);
 
 
   return (
-    <div className="p-4 bg-gray-50 min-h-screen">
+    <div className="p-2 bg-gray-50 min-h-screen">
       <div className="mb-6">
         <h1 className="text-3xl md:text-4xl font-bold text-gray-800">
           {greeting},{" "}

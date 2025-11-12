@@ -76,7 +76,7 @@ const HrDashboard = ({greeting}) => {
         <TodayOnLeave />
         <TodayAbsent />
       </div>
-      <div className="bg-white p-6 rounded-lg shadow-lg">
+      <div className="bg-white p-4 rounded-lg shadow-lg">
         <MarkAttendance userName={userName} />
       </div>
 

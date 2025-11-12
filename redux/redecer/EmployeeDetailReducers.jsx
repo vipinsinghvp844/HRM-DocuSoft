@@ -29,7 +29,6 @@ const EmloyeeDetailSlice = createSlice({
     },
     TotalUserReduserByUserId: (state, { payload }) => {
       state.TotalUsersId = payload;
-      console.log(payload, "Get by ID============");
     },
     TotalAttendanceReduser: (state, { payload }) => {
       state.TotalAttendance = [...payload];

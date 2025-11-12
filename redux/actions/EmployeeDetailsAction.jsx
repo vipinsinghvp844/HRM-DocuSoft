@@ -54,10 +54,10 @@ export const GetTotalUserActionByUserId = () => async (dispatch) => {
       `${import.meta.env.VITE_API_CUSTOM_USERS}/${userId}`
     );
 
-    const users = response.data;
+    const users = response?.data;
 
-    dispatch({ type: "SET_USER_BY_ID", payload: users });
-    return response.data;
+    dispatch(TotalUserReduserByUserId(users));
+    return response?.data;
   } catch (error) {
     console.error("Error fetching users:", error);
   }
