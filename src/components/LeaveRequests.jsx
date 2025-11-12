@@ -6,7 +6,7 @@ import { toast } from "react-toastify";
 import { Link, useLocation } from "react-router-dom";
 import DataGrid, {
   Column,
-  
+
   Paging,
   FilterRow,
   HeaderFilter,
@@ -35,6 +35,7 @@ const LeaveRequests = ({ setPendingCount }) => {
   const userName = localStorage.getItem("user_name");
   const [showDeleteModal, setShowDeleteModal] = useState(false);
   const [deleteRequest, setDeleteRequest] = useState(null);
+  const [expandedId, setExpandedId] = useState(null);
 
   const onRowPrepared = (e) => {
     if (e.rowType === "data") {
@@ -268,7 +269,7 @@ const LeaveRequests = ({ setPendingCount }) => {
 
           <Column
             caption="#"
-            width={50}
+            width={30}
             cellRender={({ rowIndex }) => rowIndex + 1}
           />
           <Column dataField="user_name" caption="User Name" />
@@ -277,7 +278,35 @@ const LeaveRequests = ({ setPendingCount }) => {
           <Column dataField="unpaid_leave_count" caption="Unpaid Count" />
           <Column dataField="start_date" caption="Start Date" dataType="date" />
           <Column dataField="end_date" caption="End Date" dataType="date" />
-          <Column dataField="reason_for_leave" caption="Reason" />
+
+          <Column
+            caption="Reason"
+            width={200}
+            cellRender={({ data }) => (
+              <div>
+                {data.reason_for_leave && data.reason_for_leave.length > 18 ? (
+                  <>
+                    {expandedId === data.id
+                      ? data.reason_for_leave
+                      : `${data.reason_for_leave.slice(0, 18)}...`}
+                    <button
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        setExpandedId(expandedId === data.id ? null : data.id);
+                      }}
+                      className="ml-1 text-blue-500 text-xs font-medium hover:underline"
+                    >
+                      {expandedId === data.id ? "Show less" : "Show more"}
+                    </button>
+                  </>
+                ) : (
+                  data.reason_for_leave || "-"
+                )}
+              </div>
+            )}
+          />
+
+
           <Column dataField="total_leave_days" caption="Days" />
           <Column dataField="status" caption="Status" />
           <Column dataField="hr_note" caption="HR Note" />
@@ -290,8 +319,8 @@ const LeaveRequests = ({ setPendingCount }) => {
                   <FaCheckCircle
                     size={22}
                     className={`cursor-pointer text-green-600 hover:text-green-700 ${new Date(data.start_date) < new Date(currentDate)
-                        ? "opacity-40 pointer-events-none"
-                        : ""
+                      ? "opacity-40 pointer-events-none"
+                      : ""
                       }`}
                     onClick={() => {
                       setSelectedRequest(data);
@@ -307,8 +336,8 @@ const LeaveRequests = ({ setPendingCount }) => {
                   <FaTimesCircle
                     size={22}
                     className={`cursor-pointer text-red-600 hover:text-red-700 ${new Date(data.start_date) < new Date(currentDate)
-                        ? "opacity-40 pointer-events-none"
-                        : ""
+                      ? "opacity-40 pointer-events-none"
+                      : ""
                       }`}
                     onClick={() => {
                       setSelectedRequest(data);

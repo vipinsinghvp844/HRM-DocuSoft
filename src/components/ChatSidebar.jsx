@@ -1,14 +1,19 @@
 import { useContext } from "react";
 import { WebSocketContext } from "./WebSocketContext";
 import { useSelector } from "react-redux";
+import { getProfileImage, getAvatarColor } from "../utils/getProfileImage";
+
 
 function ChatSidebar({
   selectUser,
   filteredUsers,
   searchItem,
   handleInputChange,
-  getProfileImage,
+  // getProfileImage,
   allMessages,
+  TotalUsers,
+  placeholderImage,
+  AllProfilesImage
 }) {
   const currentUserId = localStorage.getItem("user_id");
   const { userStatus } = useContext(WebSocketContext);
@@ -62,7 +67,7 @@ function ChatSidebar({
             )?.unread_count || 0;
 
           const isOnline = userStatus[String(user.id)]?.status === "online";
-          const avatar = getProfileImage(user.id);
+          const avatar = getProfileImage(user.id, TotalUsers, AllProfilesImage, placeholderImage);
           return (
             <div
               key={user.id}
@@ -73,15 +78,14 @@ function ChatSidebar({
                 {avatar.type === "image" ? (
                   <img
                     src={avatar.value}
-                    alt="Profile"
-                    className="w-10 h-10 rounded-full object-cover"
+                    alt={`${user.first_name} ${user.last_name}`}
+                    className={`w-10 h-10 rounded-full object-cover
+                                  `}
                   />
                 ) : (
                   <div
-                    className="w-10 h-10 flex items-center justify-center rounded-full text-white font-semibold"
-                    style={{
-                      backgroundColor: "#3b82f6",
-                    }}
+                    className={`w-10 h-10 flex items-center justify-center rounded-full text-white font-semibold
+                  ${getAvatarColor(user.first_name || avatar.value)}`}
                   >
                     {avatar.value}
                   </div>

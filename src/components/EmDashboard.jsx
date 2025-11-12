@@ -37,7 +37,7 @@ function EmployeeDashboard({greeting}) {
         </p>
       </div>
 
-      <div className="bg-white p-6 rounded-lg shadow-lg">
+      <div className="bg-white p-3 rounded-lg shadow-lg">
         <MarkAttendance userName={userName} />
       </div>
     </div>

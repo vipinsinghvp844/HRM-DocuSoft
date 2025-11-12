@@ -14,6 +14,7 @@ import {
 } from "../../redux/actions/EmployeeDetailsAction";
 import api from "./api";
 
+
 const ChatBox = () => {
   const placeholderImage = `${import.meta.env.VITE_API_BASE_URL}/2024/07/placeholder-image-hrm.png`;
   const [selectedUser, setSelectedUser] = useState(null);
@@ -166,40 +167,6 @@ const ChatBox = () => {
   const filteredUsers = TotalUsers.filter((user) =>
     user.username.toLowerCase().includes(searchItem.toLowerCase())
   );
-
-  //profile and initials both function here
-  const getProfileImage = (userId) => {
-    const userData = TotalUsers?.find(
-      (user) => String(user.id) === String(userId)
-    );
-
-    const firstName = userData?.first_name?.trim() || "";
-    const lastName = userData?.last_name?.trim() || "";
-    const userName = `${firstName} ${lastName}`.trim();
-
-
-    const profile = AllProfilesImage?.find(
-      (p) => String(p.user_id) === String(userId)
-    );
-
-
-    if (profile?.profile_image?.trim()) {
-      return { type: "image", value: profile.profile_image };
-    }
-
-    if (userName) {
-      const nameParts = userName.split(" ");
-      const firstInitial = nameParts[0]?.[0]?.toUpperCase() || "";
-      const lastInitial =
-        nameParts.length > 1
-          ? nameParts[nameParts.length - 1]?.[0]?.toUpperCase()
-          : "";
-      const initials = `${firstInitial}${lastInitial}` || "?";
-      return { type: "initials", value: initials };
-    }
-
-    return { type: "image", value: placeholderImage };
-  };
 
 
   const fetchMessages = async (pageNum) => {
@@ -473,7 +440,7 @@ const ChatBox = () => {
             filteredUsers={filteredUsers}
             searchItem={searchItem}
             handleInputChange={handleInputChange}
-            getProfileImage={getProfileImage}
+            // getProfileImage={getProfileImage}
             userId={userId}
             hasMore={hasMore}
             allMessages={allMessages}
