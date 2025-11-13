@@ -1,8 +1,9 @@
 import React, { useEffect, useState } from "react";
 import { Button, Col, Container, Form, Row, Spinner } from "react-bootstrap";
-import { useSelector } from "react-redux";
+import { useDispatch, useSelector } from "react-redux";
 import { toast } from "react-toastify";
 import api from "./api";
+import { GetTotalUserAction } from "../../redux/actions/EmployeeDetailsAction";
 
 const AdminAddEmpLeave = () => {
   const [userName, setUserName] = useState("");
@@ -15,6 +16,7 @@ const AdminAddEmpLeave = () => {
   const [leaveDays, setLeaveDays] = useState({ unpaidLeave: 0, paidLeave: 0 });
   const [reasonForLeave, setReasonForLeave] = useState("");
   const [isLoading, setIsLoading] = useState(false);
+  const dispatch = useDispatch();
 
   const { TotalUsers } = useSelector(
     ({ EmployeeDetailReducers }) => EmployeeDetailReducers
@@ -43,19 +45,35 @@ const AdminAddEmpLeave = () => {
   };
 
   // Initial load
-  useEffect(() => {
-    const storedUserRole = localStorage.getItem("role");
-    setUserRole(storedUserRole || "");
+// --- Lazy Fetch Employees When Input is Focused ---
+const fetchUsers = async () => {
+  try {
+    setIsLoading(true);
+    const res = await dispatch(GetTotalUserAction());
 
-    try {
-      const employeeUsers = TotalUsers?.filter(
-        (user) => user.role === "employee" || user.role === "hr"
-      );
-      setEmployees(employeeUsers || []);
-    } catch (error) {
-      toast.error("Error loading employees");
-    }
-  }, [TotalUsers]);
+    const users = Array.isArray(res)
+      ? res
+      : res?.payload || res?.data || [];
+
+    const employeeUsers = users.filter(
+      (user) => user.role === "employee" || user.role === "hr"
+    );
+    setEmployees(employeeUsers || []);
+  } catch (error) {
+    toast.error("Error loading employees");
+  } finally {
+    setIsLoading(false);
+  }
+};
+
+// --- Called once to set userRole only ---
+useEffect(() => {
+  const storedUserRole = localStorage.getItem("role");
+  setUserRole(storedUserRole || "");
+}, []);
+
+
+
 
   // User select from dropdown
   const handleUserSelection = (employee) => {
@@ -68,10 +86,10 @@ const AdminAddEmpLeave = () => {
   const handleSubmit = async (e) => {
     e.preventDefault();
 
-    if (userRole !== "employee" && localStorage.getItem("role") === "hr") {
-      toast.info("Admin can only add leaves for employees.");
-      return;
-    }
+    // if (userRole !== "employee" && localStorage.getItem("role") === "hr") {
+    //   toast.info("Admin can only add leaves for employees.");
+    //   return;
+    // }
 
     const totalLeave =
       (parseInt(leaveDays?.paidLeave) || 0) +
@@ -103,8 +121,8 @@ const AdminAddEmpLeave = () => {
       toast.success("Leave added successfully!");
       resetForm();
     } catch (error) {
-      toast.error(error?.response?.data?.message,"Error adding leaves. Please try again." );
-    }finally{
+      toast.error(error?.response?.data?.message, "Error adding leaves. Please try again.");
+    } finally {
       setIsLoading(false);
     }
   };
@@ -128,31 +146,58 @@ const AdminAddEmpLeave = () => {
         {/* User Name Dropdown */}
         <Form.Group controlId="formUserName">
           <Form.Label>User Name</Form.Label>
-          <div className="dropdown-wrapper">
+          <div className="dropdown-wrapper" style={{ position: "relative" }}>
             <Form.Control
               type="text"
               placeholder="Click to select user name"
               value={userName}
-              onFocus={() => setShowDropdown(true)}
+              onFocus={async () => {
+                setShowDropdown(true);
+                if (employees.length === 0) {
+                  await fetchUsers(); // Load users when input is focused
+                }
+              }}
               onBlur={() => setTimeout(() => setShowDropdown(false), 200)}
               readOnly
               required
             />
+
             {showDropdown && (
-              <ul className="dropdown-menu">
-                {employees.map((employee) => (
-                  <li
-                    key={employee.id}
-                    className="dropdown-item"
-                    onClick={() => handleUserSelection(employee)}
-                  >
-                    {employee.username}
+              <ul
+                className="dropdown-menu show"
+                style={{
+                  display: "block",
+                  position: "absolute",
+                  width: "100%",
+                  maxHeight: "200px",
+                  overflowY: "auto",
+                  zIndex: "999",
+                }}
+              >
+                {isLoading ? (
+                  <li className="dropdown-item text-center">
+                    <Spinner animation="border" size="sm" /> Loading...
                   </li>
-                ))}
+                ) : employees.length > 0 ? (
+                  employees.map((employee) => (
+                    <li
+                      key={employee.id}
+                      className="dropdown-item"
+                      onClick={() => handleUserSelection(employee)}
+                    >
+                      {employee.username}
+                    </li>
+                  ))
+                ) : (
+                  <li className="dropdown-item text-center text-muted">
+                    No employees found
+                  </li>
+                )}
               </ul>
             )}
           </div>
         </Form.Group>
+
 
         {/* Paid & Unpaid Leave */}
         <Form.Group controlId="formLeaveDays">

@@ -1,14 +1,19 @@
 import { useContext } from "react";
 import { WebSocketContext } from "./WebSocketContext";
 import { useSelector } from "react-redux";
+import { getProfileImage, getAvatarColor } from "../utils/getProfileImage";
+
 
 function ChatSidebar({
   selectUser,
   filteredUsers,
   searchItem,
   handleInputChange,
-  getProfileImage,
+  // getProfileImage,
   allMessages,
+  TotalUsers,
+  placeholderImage,
+  AllProfilesImage
 }) {
   const currentUserId = localStorage.getItem("user_id");
   const { userStatus } = useContext(WebSocketContext);
@@ -62,7 +67,7 @@ function ChatSidebar({
             )?.unread_count || 0;
 
           const isOnline = userStatus[String(user.id)]?.status === "online";
-
+          const avatar = getProfileImage(user.id, TotalUsers, AllProfilesImage, placeholderImage);
           return (
             <div
               key={user.id}
@@ -70,15 +75,25 @@ function ChatSidebar({
               className="flex items-center px-3 py-2 hover:bg-gray-100 cursor-pointer transition"
             >
               <div className="relative mr-3">
-                <img
-                  src={getProfileImage(user.id)}
-                  alt="Profile"
-                  className="w-10 h-10 rounded-full object-cover"
-                />
+                {avatar.type === "image" ? (
+                  <img
+                    src={avatar.value}
+                    alt={`${user.first_name} ${user.last_name}`}
+                    className={`w-10 h-10 rounded-full object-cover
+                                  `}
+                  />
+                ) : (
+                  <div
+                    className={`w-10 h-10 flex items-center justify-center rounded-full text-white font-semibold
+                  ${getAvatarColor(user.first_name || avatar.value)}`}
+                  >
+                    {avatar.value}
+                  </div>
+                )}
+
                 <span
-                  className={`absolute bottom-0 right-0 w-3.5 h-3.5 rounded-full border-2 border-white ${
-                    isOnline ? "bg-green-500" : "bg-gray-400"
-                  }`}
+                  className={`absolute bottom-0 right-0 w-3.5 h-3.5 rounded-full border-2 border-white ${isOnline ? "bg-green-500" : "bg-gray-400"
+                    }`}
                 />
               </div>
 

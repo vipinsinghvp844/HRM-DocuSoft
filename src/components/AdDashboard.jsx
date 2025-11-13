@@ -1,13 +1,23 @@
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import TotalUsers from './TotalUsers';
 import TodayPresent from './TodayPresent';
 import TodayOnLeave from './TodayOnLeave';
 import TodayAbsent from './TodayAbsent';
 import CalendarComponent from './CalendarComponent ';
+import {
+  GetEmployeeLeaveDetailAction,GetHolidayAction
+} from "../../redux/actions/EmployeeDetailsAction";
+import { useDispatch } from 'react-redux';
 
 const AdDashboard = ({greeting}) => {
   const [birthdayMessages, setBirthdayMessages] = useState("");
   const firstName = localStorage.getItem("firstname") || "";
+  const dispatch = useDispatch();
+
+  useEffect(() => {
+    // dispatch(GetEmployeeLeaveDetailAction());
+    dispatch(GetHolidayAction());
+  }, []);
   
 
 
@@ -33,7 +43,7 @@ const AdDashboard = ({greeting}) => {
         </div>
 
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-          <div className="bg-white rounded-xl shadow-md p-4">
+          <div className="bg-white rounded-xl shadow-md p-2">
             <CalendarComponent />
           </div>
           <div className="bg-white rounded-xl shadow-md p-4">

@@ -7,8 +7,11 @@ import {
 } from "../../redux/actions/EmployeeDetailsAction";
 import { useDispatch, useSelector } from "react-redux";
 import LoaderSpiner from "./LoaderSpiner";
-import { ArrowLeftCircle, Bell, CheckCircle2 } from "lucide-react";
+import { ArrowLeftCircle, Bell } from "lucide-react";
 import { toast } from "react-toastify";
+import { getProfileImage, getAvatarColor } from "../utils/getProfileImage";
+
+
 
 const Notification = () => {
   const [isLoading, setIsLoading] = useState(false);
@@ -18,20 +21,11 @@ const Notification = () => {
   const [expandedId, setExpandedId] = useState(null);
   const navigate = useNavigate();
   const dispatch = useDispatch();
-  const { TotalNotifications } = useSelector(
+  const { TotalNotifications, TotalUsers } = useSelector(
     ({ EmployeeDetailReducers }) => EmployeeDetailReducers
   );
   const { AllProfilesImage } = useSelector(({ AllReducers }) => AllReducers);
   const placeholderImage = `${import.meta.env.VITE_API_BASE_URL}/2024/07/placeholder-image-hrm.png`;
-  const getProfileImage = (userId) => {
-    if (!AllProfilesImage) return placeholderImage;
-    const profile = AllProfilesImage.find(
-      (profile) => String(profile.user_id) === String(userId)
-    );
-    return profile?.profile_image && profile.profile_image.trim() !== ""
-      ? profile.profile_image
-      : placeholderImage;
-  };
 
   useEffect(() => {
     fetchNotification(1);
@@ -99,6 +93,7 @@ const Notification = () => {
     }
   };
 
+
   return (
     <div className="pt-4 px-2 relative">
       {isLoading && (
@@ -134,6 +129,8 @@ const Notification = () => {
       <div className="space-y-3">
         {TotalNotifications.length > 0 ? (
           TotalNotifications.map((item) => {
+            const avatar = getProfileImage(item.sender_id, TotalUsers, AllProfilesImage, placeholderImage);
+
             const match = item.message.match(/\d{4}-\d{2}-\d{2}/g);
             const startDate = match ? match[0] : null;
             const isRead = item.is_read == 1;
@@ -149,22 +146,40 @@ const Notification = () => {
                   )
                 }
                 className={`flex items-center gap-3 p-2 rounded-xl cursor-pointer transition-all duration-200 
-            ${isRead
+                ${isRead
                     ? "bg-gray-50 hover:bg-gray-100 border border-gray-200"
                     : "bg-blue-50 hover:bg-blue-100 border border-blue-300 shadow-sm"
                   }`}
               >
                 {/* Left avatar icon */}
                 <div
-                  className={`flex-shrink-0 w-12 h-12 flex items-center justify-center rounded-full 
-              ${isRead ? "bg-gray-200" : "bg-blue-500 text-white shadow-md"}`}
+                  className={`flex-shrink-0 w-12 h-12 flex items-center justify-center rounded-full transition-all duration-200
+                  ${isRead ? "bg-gray-200 border border-gray-300" : "border-2 shadow-md"}
+                  ${!isRead && avatar.type === "initials"
+                      ? getAvatarColor(item.sender_name || item.sender_first_name || avatar.value)
+                      : ""}
+                  `}
                 >
-                  <img
-                src={getProfileImage(item.sender_id)}
-                alt="Profile"
-                className="w-11 h-11 rounded-full object-cover cursor-pointer border"
-              />
+                  {avatar.type === "image" ? (
+                    <img
+                      src={avatar.value}
+                      alt={`${item.first_name} ${item.last_name}`}
+                      className={`w-10 h-10 rounded-full object-cover
+                  ${isRead ? "border border-gray-300" : "border-4 border-blue-400"}`}
+                    />
+                  ) : (
+                    <div
+                      className={`w-10 h-10 flex items-center justify-center rounded-full text-white font-semibold
+                      ${getAvatarColor(item.sender_name || item.sender_first_name || avatar.value)}
+                      ${isRead ? "opacity-70" : ""}`}
+                    >
+                      {avatar.value}
+                    </div>
+                  )}
                 </div>
+
+
+
 
                 {/* Message content */}
                 <div className="flex-1">

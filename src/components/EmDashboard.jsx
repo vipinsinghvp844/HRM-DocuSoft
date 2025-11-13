@@ -1,8 +1,7 @@
 import { useState, useEffect } from "react";
-import { Container } from "react-bootstrap";
 import MarkAttendance from "./MarkAttendance";
 import {
-  GetEmployeeLeaveDetailActionById
+  GetEmployeeLeaveDetailActionById,GetHolidayAction
 } from "../../redux/actions/EmployeeDetailsAction";
 import { useDispatch } from "react-redux";
 
@@ -13,16 +12,17 @@ function EmployeeDashboard({greeting}) {
 
   useEffect(() => {
     dispatch(GetEmployeeLeaveDetailActionById())
+    dispatch(GetHolidayAction());
     const user_name = localStorage.getItem("user_name");
 
     if (user_name) {
       setUserName(user_name);
     }
-  }, []);
+  }, [dispatch]);
 
 
   return (
-    <div className="p-4 bg-gray-50 min-h-screen">
+    <div className="p-2 bg-gray-50 min-h-screen">
       <div className="mb-6">
         <h1 className="text-3xl md:text-4xl font-bold text-gray-800">
           {greeting},{" "}
@@ -36,7 +36,7 @@ function EmployeeDashboard({greeting}) {
         </p>
       </div>
 
-      <div className="bg-white p-6 rounded-lg shadow-lg">
+      <div className="bg-white p-3 rounded-lg shadow-lg">
         <MarkAttendance userName={userName} />
       </div>
     </div>

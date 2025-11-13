@@ -4,6 +4,8 @@ import 'react-calendar/dist/Calendar.css';
 import CalendarComponent from './CalendarComponent ';
 import api from './api';
 import { ArrowLeftCircle } from 'lucide-react';
+import Spinner from './LoaderSpiner';
+import { useSelector } from 'react-redux';
 
 
 const EmHolidays = () => {
@@ -13,24 +15,18 @@ const EmHolidays = () => {
     date: '',
     type: '',
   });
+  const [isLoading, setIsLoading] = useState(false);
+  const { TotalHolidays } = useSelector(
+    ({ EmployeeDetailReducers }) => EmployeeDetailReducers
+  );
 
   useEffect(() => {
-    fetchHolidays();
-  }, []);
+  if (TotalHolidays && TotalHolidays.length > 0) {
+    setHolidays(TotalHolidays);
+    setFilteredHolidays(TotalHolidays);
+  }
+}, [TotalHolidays]);
 
-  const fetchHolidays = async () => {
-    try {
-      const response = await api.get(`${import.meta.env.VITE_API_HOLIDAYS}`, {
-        headers: {
-          Authorization: `Bearer ${localStorage.getItem('authtoken')}`,
-        },
-      });
-      setHolidays(response.data);
-      setFilteredHolidays(response.data); 
-    } catch (error) {
-      console.error('Error fetching holidays:', error);
-    }
-  };
 
   const handleFilterChange = (e) => {
     const { name, value } = e.target;
@@ -143,11 +139,14 @@ const EmHolidays = () => {
         </form>
       </div>
 
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-        <div className="bg-white shadow rounded-lg p-4">
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-4 relative">
+        <div className="bg-white shadow rounded-lg p-2">
           <h4 className="text-lg font-semibold border-b pb-2 mb-4">Holiday List</h4>
+          {isLoading ? (
+            <Spinner />
+          ) : null}
           <ul className="divide-y">
-            {filteredHolidays.length > 0 ? (
+            {filteredHolidays?.length > 0 ? (
               filteredHolidays.map((holiday) => renderHolidayListItem(holiday))
             ) : (
               <li className="p-2 text-center text-gray-500">No holidays available.</li>
@@ -155,7 +154,7 @@ const EmHolidays = () => {
           </ul>
         </div>
 
-        <div className="bg-white shadow rounded-lg p-4">
+        <div className="bg-white shadow rounded-lg p-2">
           <div>
             <CalendarComponent />
           </div>

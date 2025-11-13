@@ -54,10 +54,10 @@ export const GetTotalUserActionByUserId = () => async (dispatch) => {
       `${import.meta.env.VITE_API_CUSTOM_USERS}/${userId}`
     );
 
-    const users = response.data;
+    const users = response?.data;
 
-    dispatch({ type: "SET_USER_BY_ID", payload: users });
-    return response.data;
+    dispatch(TotalUserReduserByUserId(users));
+    return response?.data;
   } catch (error) {
     console.error("Error fetching users:", error);
   }
@@ -287,7 +287,6 @@ export const GetEmpPersonalInfoAction = () => async (dispatch) => {
 };
 
 // Holi days List Get
-
 export const GetHolidayAction = () => async (dispatch) => {
   try {
     const response = await api.get(`${import.meta.env.VITE_API_HOLIDAYS}`, {
@@ -304,6 +303,45 @@ export const GetHolidayAction = () => async (dispatch) => {
     // console.log(response.data, "Data from API ===========");
 
     return response.data; // Ensure this returns data correctly
+  } catch (error) {
+    console.error("Error performing action", error);
+  }
+};
+// Add holiday action
+export const AddHolidayAction = (payload, callback) => async (dispatch) => {
+  try {
+    const response = await api.post(`${import.meta.env.VITE_API_HOLIDAYS}`, payload);
+
+    if (response?.data) {
+      callback(response.data);
+    }
+    return response.data; 
+  } catch (error) {
+    console.error("Error performing action", error);
+  }
+};
+//update holiday action
+export const UpdateHolidayAction = (id, payload, callback) => async (dispatch) => {
+  try {
+    const response = await api.put(`${import.meta.env.VITE_API_HOLIDAYS}/${id}`, payload);
+
+    if (response?.data) {
+      callback(response.data);
+    }
+    return response.data; 
+  } catch (error) {
+    console.error("Error performing action", error);
+  }
+};
+//delete holiday action
+export const DeleteHolidayAction = (id, callback) => async (dispatch) => {
+  try {
+    const response = await api.delete(`${import.meta.env.VITE_API_HOLIDAYS}/${id}`);
+
+    if (response?.data) {
+      callback(response.data);
+    }
+    return response.data; 
   } catch (error) {
     console.error("Error performing action", error);
   }

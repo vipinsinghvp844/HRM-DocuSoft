@@ -16,7 +16,6 @@ import { ArrowLeftCircle } from "lucide-react";
 const EmployeeViewLeave = () => {
   const [requests, setRequests] = useState([]);
   const [loading, setLoading] = useState(true);
-  const [error, setError] = useState(null);
   const [loggedInUserId, setLoggedInUserId] = useState(null);
   const [showConfirm, setShowConfirm] = useState(false);
   const [deleteRequestId, setDeleteRequestId] = useState(null);
@@ -24,6 +23,7 @@ const EmployeeViewLeave = () => {
   const [editing, setEditing] = useState(false);
   const [modalType, setModalType] = useState(null);
   const [selectedRequest, setSelectedRequest] = useState(null);
+  const [expandedId, setExpandedId] = useState(null);
   const [formData, setFormData] = useState({
     paid_leave_count: "",
     unpaid_leave_count: "",
@@ -31,7 +31,6 @@ const EmployeeViewLeave = () => {
     end_date: "",
     reason_for_leave: "",
   });
-
 
   const calculateEndDate = (startDate, paid, unpaid) => {
     if (!startDate) return "";
@@ -41,8 +40,6 @@ const EmployeeViewLeave = () => {
     endDate.setDate(endDate.getDate() + validDays - 1);
     return endDate.toISOString().split("T")[0];
   };
-
-
 
   const dispatch = useDispatch();
   const { TotalEmployeeInLeaveById } = useSelector(
@@ -59,7 +56,6 @@ const EmployeeViewLeave = () => {
     try {
       const user_id = localStorage.getItem("user_id");
       if (!user_id) {
-        setError("User not logged in. Please log in and try again.");
         setLoading(false);
         return;
       }
@@ -69,7 +65,7 @@ const EmployeeViewLeave = () => {
       );
       setRequests(filtdata);
     } catch (error) {
-      setError("Error fetching leave requests.");
+      console.error("Error fetching leave requests.");
     } finally {
       setLoading(false);
     }
@@ -78,7 +74,7 @@ const EmployeeViewLeave = () => {
 
   const handleDeleteClick = (requestId) => {
     if (!loggedInUserId) {
-      setError("User not logged in. Please log in and try again.");
+      console.error("User not logged in. Please log in and try again.");
       return;
     }
     const request = requests.find((req) => req.id === requestId);
@@ -131,7 +127,6 @@ const EmployeeViewLeave = () => {
       setDeleteRequestId(null);
     } catch (error) {
       console.error("Error deleting leave request:", error);
-      setError("Error deleting leave request. Please try again later.");
     } finally {
       setDeleting(false);
     }
@@ -160,7 +155,6 @@ const EmployeeViewLeave = () => {
       setSelectedRequest(null);
     } catch (error) {
       console.error("Error updating leave request:", error);
-      setError("Error updating leave request. Please try again later.");
     } finally {
       setEditing(false);
     }
@@ -211,7 +205,32 @@ const EmployeeViewLeave = () => {
           <Column dataField="unpaid_leave_count" caption="Unpaid Count" />
           <Column dataField="start_date" caption="Start Date" dataType="date" />
           <Column dataField="end_date" caption="End Date" dataType="date" />
-          <Column dataField="reason_for_leave" caption="Reason" />
+          <Column
+            caption="Reason"
+            width={200}
+            cellRender={({ data }) => (
+              <div>
+                {data.reason_for_leave && data.reason_for_leave.length > 18 ? (
+                  <>
+                    {expandedId === data.id
+                      ? data.reason_for_leave
+                      : `${data.reason_for_leave.slice(0, 18)}...`}
+                    <button
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        setExpandedId(expandedId === data.id ? null : data.id);
+                      }}
+                      className="ml-1 text-blue-500 text-xs font-medium hover:underline"
+                    >
+                      {expandedId === data.id ? "Show less" : "Show more"}
+                    </button>
+                  </>
+                ) : (
+                  data.reason_for_leave || "-"
+                )}
+              </div>
+            )}
+          />
           <Column dataField="total_leave_days" caption="Total Days" width={70} />
           <Column dataField="status" caption="Status" />
           <Column dataField="hr_note" caption="HR Note" />

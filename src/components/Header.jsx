@@ -7,6 +7,7 @@ import {
 } from "../../redux/actions/dev-aditya-action";
 import {
   fetchNotificationsAll,
+  GetTotalUserAction,
   unseenUserandMessagecount,
 } from "../../redux/actions/EmployeeDetailsAction";
 import api from "./api";
@@ -25,26 +26,14 @@ const Header = ({ onLogout, userRole, pendingCount }) => {
   const { loginUserProfile, loginUserData } = useSelector(
     ({ AllReducers }) => AllReducers
   );
-  const [userStatus, setUserStatus] = useState("active");
+  const {TotalUsersId} = useSelector(
+    ({ EmployeeDetailReducers }) => EmployeeDetailReducers
+  );
+  // const [userStatus, setUserStatus] = useState("active");
   const [show, setShow] = useState(false);
   const userId = localStorage.getItem("user_id");
-
-
-  useEffect(() => {
-    const fetchUserStatus = async () => {
-      try {
-        const response = await api.get(
-          `${import.meta.env.VITE_API_CUSTOM_USERS}/${userId}`
-        );
-        setUserStatus(response.data.user_state);
-      } catch (error) {
-        console.error("Error fetching user status:", error);
-      }
-    };
-
-    fetchUserStatus();
-  }, [userId]);
-
+  const userStatus = TotalUsersId?.user_state;
+    
 
   const toggleMenu = () => {
     if (window.innerWidth < 992) {
@@ -222,6 +211,10 @@ const Header = ({ onLogout, userRole, pendingCount }) => {
       </Nav.Link>
     ));
 
+    useEffect(() => {
+      dispatch(GetTotalUserAction());
+    }, [dispatch]);
+
   useEffect(() => {
     const fetchNotifications = async () => {
       try {
@@ -236,7 +229,7 @@ const Header = ({ onLogout, userRole, pendingCount }) => {
     };
 
     fetchNotifications();
-  }, []);
+  }, [dispatch]);
 
   useEffect(() => {
     if (Array.isArray(TotalNotifications)) {
@@ -263,7 +256,7 @@ const Header = ({ onLogout, userRole, pendingCount }) => {
     };
 
     fetchUnseenUserandMessegesCount();
-  }, []);
+  }, [dispatch]);
 
   useEffect(() => {
     const fetchUserProfile = async () => {

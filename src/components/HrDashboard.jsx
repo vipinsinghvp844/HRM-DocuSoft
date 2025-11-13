@@ -46,10 +46,10 @@ const HrDashboard = ({greeting}) => {
   useEffect(() => {
     try {
       const currentDate = new Date().toISOString().split("T")[0];
-      dispatch(GetEmployeeLeaveDetailAction());
-      dispatch(GetTotalUserAction());
-      dispatch(GetAttendanceDataAction(currentDate));
-      dispatch(FetchAllUserProfileAction());
+      // dispatch(GetEmployeeLeaveDetailAction());
+      // dispatch(GetTotalUserAction());
+      // dispatch(GetAttendanceDataAction(currentDate));
+      // dispatch(FetchAllUserProfileAction());
       dispatch(GetLeavePolicyAction());
       dispatch(GetOfficeShiftsAction());
     } catch (error) {
@@ -76,12 +76,12 @@ const HrDashboard = ({greeting}) => {
         <TodayOnLeave />
         <TodayAbsent />
       </div>
-      <div className="bg-white p-6 rounded-lg shadow-lg">
+      <div className="bg-white p-4 rounded-lg shadow-lg">
         <MarkAttendance userName={userName} />
       </div>
 
       <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-        <div className="bg-white rounded-xl shadow-md p-4">
+        <div className="bg-white rounded-xl shadow-md p-2">
           <CalendarComponent />
         </div>
         <div className="bg-white rounded-xl shadow-md p-4">

@@ -358,3 +358,50 @@ body.dx-device-desktop.dx-device-generic dx-license {
 
 
 }
+
+
+
+/* Tailwind FullCalendar responsive fix */
+.fc .fc-toolbar {
+  @apply flex flex-wrap justify-between items-center gap-2 p-2;
+}
+
+.fc .fc-toolbar-chunk {
+  @apply flex flex-wrap items-center gap-2;
+}
+
+/* Shrink buttons and text on small screens */
+@media (max-width: 640px) {
+  .fc-toolbar-title {
+    @apply text-base font-semibold;
+  }
+
+  .fc-button {
+    @apply px-2 py-1 text-xs;
+  }
+
+  .fc .fc-toolbar {
+    @apply flex-col items-stretch gap-2;
+  }
+
+  .fc-toolbar-chunk {
+    @apply justify-between w-full;
+  }
+
+  .fc-view-harness {
+    @apply text-xs;
+  }
+}
+
+/* Make event text wrap properly */
+.fc-event {
+  white-space: normal !important;
+  word-wrap: break-word !important;
+  line-height: 1.2;
+  font-size: 0.8rem;
+}
+
+/* Optional: round corners and smooth shadows */
+.fc {
+  @apply rounded-lg shadow-sm overflow-hidden bg-white;
+}
