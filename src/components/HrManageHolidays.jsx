@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from "react";
-import { GetHolidayAction } from "../../redux/actions/EmployeeDetailsAction";
+import { AddHolidayAction, DeleteHolidayAction, GetHolidayAction, UpdateHolidayAction } from "../../redux/actions/EmployeeDetailsAction";
 import { useDispatch, useSelector } from "react-redux";
 import api from "./api";
 import { ArrowLeftCircle } from "lucide-react";
@@ -27,32 +27,10 @@ const ManageHolidays = () => {
   const [selectedHoliday, setSelectedHoliday] = useState(null);
   const userRole = localStorage.getItem("role");
   const dispatch = useDispatch();
-  // const { TotalHolidays } = useSelector(
-  //   ({ EmployeeDetailReducers }) => EmployeeDetailReducers
-  // );
+  const { TotalHolidays } = useSelector(
+    ({ EmployeeDetailReducers }) => EmployeeDetailReducers
+  );
 
-
-  useEffect(() => {
-    fetchHolidays();
-  }, []);
-
-  const fetchHolidays = async () => {
-    try {
-      setIsLoading(true);
-      // const response = await axios.get(`${import.meta.env.VITE_API_HOLIDAYS}`, {
-      //   headers: {
-      //     Authorization: `Bearer ${localStorage.getItem("authtoken")}`,
-      //   }
-      // });
-      const response = await dispatch(GetHolidayAction());
-      // console.log(response, '=====getHoliday');
-      setHolidays(response);
-    } catch (error) {
-      console.error("Error fetching holidays:", error);
-    } finally {
-      setIsLoading(false);
-    }
-  };
 
   const handleChange = (e) => {
     const { name, value, type, checked } = e.target;
@@ -64,17 +42,11 @@ const ManageHolidays = () => {
 
   const handleAddHoliday = async (e) => {
     e.preventDefault();
+    setIsLoading(true);
     try {
-      const response = await api.post(
-        `${import.meta.env.VITE_API_HOLIDAYS}`,
-        newHoliday, {
-        headers: {
-          Authorization: `Bearer ${localStorage.getItem("authtoken")}`,
-        }
-      }
-      );
-      // console.log('Holiday added:', response.data);
-      fetchHolidays();
+      const response = await dispatch(AddHolidayAction(newHoliday, async()=>{
+        await dispatch(GetHolidayAction());
+      }));
       setNewHoliday({
         holiday_name: "",
         holiday_date: "",
@@ -84,39 +56,34 @@ const ManageHolidays = () => {
       });
     } catch (error) {
       console.error("Error adding holiday:", error);
+    }finally {
+      setIsLoading(false);
     }
   };
 
   const handleUpdateHoliday = async (id, updatedHoliday) => {
+    setIsLoading(true);
     try {
-      const response = await api.put(
-        `${import.meta.env.VITE_API_HOLIDAYS}/${id}`, {
-        headers: {
-          Authorization: `Bearer ${localStorage.getItem("authtoken")}`,
-        }
-      },
-        updatedHoliday
-      );
-      // console.log('Holiday updated:', response.data);
-      fetchHolidays();
+      const response = await dispatch(UpdateHolidayAction(id, updatedHoliday, async()=>{
+        await dispatch(GetHolidayAction());
+      }));
     } catch (error) {
       console.error("Error updating holiday:", error);
+    }finally {
+      setIsLoading(false);
     }
   };
 
   const handleDeleteHoliday = async (id) => {
+    setIsLoading(true);
     try {
-      const response = await api.delete(
-        `${import.meta.env.VITE_API_HOLIDAYS}/${id}`, {
-        headers: {
-          Authorization: `Bearer ${localStorage.getItem("authtoken")}`,
-        }
-      }
-      );
-      // console.log('Holiday deleted:', response.data);
-      fetchHolidays();
+      const response = await dispatch(DeleteHolidayAction(id, async()=>{
+        await dispatch(GetHolidayAction());
+      }));
     } catch (error) {
       console.error("Error deleting holiday:", error);
+    }finally {
+      setIsLoading(false);
     }
   };
 
@@ -234,64 +201,10 @@ const ManageHolidays = () => {
           Add Holiday
         </button>
       </form>
-
-      {/* Holiday List Table */}
-      <h3 className="text-xl md:text-2xl font-semibold text-center flex-1">Holiday List</h3>
-      {/* <div className="overflow-x-auto bg-white rounded-lg shadow p-4">
-        {isLoading ? (
-          <div className="flex justify-center items-center min-h-[200px]">
-            <LoaderSpiner />
-          </div>
-        ) : holidays.length === 0 ? (
-          <p className="text-center text-gray-500">No Holidays Available</p>
-        ) : (
-          <table className="min-w-full table-auto border border-gray-200">
-            <thead className="bg-gray-100">
-              <tr>
-                <th className="px-4 py-2 border">No.</th>
-                <th className="px-4 py-2 border">Date</th>
-                <th className="px-4 py-2 border">Holiday Name</th>
-                <th className="px-4 py-2 border">Type</th>
-                <th className="px-4 py-2 border">Actions</th>
-              </tr>
-            </thead>
-            <tbody>
-              {holidays.map((holiday, index) => (
-                <tr key={holiday.id} className="hover:bg-gray-50">
-                  <td className="px-4 py-2 border">{index + 1}</td>
-                  <td className="px-4 py-2 border">{holiday.holiday_date}</td>
-                  <td className="px-4 py-2 border">{holiday.holiday_name}</td>
-                  <td className="px-4 py-2 border">{holiday.holiday_type}</td>
-                  <td className="px-4 py-2 border flex gap-2">
-                    <button
-                      onClick={() => openModal(holiday)}
-                      className="text-yellow-500 hover:text-yellow-600 flex items-center gap-1"
-                      title="Update"
-                    >
-                      <FaEdit />
-                      <span className="hidden md:inline">Update</span>
-                    </button>
-                    {userRole !== "hr" && (
-                      <button
-                        onClick={() => handleDeleteHoliday(holiday.id)}
-                        className="text-red-600 hover:text-red-700 flex items-center gap-1"
-                        title="Delete"
-                      >
-                        <FaTrash />
-                        <span className="hidden md:inline">Delete</span>
-                      </button>
-                    )}
-                  </td>
-                </tr>
-              ))}
-            </tbody>
-          </table>
-        )}
-      </div> */}
-
+      {/* Holidays DataGrid */}
        <div className="overflow-x-auto bg-white rounded-xl shadow-md p-3">
         <DataGrid
-          dataSource={holidays}
+          dataSource={TotalHolidays}
           keyExpr="id"
           showBorders={true}
           rowAlternationEnabled={true}
@@ -416,8 +329,9 @@ const ManageHolidays = () => {
                     type="button"
                     onClick={saveModalChanges}
                     className="px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700"
+                    disabled={isLoading}
                   >
-                    Save Changes
+                    {isLoading ? "Saving..." : "Save Changes"}
                   </button>
                 </div>
               </form>

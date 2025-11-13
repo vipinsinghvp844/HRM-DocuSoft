@@ -345,6 +345,7 @@ const MarkAttendance = () => {
             showBorders
             columnAutoWidth
             wordWrapEnabled
+            noDataText="No Attendance Recorded"
             height="auto"
           >
             <Column dataField="clock_in" caption="Check In" />

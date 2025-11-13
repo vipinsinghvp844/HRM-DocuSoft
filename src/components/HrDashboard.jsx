@@ -46,10 +46,10 @@ const HrDashboard = ({greeting}) => {
   useEffect(() => {
     try {
       const currentDate = new Date().toISOString().split("T")[0];
-      dispatch(GetEmployeeLeaveDetailAction());
-      dispatch(GetTotalUserAction());
-      dispatch(GetAttendanceDataAction(currentDate));
-      dispatch(FetchAllUserProfileAction());
+      // dispatch(GetEmployeeLeaveDetailAction());
+      // dispatch(GetTotalUserAction());
+      // dispatch(GetAttendanceDataAction(currentDate));
+      // dispatch(FetchAllUserProfileAction());
       dispatch(GetLeavePolicyAction());
       dispatch(GetOfficeShiftsAction());
     } catch (error) {

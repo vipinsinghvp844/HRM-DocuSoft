@@ -11,7 +11,7 @@ function TodayAbsent() {
   const [absentUsers, setAbsentUsers] = useState([]);
   const currentDate = new Date().toISOString().split("T")[0];
 
-  const { TotalAttendance } = useSelector(
+  const { TotalAttendance, TotalEmployeeInLeave, TotalUsers } = useSelector(
     ({ EmployeeDetailReducers }) => EmployeeDetailReducers
   );
 
@@ -24,13 +24,13 @@ function TodayAbsent() {
 
   const fetchAbsentUsers = async () => {
     try {
-      const usersData = await dispatch(GetTotalUserAction());
-      const nonAdminUsers = usersData.filter(
+      // const usersData = await dispatch(GetTotalUserAction());
+      const nonAdminUsers = TotalUsers.filter(
         (user) => user.role !== "admin" && user.user_state !== "inactive"
       );
 
-      const totalLeaveUsers = await dispatch(GetEmployeeLeaveDetailAction());
-      const onLeaveUsers = totalLeaveUsers
+      // const totalLeaveUsers = await dispatch(GetEmployeeLeaveDetailAction());
+      const onLeaveUsers = TotalEmployeeInLeave
         ?.filter((leave) => {
           const startDate = new Date(leave.start_date)
             .toISOString()

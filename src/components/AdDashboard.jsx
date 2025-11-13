@@ -15,7 +15,7 @@ const AdDashboard = ({greeting}) => {
   const dispatch = useDispatch();
 
   useEffect(() => {
-    dispatch(GetEmployeeLeaveDetailAction());
+    // dispatch(GetEmployeeLeaveDetailAction());
     dispatch(GetHolidayAction());
   }, []);
   

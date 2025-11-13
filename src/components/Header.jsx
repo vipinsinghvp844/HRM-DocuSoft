@@ -7,6 +7,7 @@ import {
 } from "../../redux/actions/dev-aditya-action";
 import {
   fetchNotificationsAll,
+  GetTotalUserAction,
   unseenUserandMessagecount,
 } from "../../redux/actions/EmployeeDetailsAction";
 import api from "./api";
@@ -209,6 +210,10 @@ const Header = ({ onLogout, userRole, pendingCount }) => {
         {badge && <span className="badge bg-danger">{badge}</span>}
       </Nav.Link>
     ));
+
+    useEffect(() => {
+      dispatch(GetTotalUserAction());
+    }, [dispatch]);
 
   useEffect(() => {
     const fetchNotifications = async () => {

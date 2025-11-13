@@ -70,7 +70,7 @@ const CustomDropdown = ({ title, options, onSelect }) => {
 
 // Main Component
 const AttendanceRecord = () => {
-  const userId = sessionStorage.getItem("user_id");
+  const userId = localStorage.getItem("user_id");
   const [attendanceData, setAttendanceData] = useState([]);
   const [selectedMonth, setSelectedMonth] = useState(new Date().getMonth() + 1);
   const [selectedYear, setSelectedYear] = useState(new Date().getFullYear());
@@ -191,6 +191,7 @@ const AttendanceRecord = () => {
           const leave = leaveData.find(
             (l) => l.user_id == userId && l.start_date <= date && l.end_date >= date && l.status === "Accept"
           );
+                 
           const sunday = new Date(date).getDay() === 0;
 
           fullMonthData.push(
