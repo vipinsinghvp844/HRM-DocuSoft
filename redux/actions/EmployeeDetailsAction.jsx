@@ -454,6 +454,9 @@ export const changeReadUnreadAction =
     }
   };
 
+
+
+//chat user specific messages
 export const GetSpecificUserCahts =
   (selecteduserid, pageNum, callback) => async (dispatch) => {
     try {
@@ -478,6 +481,7 @@ export const GetSpecificUserCahts =
       console.error("Error performing action", error);
     }
   };
+  // send message to specific user
 export const messageSentSpecificUser = (payload, callback) => async () => {
   try {
     const response = await api.post(
@@ -498,6 +502,25 @@ export const messageSentSpecificUser = (payload, callback) => async () => {
     console.error("Error performing action", error);
   }
 };
+
+//message edit only self
+export const messageEditSpecificUser = (messageId, payload, callback) => async () => {
+  try {
+    const response = await api.post(
+      `${import.meta.env.VITE_API_CHATTING}/${messageId}`,
+      payload
+    );
+    if (response.data) {
+      callback(response.data);
+    }
+
+    return response.data;
+  } catch (error) {
+    console.error("Error performing action", error);
+  }
+};
+
+//get unseen user and message count
 export const unseenUserandMessagecount = (callback) => async (dispatch) => {
   try {
     const response = await api.get(
@@ -519,6 +542,7 @@ export const unseenUserandMessagecount = (callback) => async (dispatch) => {
     console.error("Error performing action", error);
   }
 };
+//read message on select user
 export const readMessageOnSelectUser = (messageIds, callback) => async () => {
   try {
     const response = await api.put(

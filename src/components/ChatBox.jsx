@@ -3,9 +3,8 @@ import ChatSidebar from "./ChatSidebar";
 import ChatWindow from "./ChatWindow";
 import { useEffect, useRef, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
-import axios from "axios";
 import EmojiPicker from "emoji-picker-react";
-import { GetTotalUserAction } from "../../redux/actions/EmployeeDetailsAction";
+import { GetTotalUserAction, messageEditSpecificUser } from "../../redux/actions/EmployeeDetailsAction";
 import {
   GetSpecificUserCahts,
   messageSentSpecificUser,
@@ -67,17 +66,7 @@ const ChatBox = () => {
 
   const handleEditMessage = async (messageId) => {
     try {
-      const response = await api.put(
-        `${import.meta.env.VITE_API_CHATTING}/${messageId}`,
-        {
-          message: editedMessage,
-        },
-        {
-          headers: {
-            Authorization: `Bearer ${localStorage.getItem("authtoken")}`,
-          },
-        }
-      );
+      const response = await dispatch(messageEditSpecificUser (messageId, editedMessage));
 
       // Update the state after success
       setMessages((prev) =>

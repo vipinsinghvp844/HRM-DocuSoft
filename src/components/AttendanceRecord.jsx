@@ -185,14 +185,15 @@ const AttendanceRecord = () => {
 
             const currentDate = new Date(date);
 
-            // Check if current date lies between start and end (inclusive)
+            // Check if current date lies between start and end 
             return currentDate >= startDate && currentDate <= endDate;
           });
           const leave = leaveData.find(
             (l) => l.user_id == userId && l.start_date <= date && l.end_date >= date && l.status === "Accept"
           );
-                 
+
           const sunday = new Date(date).getDay() === 0;
+          const today = new Date().toISOString().split("T")[0];
 
           fullMonthData.push(
             record
@@ -219,7 +220,8 @@ const AttendanceRecord = () => {
                   }
                   : sunday
                     ? {
-                      id: `holiday-${day}`,
+                      id: `sunday- 
+                      ${day}`,
                       date,
                       clock_in: "-",
                       clock_out: "-",
@@ -227,15 +229,24 @@ const AttendanceRecord = () => {
                       status: "Sunday",
                       breaks: [],
                     }
-                    : {
-                      id: `absent-${day}`,
-                      date,
-                      clock_in: "-",
-                      clock_out: "-",
-                      total_work: "-",
-                      status: "Absent",
-                      breaks: [],
-                    }
+                    : date > today
+                      ? {
+                        id: `future-${day}`,
+                        date,
+                        clock_in: "-",
+                        clock_out: "-",
+                        total_work: "-",
+                        status: "Upcoming",
+                        breaks: [],
+                      } : {
+                        id: `absent-${day}`,
+                        date,
+                        clock_in: "-",
+                        clock_out: "-",
+                        total_work: "-",
+                        status: "Absent",
+                        breaks: [],
+                      }
           );
         }
 
@@ -259,6 +270,7 @@ const AttendanceRecord = () => {
     Leave: { bg: "bg-yellow-100 text-yellow-800", row: "#fff9e6" },
     Absent: { bg: "bg-red-100 text-red-800", row: "#ffe6e6" },
     sunday: { bg: "bg-purple-100 text-purple-800", row: "#f3e6ff" },
+    Upcoming: { bg: "bg-gray-100 text-gray-800", row: "#f5f5f5" },
   };
 
   const getStatusType = (status = "") => {
@@ -266,6 +278,7 @@ const AttendanceRecord = () => {
     if (status.includes("Leave")) return "Leave";
     if (status.includes("Sunday")) return "sunday";
     if (status === "Absent") return "Absent";
+    if (status === "Upcoming") return "Upcoming";
     return "Present";
   };
 
@@ -333,7 +346,16 @@ const AttendanceRecord = () => {
           <HeaderFilter visible />
           <Paging defaultPageSize={31} />
 
-          <Column caption="#" width={50} cellRender={({ rowIndex }) => rowIndex + 1} />
+          <Column
+            caption="#"
+            width={50}
+            cellRender={({ data }) => {
+              const index = attendanceData.findIndex(
+                (item) => item.id === data.id
+              );
+              return index + 1;
+            }}
+          />
           <Column dataField="date" caption="Date" dataType="date" />
           <Column dataField="clock_in" caption="Check In" />
           <Column dataField="clock_out" caption="Check Out" />

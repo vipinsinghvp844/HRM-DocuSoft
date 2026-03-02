@@ -37,9 +37,10 @@ const ManageAttendance = () => {
     fetchEmployees();
   }, []);
 
-  const handleAttendanceDetails = async (userId) => {
+  const handleAttendanceDetails = async (userId, userName) => {
     try {
-      navigate(`/employee-attendance/${userId}`, {
+      const safeName = userName?.trim() || "Unknown";
+      navigate(`/employee-attendance/${userId}/${safeName}`, {
         state: {
           attendanceDetails: employees,
         },
@@ -121,7 +122,7 @@ const ManageAttendance = () => {
                   <Eye size={18} />
                 </button>
                 <button
-                  onClick={() => handleAttendanceDetails(data.id)}
+                  onClick={() => handleAttendanceDetails(data.id, data.first_name)}
                   className="p-2 bg-indigo-500 text-white rounded-lg shadow hover:bg-indigo-600 transition"
                   title="View Attendance Report"
                 >

@@ -10,7 +10,6 @@ import {
   Form,
   Spinner,
 } from "react-bootstrap";
-import axios from "axios";
 import { useParams } from "react-router-dom"; // Assuming you're using React Router for navigation
 import { useDispatch, useSelector } from "react-redux";
 

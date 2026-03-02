@@ -68,29 +68,17 @@ const CustomDropdown = ({ title, options, onSelect }) => {
 };
 
 const EmployeeAttendance = () => {
-  const { userId } = useParams();
+  const { userId, userName } = useParams();
   const [attendanceData, setAttendanceData] = useState([]);
   const [selectedMonth, setSelectedMonth] = useState(new Date().getMonth() + 1);
   const [selectedYear, setSelectedYear] = useState(new Date().getFullYear());
   const [workDuration, setWorkDuration] = useState({ hours: 0, minutes: 0 });
   const [breakDuration, setBreakDuration] = useState({ hours: 0, minutes: 0 });
   const [isLoading, setIsLoading] = useState(false);
-  const [holidays, setHolidays] = useState([]);
   const { TotalEmployeeInLeave, TotalHolidays } = useSelector(
     ({ EmployeeDetailReducers }) => EmployeeDetailReducers
   );
-
   const formattedMonth = padZero(selectedMonth);
-
-  // useEffect(() => {
-  //   const fetchHolidays = async () => {
-  //     try {
-  //       const res = await api.get(import.meta.env.VITE_API_HOLIDAYS);
-  //       setHolidays(res.data);
-  //     } catch (error) { }
-  //   };
-  //   fetchHolidays();
-  // }, []);
 
   useEffect(() => {
     const fetchData = async () => {
@@ -197,6 +185,7 @@ const EmployeeAttendance = () => {
             (l) => l.user_id == userId && l.start_date <= date && l.end_date >= date && l.status === "Accept"
           );
           const sunday = new Date(date).getDay() === 0;
+          const today = new Date().toISOString().split("T")[0];
 
           fullMonthData.push(
             record
@@ -223,22 +212,33 @@ const EmployeeAttendance = () => {
                   }
                   : sunday
                     ? {
-                      id: `holiday-${day}`,
+                      id: `sunday- 
+                      ${day}`,
                       date,
                       clock_in: "-",
                       clock_out: "-",
                       total_work: "-",
                       status: "Sunday",
                       breaks: [],
-                    } : {
-                      id: `absent-${day}`,
-                      date,
-                      clock_in: "-",
-                      clock_out: "-",
-                      total_work: "-",
-                      status: "Absent",
-                      breaks: [],
                     }
+                    : date > today
+                      ? {
+                        id: `future-${day}`,
+                        date,
+                        clock_in: "-",
+                        clock_out: "-",
+                        total_work: "-",
+                        status: "Upcoming",
+                        breaks: [],
+                      } : {
+                        id: `absent-${day}`,
+                        date,
+                        clock_in: "-",
+                        clock_out: "-",
+                        total_work: "-",
+                        status: "Absent",
+                        breaks: [],
+                      }
           );
         }
 
@@ -262,6 +262,8 @@ const EmployeeAttendance = () => {
     Leave: { bg: "bg-yellow-100 text-yellow-800", row: "#fff9e6" },
     Absent: { bg: "bg-red-100 text-red-800", row: "#ffe6e6" },
     sunday: { bg: "bg-purple-100 text-purple-800", row: "#f3e6ff" },
+    Upcoming: { bg: "bg-gray-100 text-gray-800", row: "#f5f5f5" },
+
   };
 
   const getStatusType = (status = "") => {
@@ -269,6 +271,8 @@ const EmployeeAttendance = () => {
     if (status.includes("Leave")) return "Leave";
     if (status.includes("Sunday")) return "sunday";
     if (status === "Absent") return "Absent";
+    if (status === "Upcoming") return "Upcoming";
+
     return "Present";
   };
 
@@ -286,7 +290,7 @@ const EmployeeAttendance = () => {
           <ArrowLeftCircle size={32} className="mr-2" />
           <span className="hidden md:inline text-lg font-semibold">Back</span>
         </button>
-        <h3 className="text-xl md:text-2xl font-semibold text-center flex-1">Attendance Records for {userId}</h3>
+        <h3 className="text-xl md:text-2xl font-semibold text-center flex-1">Attendance Records for {userName || "Unknown"}</h3>
       </div>
 
       {/* Summary */}
@@ -333,7 +337,16 @@ const EmployeeAttendance = () => {
           <HeaderFilter visible />
           <Paging defaultPageSize={31} />
 
-          <Column caption="#" width={50} cellRender={({ rowIndex }) => rowIndex + 1} />
+          <Column
+            caption="#"
+            width={50}
+            cellRender={({ data }) => {
+              const index = attendanceData.findIndex(
+                (item) => item.id === data.id
+              );
+              return index + 1;
+            }}
+          />
           <Column dataField="date" caption="Date" dataType="date" />
           <Column dataField="clock_in" caption="Check In" />
           <Column dataField="clock_out" caption="Check Out" />

@@ -32,7 +32,7 @@ const LeaveRequests = ({ setPendingCount }) => {
   );
   const dispatch = useDispatch();
   const role = localStorage.getItem("role");
-  const userName = localStorage.getItem("user_name");
+  const userId = localStorage.getItem("user_id");
   const [showDeleteModal, setShowDeleteModal] = useState(false);
   const [deleteRequest, setDeleteRequest] = useState(null);
   const [expandedId, setExpandedId] = useState(null);
@@ -77,12 +77,18 @@ const LeaveRequests = ({ setPendingCount }) => {
     const fetchAndProcessRequests = async () => {
       try {
         let fetchedRequests = [];
+console.log(TotalEmployeeInLeave);
 
         if (role === "hr") {
+          
           fetchedRequests = TotalEmployeeInLeave.filter(
-            (item) => item.user_name !== userName
+            (item) => item.user_id?.toString() !== userId?.toString()
           );
+          console.log(fetchedRequests);
+
         } else {
+          console.log("lsdhgjkdghbkjfdsg");
+
           fetchedRequests = TotalEmployeeInLeave;
         }
 
@@ -146,7 +152,7 @@ const LeaveRequests = ({ setPendingCount }) => {
     };
 
     fetchAndProcessRequests();
-  }, [TotalEmployeeInLeave, userName, role, setPendingCount]);
+  }, [TotalEmployeeInLeave, userId, role, setPendingCount]);
 
   const calculateTotalLeaveDays = (startDate, endDate) => {
     if (!startDate || !endDate) return 0; // Handle missing dates

@@ -29,8 +29,9 @@ function TodayAbsent() {
         (user) => user.role !== "admin" && user.user_state !== "inactive"
       );
 
-      // const totalLeaveUsers = await dispatch(GetEmployeeLeaveDetailAction());
-      const onLeaveUsers = TotalEmployeeInLeave
+      const totalLeaveUsers = await dispatch(GetEmployeeLeaveDetailAction());
+      
+      const onLeaveUsers = totalLeaveUsers
         ?.filter((leave) => {
           const startDate = new Date(leave.start_date)
             .toISOString()

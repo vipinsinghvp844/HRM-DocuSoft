@@ -305,7 +305,7 @@ function App() {
                     }
                   />
                   <Route
-                    path="/employee-attendance/:userId"
+                    path="/employee-attendance/:userId/:userName?"
                     element={
                       <ProtectedRoute
                         element={EmployeeAttDetails}
